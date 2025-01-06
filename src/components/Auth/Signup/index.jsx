@@ -314,7 +314,7 @@ export default function Signup() {
             <div className="flex-1 lg:flex hidden transform scale-60 xl:scale-100   xl:justify-center">
               <div
                 className="absolute xl:-right-20 -right-[138px]"
-                style={{ top: "calc(50% - 258px)" }}
+                style={{ top: "calc(50% - 248px)" }}
               >
                 <Thumbnail />
               </div>

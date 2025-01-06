@@ -3,12 +3,45 @@ import InputCom from "../../Helpers/InputCom";
 import Layout from "../../Partials/Layout";
 import Thumbnail from "./Thumbnail";
 import { Link } from "react-router-dom";
-
+import { doc, setDoc ,getDoc} from "firebase/firestore";
+import { db } from "../../firebse";
 export default function Login() {
   const [checked, setValue] = useState(false);
   const rememberMe = () => {
     setValue(!checked);
   };
+  const loginUser = async () => {
+    const email = document.getElementById("email")?.value.trim();
+    const password = document.getElementById("password")?.value.trim();
+    const sanitizedEmail = email.replace(/\ /g, "_");
+  
+    if (!email || !password) {
+      alert("Please enter both email and password.");
+      return;
+    }
+  
+    try {
+      // Fetch the user details from Firestore
+      const docRef = doc(db, "users", sanitizedEmail);
+      const docSnap = await getDoc(docRef);
+  
+      if (docSnap.exists()) {
+        const userData = docSnap.data();
+        // Check if the password matches
+        if (userData.password === password) {
+          alert("Login successful!");
+        } else {
+          alert("Incorrect password. Please try again.");
+        }
+      } else {
+        alert("No account found with this email. Please sign up.");
+      }
+    } catch (error) {
+      console.error("Error logging in:", error);
+      alert("Failed to log in. Please try again.");
+    }
+  };
+  
   return (
     <Layout childrenClasses="pt-0 pb-0">
       <div className="login-page-wrapper w-full py-10">
@@ -93,7 +126,7 @@ export default function Login() {
                   <div className="signin-area mb-3.5">
                     <div className="flex justify-center">
                       <button
-                        type="button"
+                        type="button" onClick={loginUser}
                         className="black-btn mb-6 text-sm text-white w-full h-[50px] font-semibold flex justify-center bg-purple items-center"
                       >
                         <span>Log In</span>
