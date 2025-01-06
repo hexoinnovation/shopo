@@ -4,8 +4,9 @@ import Layout from "../../Partials/Layout";
 import Thumbnail from "./Thumbnail";
 import { Link } from "react-router-dom";
 import { doc, setDoc } from "firebase/firestore";
-import { db } from "../../firebse";
-
+import { db,auth } from "../../firebse";
+import Swal from 'sweetalert2';
+import { createUserWithEmailAndPassword } from "firebase/auth";
 export default function Signup() {
   const [checked, setValue] = useState(false);
 
@@ -40,6 +41,8 @@ export default function Signup() {
   const rememberMe = () => {
     setValue(!checked);
   };
+  
+
   const saveUserDetails = async () => {
     // Extract values from input fields
     const fname = document.getElementById("fname")?.value.trim();
@@ -49,19 +52,23 @@ export default function Signup() {
     const phone = document.getElementById("phone")?.value.trim();
     const address = document.getElementById("address")?.value.trim();
     const postcode = document.getElementById("postcode")?.value.trim();
-    const sanitizedEmail = email.replace(/\ /g, "_");
+  
     // Validate extracted values
-    if (!fname || !lname || !email || !phone || !address || !postcode) {
-      alert("Please fill in all fields.");
+    if (!fname || !lname || !email || !password || !phone || !address || !postcode) {
+      Swal.fire({
+        icon: "warning",
+        title: "Incomplete Information",
+        text: "Please fill in all fields.",
+      });
       return;
     }
   
+    const sanitizedEmail = email.replace(/\ /g, "_");
   
     const userDetails = {
       firstName: fname,
       lastName: lname,
       email,
-      password,
       phone,
       country: selectedCountry,
       town: selectedTowns,
@@ -69,18 +76,31 @@ export default function Signup() {
       postcode,
     };
   
-    console.log("Saving user details:", userDetails);
-  
     try {
-      
-        await setDoc(doc(db, "users", sanitizedEmail), userDetails);
-      alert("User details saved successfully!");
+      // Create user in Firebase Auth
+      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+      const user = userCredential.user;
+  
+      console.log("User created in Firebase Auth:", user);
+  
+      // Save additional user details in Firestore
+      await setDoc(doc(db, "users", sanitizedEmail), userDetails);
+  
+      Swal.fire({
+        icon: "success",
+        title: "Signup Successful",
+        text: "User details saved successfully!",
+      });
     } catch (error) {
-      console.error("Error saving user details:", error);
-      alert("Failed to save user details.");
+      console.error("Error during signup:", error);
+  
+      Swal.fire({
+        icon: "error",
+        title: "Signup Failed",
+        text: error.message || "Failed to create an account. Please try again.",
+      });
     }
   };
-  
   
   return (
     <Layout childrenClasses="pt-0 pb-0">

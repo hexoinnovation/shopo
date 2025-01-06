@@ -4,41 +4,57 @@ import Layout from "../../Partials/Layout";
 import Thumbnail from "./Thumbnail";
 import { Link } from "react-router-dom";
 import { doc, setDoc ,getDoc} from "firebase/firestore";
-import { db } from "../../firebse";
+import { db,app } from "../../firebse";
+import Swal from 'sweetalert2';
+import { signInWithEmailAndPassword ,getAuth} from "firebase/auth";
 export default function Login() {
   const [checked, setValue] = useState(false);
   const rememberMe = () => {
     setValue(!checked);
   };
+  const auth=getAuth(app)
   const loginUser = async () => {
     const email = document.getElementById("email")?.value.trim();
     const password = document.getElementById("password")?.value.trim();
-    const sanitizedEmail = email.replace(/\ /g, "_");
   
     if (!email || !password) {
-      alert("Please enter both email and password.");
+      Swal.fire({
+        icon: "warning",
+        title: "Missing Information",
+        text: "Please enter both email and password.",
+      });
       return;
     }
   
     try {
-      // Fetch the user details from Firestore
+      // Sign in with Firebase Authentication
+      await signInWithEmailAndPassword(auth, email, password);
+  
+      // Fetch additional user details from Firestore (optional)
+      const sanitizedEmail = email.replace(/\ /g, "_");
       const docRef = doc(db, "users", sanitizedEmail);
       const docSnap = await getDoc(docRef);
   
       if (docSnap.exists()) {
-        const userData = docSnap.data();
-        // Check if the password matches
-        if (userData.password === password) {
-          alert("Login successful!");
-        } else {
-          alert("Incorrect password. Please try again.");
-        }
+        Swal.fire({
+          icon: "success",
+          title: "Login Successful",
+          text: `Welcome back, ${docSnap.data().name || "User"}!`,
+        });
       } else {
-        alert("No account found with this email. Please sign up.");
+        Swal.fire({
+          icon: "info",
+          title: "Account Not Found",
+          text: "No additional details found for this account.",
+        });
       }
     } catch (error) {
       console.error("Error logging in:", error);
-      alert("Failed to log in. Please try again.");
+      Swal.fire({
+        icon: "error",
+        title: "Login Failed",
+        text: "Invalid email or password. Please try again.",
+      });
     }
   };
   
