@@ -1306,7 +1306,7 @@ export default function Navbar({ className, type }) {
             </div>
             <div className="become-seller-btn">
               <Link to="/login">
-                <div className="black-btn w-[161px] h-[40px] flex justify-center items-center cursor-pointer">
+                <div className="black-btn  ml-16 w-[161px] h-[40px] flex justify-center items-center cursor-pointer">
                   <div className="flex space-x-2 items-center">
                     <span className="text-sm font-600">Login</span>
                     <span>
@@ -1341,7 +1341,7 @@ export default function Navbar({ className, type }) {
             </div>
             <div className="become-seller-btn">
               <Link to="/become-saller">
-                <div className="black-btn w-[161px] h-[40px] flex justify-center items-center cursor-pointer">
+                <div className="black-btn ml-16 w-[161px] h-[40px] flex justify-center items-center cursor-pointer">
                   <div className="flex space-x-2 items-center">
                     <span className="text-sm font-600">Become a Seller</span>
                     <span>
