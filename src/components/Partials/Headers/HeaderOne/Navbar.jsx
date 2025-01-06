@@ -894,7 +894,7 @@ export default function Navbar({ className, type }) {
                                           : "hover:text-qyellow hover:border-qyellow"
                                       }`}
                                     >
-                                      Shop Fullwidth
+                                      Mobile & Laptops
                                     </span>
                                   </Link>
                                 </li>
@@ -907,7 +907,7 @@ export default function Navbar({ className, type }) {
                                           : "hover:text-qyellow hover:border-qyellow"
                                       }`}
                                     >
-                                      Shop Category Icon
+                                      Gaming Entertainment
                                     </span>
                                   </Link>
                                 </li>
@@ -920,7 +920,7 @@ export default function Navbar({ className, type }) {
                                           : "hover:text-qyellow hover:border-qyellow"
                                       }`}
                                     >
-                                      Shop Category Icon
+                                      Image & Video
                                     </span>
                                   </Link>
                                 </li>
@@ -933,10 +933,102 @@ export default function Navbar({ className, type }) {
                                           : "hover:text-qyellow hover:border-qyellow"
                                       }`}
                                     >
-                                      Shop List View
+                                      Vehicles
                                     </span>
                                   </Link>
                                 </li>
+                                <li>
+                                  <Link to="/all-products">
+                                    <span
+                                      className={`text-qgray text-sm font-400 border-b border-transparent   ${
+                                        type === 3
+                                          ? "hover:text-qh3-blue hover:border-qh3-blue"
+                                          : "hover:text-qyellow hover:border-qyellow"
+                                      }`}
+                                    >
+                                      Furnitures
+                                    </span>
+                                  </Link>
+                                </li>
+                                <li>
+                                  <Link to="/all-products">
+                                    <span
+                                      className={`text-qgray text-sm font-400 border-b border-transparent   ${
+                                        type === 3
+                                          ? "hover:text-qh3-blue hover:border-qh3-blue"
+                                          : "hover:text-qyellow hover:border-qyellow"
+                                      }`}
+                                    >
+                                      Sport
+                                    </span>
+                                  </Link>
+                                </li>
+                                <li>
+                                  <Link to="/all-products">
+                                    <span
+                                      className={`text-qgray text-sm font-400 border-b border-transparent   ${
+                                        type === 3
+                                          ? "hover:text-qh3-blue hover:border-qh3-blue"
+                                          : "hover:text-qyellow hover:border-qyellow"
+                                      }`}
+                                    >
+                                      Food & Drinks
+                                    </span>
+                                  </Link>
+                                </li>
+                                <li>
+                                  <Link to="/all-products">
+                                    <span
+                                      className={`text-qgray text-sm font-400 border-b border-transparent   ${
+                                        type === 3
+                                          ? "hover:text-qh3-blue hover:border-qh3-blue"
+                                          : "hover:text-qyellow hover:border-qyellow"
+                                      }`}
+                                    >
+                                      Fashion Accessories
+                                    </span>
+                                  </Link>
+                                </li>
+                                <li>
+                                  <Link to="/all-products">
+                                    <span
+                                      className={`text-qgray text-sm font-400 border-b border-transparent   ${
+                                        type === 3
+                                          ? "hover:text-qh3-blue hover:border-qh3-blue"
+                                          : "hover:text-qyellow hover:border-qyellow"
+                                      }`}
+                                    >
+                                      Toilet & Sanitation
+                                    </span>
+                                  </Link>
+                                </li>
+                                <li>
+                                  <Link to="/all-products">
+                                    <span
+                                      className={`text-qgray text-sm font-400 border-b border-transparent   ${
+                                        type === 3
+                                          ? "hover:text-qh3-blue hover:border-qh3-blue"
+                                          : "hover:text-qyellow hover:border-qyellow"
+                                      }`}
+                                    >
+                                      Makeup Corner
+                                    </span>
+                                  </Link>
+                                </li>
+                                <li>
+                                  <Link to="/all-products">
+                                    <span
+                                      className={`text-qgray text-sm font-400 border-b border-transparent   ${
+                                        type === 3
+                                          ? "hover:text-qh3-blue hover:border-qh3-blue"
+                                          : "hover:text-qyellow hover:border-qyellow"
+                                      }`}
+                                    >
+                                      Baby Items
+                                    </span>
+                                  </Link>
+                                </li>
+                                
                               </ul>
                             </div>
                           </div>
@@ -1211,6 +1303,41 @@ export default function Navbar({ className, type }) {
                   </li>
                 </ul>
               </div>
+            </div>
+            <div className="become-seller-btn">
+              <Link to="/login">
+                <div className="black-btn w-[161px] h-[40px] flex justify-center items-center cursor-pointer">
+                  <div className="flex space-x-2 items-center">
+                    <span className="text-sm font-600">Login</span>
+                    <span>
+                      <svg
+                        className="fill-current"
+                        width="6"
+                        height="10"
+                        viewBox="0 0 6 10"
+                        fill="none"
+                        xmlns="http://www.w3.org/2000/svg"
+                      >
+                        <rect
+                          x="1.08984"
+                          width="6.94106"
+                          height="1.54246"
+                          transform="rotate(45 1.08984 0)"
+                          fill="white"
+                        />
+                        <rect
+                          x="6"
+                          y="4.9082"
+                          width="6.94106"
+                          height="1.54246"
+                          transform="rotate(135 6 4.9082)"
+                          fill="white"
+                        />
+                      </svg>
+                    </span>
+                  </div>
+                </div>
+              </Link>
             </div>
             <div className="become-seller-btn">
               <Link to="/become-saller">
