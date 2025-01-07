@@ -69,6 +69,7 @@ export default function Signup() {
       firstName: fname,
       lastName: lname,
       email,
+      password,
       phone,
       country: selectedCountry,
       town: selectedTowns,
