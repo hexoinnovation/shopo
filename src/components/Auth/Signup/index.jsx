@@ -153,47 +153,49 @@ export default function Signup() {
                     />
                   </div>
 
-                  <div className="input-item mb-5">
-  <h6 className="input-label text-qgray capitalize text-[13px] font-normal block mb-2">
-    Country*
-  </h6>
-  <div
-    className="w-full h-[50px] border border-[#EDEDED] px-5 flex justify-between items-center mb-2 cursor-pointer"
-    onClick={toggleCountryDropdown}
-  >
-    <span className="text-[13px] text-qgraytwo">{selectedCountry}</span>
-    <span>
-      <svg
-        width="11"
-        height="7"
-        viewBox="0 0 11 7"
-        fill="none"
-        xmlns="http://www.w3.org/2000/svg"
-      >
-        <path
-          d="M5.4 6.8L0 1.4L1.4 0L5.4 4L9.4 0L10.8 1.4L5.4 6.8Z"
-          fill="#222222"
-        />
-      </svg>
-    </span>
-  </div>
-  {isCountryDropdownOpen && (
-    <ul className="border border-[#EDEDED] bg-white mt-1 max-h-40 overflow-y-auto">
-      {countries.map((country, index) => (
-        <li
-          key={index}
-          className="px-5 py-2 text-[13px] text-qgray hover:bg-gray-100 cursor-pointer"
-          onClick={() => selectCountry(country)}
+                  <div className="flex flex-wrap sm:space-x-5 space-y-5 sm:space-y-0 mb-5">
+  {/* Country Dropdown */}
+  <div className="w-full sm:w-1/2">
+    <h6 className="input-label text-qgray capitalize text-[13px] font-normal block mb-2">
+      Country*
+    </h6>
+    <div
+      className="w-full h-[50px] border border-[#EDEDED] px-5 flex justify-between items-center mb-2 cursor-pointer"
+      onClick={toggleCountryDropdown}
+    >
+      <span className="text-[13px] text-qgraytwo">{selectedCountry}</span>
+      <span>
+        <svg
+          width="11"
+          height="7"
+          viewBox="0 0 11 7"
+          fill="none"
+          xmlns="http://www.w3.org/2000/svg"
         >
-          {country}
-        </li>
-      ))}
-    </ul>
-  )}
-</div>
+          <path
+            d="M5.4 6.8L0 1.4L1.4 0L5.4 4L9.4 0L10.8 1.4L5.4 6.8Z"
+            fill="#222222"
+          />
+        </svg>
+      </span>
+    </div>
+    {isCountryDropdownOpen && (
+      <ul className="border border-[#EDEDED] bg-white mt-1 max-h-40 overflow-y-auto">
+        {countries.map((country, index) => (
+          <li
+            key={index}
+            className="px-5 py-2 text-[13px] text-qgray hover:bg-gray-100 cursor-pointer"
+            onClick={() => selectCountry(country)}
+          >
+            {country}
+          </li>
+        ))}
+      </ul>
+    )}
+  </div>
 
-<div className="flex sm:flex-row flex-col space-y-5 sm:space-y-0 sm:space-x-5 mb-5">
-  <div className="w-1/2">
+  {/* Town / City Dropdown */}
+  <div className="w-full sm:w-1/2">
     <h6 className="input-label text-qgray capitalize text-[13px] font-normal block mb-2">
       Town / City*
     </h6>
