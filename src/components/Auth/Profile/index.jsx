@@ -22,11 +22,18 @@ import ProfileTab from "./tabs/ProfileTab";
 import ReviewTab from "./tabs/ReviewTab";
 import SupportTab from "./tabs/SupportTab";
 import WishlistTab from "./tabs/WishlistTab";
+import { useNavigate } from "react-router-dom";
+
+import {
+  LogoutIcon,
+} from "@heroicons/react/solid"; // Importing icons from Heroicons
+import { signInWithEmailAndPassword ,getAuth,signOut} from "firebase/auth";
 
 export default function Profile() {
   const [switchDashboard, setSwitchDashboard] = useState(false);
   const location = useLocation();
   const getHashContent = location.hash.split("#");
+  const auth = getAuth(); // Initialize Firebase auth
   const [active, setActive] = useState("dashboard");
   useEffect(() => {
     setActive(
@@ -35,6 +42,34 @@ export default function Profile() {
         : "dashboard"
     );
   }, [getHashContent]);
+
+  const navigate = useNavigate();
+const [logout,setlogout] = useState("");
+const handleLogout = async () => {
+  try {
+    await signOut(auth);
+    console.log("User logged out successfully");
+    navigate("/login");
+  } catch (error) {
+    console.error("Error logging out:", error);
+  }
+};
+  // const handleLogout = async () => {
+  //   const isConfirmed = window.confirm("Are you sure you want to log out?");
+  
+  //   if (isConfirmed) {
+  //     await logout(); 
+  //     resetUserData(); 
+  //     alert("Logout successful! Please login to access your details.");
+  //     localStorage.removeItem("isAuthenticated");
+  //     localStorage.removeItem("username");
+  //     localStorage.removeItem("userEmail");
+  //     setIsAuthenticated(false); 
+  //     setDropdownOpen(false); 
+  //     window.location.reload(); 
+  //   }
+  // };
+
   return (
     <Layout childrenClasses="pt-0 pb-0">
       <div className="profile-page-wrapper w-full">
@@ -182,9 +217,12 @@ export default function Profile() {
                           <span>
                             <IcoLogout />
                           </span>
-                          <span className=" font-normal text-base">
-                            Logoout
-                          </span>
+                          <button
+                      onClick={handleLogout}
+                      className="flex items-center px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700"
+                    >
+                      Logout
+                    </button>
                         </div>
                       </Link>
                     </div>
