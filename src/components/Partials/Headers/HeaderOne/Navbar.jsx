@@ -1,6 +1,9 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import Arrow from "../../../Helpers/icons/Arrow";
+import { auth, onAuthStateChanged } from "../../../firebse"; // Adjust the path accordingly
+import { doc, getDoc} from "firebase/firestore";
+import { db,app } from "../../../firebse";
 
 export default function Navbar({ className, type }) {
   const [categoryToggle, setToggle] = useState(false);
@@ -22,6 +25,38 @@ export default function Navbar({ className, type }) {
       setSize(`0px`);
     }
   }, [categoryToggle]);
+
+  const [user, setUser] = useState(null);
+  const [userDetails, setUserDetails] = useState(null);
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+      if (currentUser) {
+        setUser(currentUser);
+        fetchPersonalInfo(currentUser.email); // Fetch additional user data
+      } else {
+        setUser(null);
+      }
+    });
+  
+    return () => unsubscribe(); // Clean up the listener on unmount
+  }, []);
+
+  const fetchPersonalInfo = async (email) => {
+    try {
+      const sanitizedEmail = email.replace(/\ /g, "_");
+      const userDoc = await getDoc(doc(db, "users", sanitizedEmail));
+  
+      if (userDoc.exists()) {
+        const userData = userDoc.data();
+        setUserDetails(userData); // Save user details in state
+      } else {
+        console.log("No such user data found in Firestore.");
+      }
+    } catch (error) {
+      console.error("Error fetching user details:", error);
+    }
+  };
+
 
   return (
     <div
@@ -1305,40 +1340,48 @@ export default function Navbar({ className, type }) {
               </div>
             </div>
             <div className="become-seller-btn">
-              <Link to="/login">
-                <div className="black-btn  ml-16 w-[161px] h-[40px] flex justify-center items-center cursor-pointer">
-                  <div className="flex space-x-2 items-center">
-                    <span className="text-sm font-600">Login</span>
-                    <span>
-                      <svg
-                        className="fill-current"
-                        width="6"
-                        height="10"
-                        viewBox="0 0 6 10"
-                        fill="none"
-                        xmlns="http://www.w3.org/2000/svg"
-                      >
-                        <rect
-                          x="1.08984"
-                          width="6.94106"
-                          height="1.54246"
-                          transform="rotate(45 1.08984 0)"
-                          fill="white"
-                        />
-                        <rect
-                          x="6"
-                          y="4.9082"
-                          width="6.94106"
-                          height="1.54246"
-                          transform="rotate(135 6 4.9082)"
-                          fill="white"
-                        />
-                      </svg>
-                    </span>
-                  </div>
-                </div>
-              </Link>
-            </div>
+  {userDetails ? (
+    <div className="black-btn ml-12 w-[161px] h-[40px] flex justify-center items-center cursor-pointer">
+      <div className="flex space-x-2 items-center">
+        <span className="text-sm font-600">Welcome, {userDetails.firstName}</span>
+      </div>
+    </div>
+  ) : (
+    <Link to="/login">
+      <div className="black-btn ml-12 w-[161px] h-[40px] flex justify-center items-center cursor-pointer">
+        <div className="flex space-x-2 items-center">
+          <span className="text-sm font-600">Login</span>
+          <span>
+            <svg
+              className="fill-current"
+              width="6"
+              height="10"
+              viewBox="0 0 6 10"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <rect
+                x="1.08984"
+                width="6.94106"
+                height="1.54246"
+                transform="rotate(45 1.08984 0)"
+                fill="white"
+              />
+              <rect
+                x="6"
+                y="4.9082"
+                width="6.94106"
+                height="1.54246"
+                transform="rotate(135 6 4.9082)"
+                fill="white"
+              />
+            </svg>
+          </span>
+        </div>
+      </div>
+    </Link>
+  )}
+</div>
             <div className="become-seller-btn">
               <Link to="/become-saller">
                 <div className="black-btn ml-16 w-[161px] h-[40px] flex justify-center items-center cursor-pointer">
