@@ -7,16 +7,20 @@ import { doc, setDoc ,getDoc} from "firebase/firestore";
 import { db,app } from "../../firebse";
 import Swal from 'sweetalert2';
 import { signInWithEmailAndPassword ,getAuth} from "firebase/auth";
+import { useNavigate } from "react-router-dom"; // Import useNavigate at the top
+
 export default function Login() {
   const [checked, setValue] = useState(false);
   const rememberMe = () => {
     setValue(!checked);
   };
   const auth=getAuth(app)
+  const navigate = useNavigate(); // Initialize useNavigate
+
   const loginUser = async () => {
     const email = document.getElementById("email")?.value.trim();
     const password = document.getElementById("password")?.value.trim();
-  
+
     if (!email || !password) {
       Swal.fire({
         icon: "warning",
@@ -25,27 +29,31 @@ export default function Login() {
       });
       return;
     }
-  
+
     try {
       // Sign in with Firebase Authentication
       await signInWithEmailAndPassword(auth, email, password);
-  
+
       // Fetch additional user details from Firestore (optional)
       const sanitizedEmail = email.replace(/\ /g, "_");
       const docRef = doc(db, "users", sanitizedEmail);
       const docSnap = await getDoc(docRef);
-  
+
       if (docSnap.exists()) {
         Swal.fire({
           icon: "success",
           title: "Login Successful",
           text: `Welcome back, ${docSnap.data().name || "User"}!`,
+        }).then(() => {
+          navigate("/"); // Redirect to the Home page after clicking OK
         });
       } else {
         Swal.fire({
           icon: "info",
           title: "Account Not Found",
           text: "No additional details found for this account.",
+        }).then(() => {
+          navigate("/"); // Redirect to the Home page after clicking OK
         });
       }
     } catch (error) {
@@ -142,7 +150,7 @@ export default function Login() {
                   <div className="signin-area mb-3.5">
                     <div className="flex justify-center">
                       <button
-                        type="button" onClick={loginUser}
+                        type="button"  onClick={loginUser}
                         className="black-btn mb-6 text-sm text-white w-full h-[50px] font-semibold flex justify-center bg-purple items-center"
                       >
                         <span>Log In</span>
