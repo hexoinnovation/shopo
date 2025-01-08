@@ -1,6 +1,9 @@
-import React, { useState } from "react";
+import React, { useState,useEffect,useRef } from "react";
 import PasswordSvg from "./PasswordSvg";
-
+import { doc, setDoc,getDoc } from "firebase/firestore";
+import { db,auth } from "../../../firebse";
+import Swal from 'sweetalert2';
+import { reauthenticateWithCredential, EmailAuthProvider, updatePassword } from 'firebase/auth'; 
 export default function PasswordTab() {
   const [oldPass, setOldPass] = useState("hide-password");
   const [newPass, setNewPass] = useState("hide-password");
@@ -35,7 +38,100 @@ export default function PasswordTab() {
       }
     }
   };
+  const formRef = useRef();
+
+  const handleCancel = () => {
+    formRef.current.reset();
+  };
+  const fetchUserDetails = async () => {
+    const user = auth.currentUser;
+    if (user) {
+      const userDocRef = doc(db, "users", user.email.replace(/\ /g, "_"));
+      const docSnap = await getDoc(userDocRef);
+      if (docSnap.exists()) {
+        const userDetails = docSnap.data();
+        document.getElementById("old_password").value = userDetails.password;
+      } else {
+        console.error("No such document!");
+      }
+    }
+  };
+  
+  useEffect(() => {
+    fetchUserDetails();
+  }, []);
+  
+  const saveUserDetails = async () => {
+    const oldPassword = document.getElementById("old_password").value.trim();
+    const newPassword = document.getElementById("new_password").value.trim();
+    const confirmPassword = document.getElementById("confirm_password").value.trim();
+  
+    if (!oldPassword || !newPassword || !confirmPassword) {
+      Swal.fire({
+        icon: "warning",
+        title: "Incomplete Information",
+        text: "Please fill in all fields.",
+      });
+      return;
+    }
+  
+    if (newPassword !== confirmPassword) {
+      Swal.fire({
+        icon: "warning",
+        title: "Passwords do not match",
+        text: "Please make sure the new password and confirm password are the same.",
+      });
+      return;
+    }
+  
+    const user = auth.currentUser;
+  
+    if (user) {
+      const userDocRef = doc(db, "users", user.email.replace(/\ /g, "_"));
+      const docSnap = await getDoc(userDocRef);
+  
+      if (docSnap.exists()) {
+        const userDetails = docSnap.data();
+  
+        if (oldPassword !== userDetails.password) {
+          Swal.fire({
+            icon: "warning",
+            title: "Old Password Incorrect",
+            text: "The old password entered does not match.",
+          });
+          return;
+        }
+  
+        try {
+          // Re-authenticate the user with their email and old password
+          const credential = EmailAuthProvider.credential(user.email, oldPassword);
+          await reauthenticateWithCredential(user, credential);
+  
+          // Now that the user is reauthenticated, update the password
+          await updatePassword(user, newPassword);
+  
+          // Update Firestore with the new password
+          await setDoc(userDocRef, { ...userDetails, password: newPassword });
+  
+          Swal.fire({
+            icon: "success",
+            title: "Password Updated Successfully",
+            text: "Your password has been updated.",
+          });
+        } catch (error) {
+          console.error("Error updating password:", error);
+          Swal.fire({
+            icon: "error",
+            title: "Update Failed",
+            text: "An error occurred while updating the password. Please try again.",
+          });
+        }
+      }
+    }
+  };
+  
   return (
+    <form ref={formRef}>
     <div className="changePasswordTab w-full">
       <div className="w-full flex xl:flex-row flex-col-reverse space-x-5 xl:items-center">
         <div className="w-[397px] mb-10">
@@ -255,13 +351,13 @@ export default function PasswordTab() {
           <div className="w-full mt-[30px] flex justify-start">
             <div className="sm:flex sm:space-x-[30px] items-center">
               <div className="w-[180px] h-[50px]">
-                <button type="button" className="yellow-btn">
+                <button type="button"onClick={saveUserDetails} className="yellow-btn">
                   <div className="w-full text-sm font-semibold">
                     Upldate Password
                   </div>
                 </button>
               </div>
-              <button type="button">
+              <button type="button" onClick={handleCancel}>
                 <div className="w-full text-sm font-semibold text-qblack mb-5 sm:mb-0">
                   Cancel
                 </div>
@@ -274,5 +370,6 @@ export default function PasswordTab() {
         </div>
       </div>
     </div>
+    </form>
   );
 }

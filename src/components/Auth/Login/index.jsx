@@ -43,7 +43,7 @@ export default function Login() {
         Swal.fire({
           icon: "success",
           title: "Login Successful",
-          text: `Welcome back, ${docSnap.data().name || "User"}!`,
+          text: `Welcome back, ${docSnap.data().firstName || "User"}!`,
         }).then(() => {
           navigate("/"); // Redirect to the Home page after clicking OK
         });
