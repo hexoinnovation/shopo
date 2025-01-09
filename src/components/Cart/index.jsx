@@ -1,4 +1,4 @@
-import { getFirestore, doc, onSnapshot, deleteDoc ,setDoc} from "firebase/firestore";
+import { getFirestore, doc, onSnapshot, setDoc, collection } from "firebase/firestore";
 import { useState, useEffect } from "react";
 import { getAuth } from "firebase/auth";
 
@@ -8,24 +8,42 @@ export default function Cart({ className, type }) {
   const db = getFirestore();
   const user = auth.currentUser;
 
-  useEffect(() => {
-    if (user) {
-      const sanitizedEmail = user.email ? user.email.replace(/\ /g, "_") : "unknown_user";
-      const cartRef = doc(db, "users", sanitizedEmail, "cart", "1"); // Replace with your actual document ID (could be user-specific)
-      const unsubscribe = onSnapshot(cartRef, (docSnapshot) => {
-        const cartData = docSnapshot.data();
-        setCartItems(cartData ? cartData.items : []);
-      });
+ 
+    useEffect(() => {
+      if (user) {
+        const sanitizedEmail = user.email ? user.email.replace(/\ /g, "_") : "unknown_user";
+  
+        // Reference to the 'cart' collection for the specific user
+        const cartRef = collection(db, "users", sanitizedEmail, "cart");
+  
+        // Listen to all documents in the 'cart' collection
+        const unsubscribe = onSnapshot(cartRef, (querySnapshot) => {
+          const items = [];
+          querySnapshot.forEach((doc) => {
+            const data = doc.data();
+            items.push(...data.items); // Assuming each document has an items array
+          });
+          setCartItems(items);
+        });
+  
+        return () => unsubscribe();
+      }
+    }, [user, db]);
 
-      return () => unsubscribe();
-    }
-  }, [user, db]);
+    const getImageSource = (image) => {
+      if (typeof image === "string" && (image.startsWith("data:image/") || image.startsWith("http"))) {
+        return image; // Return the image directly if valid
+      }
+      return "default-image-path.jpg"; // Default image for invalid cases
+    };
+    
 
+  // Handle removing items from the cart
   const handleRemoveItem = async (itemId) => {
     if (user) {
-      const sanitizedEmail = user.email ? user.email.replace(/\ /g, "_") : "unknown_user";
+      const sanitizedEmail = user.email ? user.email.replace(/\./g, "_") : "unknown_user";
       const cartRef = doc(db, "users", sanitizedEmail, "cart", "1"); // Replace with correct cart path
-      const updatedItems = cartItems.filter(item => item.id !== itemId);
+      const updatedItems = cartItems.filter((item) => item.id !== itemId);
 
       // Update the cart with the removed item
       await setDoc(cartRef, { items: updatedItems });
@@ -47,7 +65,7 @@ export default function Cart({ className, type }) {
                   <div className="flex space-x-[6px] justify-center items-center px-4 my-[20px]">
                     <div className="w-[65px] h-full">
                       <img
-                        src={item.src || "default-image-path.jpg"}
+                        src={getImageSource(item.image)}
                         alt={item.title || "Product Image"}
                         className="w-full h-full object-contain"
                       />
@@ -68,8 +86,8 @@ export default function Cart({ className, type }) {
                     onClick={() => handleRemoveItem(item.id)} // Remove item when clicked
                   >
                     <svg
-                      width="14" 
-  height="14"
+                      width="14"
+                      height="14"
                       viewBox="0 0 8 8"
                       fill="none"
                       className="inline fill-current text-[#AAAAAA] hover:text-qred"
@@ -82,12 +100,12 @@ export default function Cart({ className, type }) {
               ))
             ) : (
               <li className="empty-cart flex justify-center items-center h-80 bg-gray-100 rounded-lg shadow-lg hover:shadow-2xl transition-all duration-300 ease-in-out cursor-pointer animate-bounce">
-              <img
-                src="empty.png" // Replace with your image URL
-                alt="Empty Cart"
-                className="empty-cart-image max-w-xs max-h-full object-contain transition-all duration-300 ease-in-out hover:scale-110"
-              />
-            </li>
+                <img
+                  src="empty.png" // Replace with your empty cart image URL
+                  alt="Empty Cart"
+                  className="empty-cart-image max-w-xs max-h-full object-contain transition-all duration-300 ease-in-out hover:scale-110"
+                />
+              </li>
             )}
           </ul>
         </div>

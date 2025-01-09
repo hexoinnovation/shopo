@@ -3,7 +3,8 @@ import Star from "../Helpers/icons/Star";
 import Selectbox from "../Helpers/Selectbox";
 import { getFirestore, doc, updateDoc, arrayUnion,getDoc,setDoc, } from "firebase/firestore";
 import { getAuth } from "firebase/auth";
-
+import { updateWishlist } from "../Partials/Headers/HeaderOne/wishlistUtils";
+import { useNavigate } from "react-router-dom";
 const handleAddToCart = async (product) => {
   if (!product.id || !product.name || !product.src || !product.title || !product.category || !product.description || !product.price) {
     console.error("Missing product fields", product);
@@ -25,31 +26,34 @@ const handleAddToCart = async (product) => {
           if (!res.ok) {
             throw new Error("Failed to fetch image");
           }
-          return res.blob();
+          const mimeType = res.headers.get("Content-Type"); // Get the MIME type of the image
+          return res.blob().then((blob) => ({ blob, mimeType }));
         })
-        .then((blob) => new Promise((resolve, reject) => {
-          const reader = new FileReader();
-          reader.onloadend = () => resolve(reader.result);
-          reader.onerror = reject;
-          reader.readAsDataURL(blob); // Converts the blob to a Base64 string
-        }));
-
+        .then(({ blob, mimeType }) =>
+          new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onloadend = () => resolve(reader.result); // Store the full Base64 string
+            reader.onerror = reject;
+            reader.readAsDataURL(blob);
+          })
+        );
+        
       const cartRef = doc(db, "users", sanitizedEmail, "cart", String(product.id));
 
-      // Save the product with the Base64 image
       const docSnap = await getDoc(cartRef);
-      
       if (!docSnap.exists()) {
         await setDoc(cartRef, {
-          items: [{
-            id: String(product.id),
-            name: product.name,
-            image: imageBase64,
-            title: product.title,
-            category: product.category,
-            description: product.description,
-            price: product.price,
-          }],
+          items: [
+            {
+              id: String(product.id),
+              name: product.name,
+              image: imageBase64,
+              title: product.title,
+              category: product.category,
+              description: product.description,
+              price: product.price,
+            },
+          ],
         });
         alert("Item added to cart (new document created)!");
       } else {
@@ -116,7 +120,27 @@ export default function ProductView({ className, reportHandler }) {
       setQuantity((prev) => prev - 1);
     }
   };
+  const [isFavorite, setIsFavorite] = useState(false);
+  const { user, login } = getAuth();
+  const navigate = useNavigate();
 
+  const handleClick = () => {
+    console.log("User:", user);
+    console.log("isFavorite:", isFavorite); // Check the current favorite state
+  
+    if (!user || user === null) {
+      alert("Please log in to add items to your wishlist.");
+      navigate("/login");
+    } else {
+      setIsFavorite(!isFavorite);
+      if (!isFavorite) {
+        updateWishlist(user.email, productId, "add");
+      } else {
+        updateWishlist(user.email, productId, "remove");
+      }
+    }
+  };
+  
   return (
     <div className={`product-view w-full lg:flex justify-between ${className || ""}`}>
       <div data-aos="fade-right" className="lg:w-1/2 xl:mr-[70px] lg:mr-[50px]">
@@ -231,6 +255,27 @@ export default function ProductView({ className, reportHandler }) {
                 <button onClick={increment} type="button" className="text-base text-qgray">+</button>
               </div>
             </div>
+            <div className="w-[60px] h-full flex justify-center items-center border border-qgray-border">
+      <button type="button" onClick={handleClick}>
+        <span>
+          <svg
+            width="24"
+            height="24"
+            viewBox="0 0 24 24"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              d="M17 1C14.9 1 13.1 2.1 12 3.7C10.9 2.1 9.1 1 7 1C3.7 1 1 3.7 1 7C1 13 12 22 12 22C12 22 23 13 23 7C23 3.7 20.3 1 17 1Z"
+              stroke={isFavorite ? "red" : "#D5D5D5"}
+              strokeWidth="2"
+              strokeMiterlimit="10"
+              strokeLinecap="square"
+            />
+          </svg>
+        </span>
+      </button>
+    </div>
             <div className="w-[210px] h-[60px] flex justify-center items-center border border-qgray-border">
   <button
     type="button"
