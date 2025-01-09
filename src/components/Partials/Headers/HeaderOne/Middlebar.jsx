@@ -5,8 +5,51 @@ import ThinLove from "../../../Helpers/icons/ThinLove";
 import ThinPeople from "../../../Helpers/icons/ThinPeople";
 import SearchBox from "../../../Helpers/SearchBox";
 import { Link } from "react-router-dom";
+import { getFirestore, doc, onSnapshot } from "firebase/firestore";
+import { useState, useEffect } from "react";
+import { getAuth } from "firebase/auth";
 
 export default function Middlebar({ className, type }) {
+  const [cartCount, setCartCount] = useState(0);
+  const [User, setUser] = useState(0);
+  const auth = getAuth();
+  const db = getFirestore();
+  const user = auth.currentUser;
+const[product, setProduct] = useState(0);
+  useEffect(() => {
+    const auth = getAuth();
+    const currentUser = auth.currentUser;
+    setUser(currentUser);
+  }, []);
+  
+  useEffect(() => {
+    let unsubscribe;
+  
+    if (user) {
+      const sanitizedEmail = user.email ? user.email.replace(/\ /g, "_") : "unknown_user";
+      
+      const cartRef = doc(db, "users", sanitizedEmail, "cart", "1");
+  
+      unsubscribe = onSnapshot(cartRef, (docSnapshot) => {
+        if (docSnapshot.exists()) {
+          const cartData = docSnapshot.data();
+          const items = cartData?.items || [];  // Get the items array
+          setCartCount(items.length);  // Set cart count based on the number of items
+        } else {
+          setCartCount(0);  // If no cart data exists, reset count
+        }
+      });
+    } else {
+      setCartCount(0); // If no user, reset cart count
+    }
+  
+    // Cleanup
+    return () => {
+      if (unsubscribe) unsubscribe();
+    };
+  }, [user, db]);
+  
+
   return (
     <div className={`w-full h-[86px] bg-white ${className}`}>
       <div className="container-x mx-auto h-full">
@@ -59,7 +102,7 @@ export default function Middlebar({ className, type }) {
                   </span>
                 </Link>
                 <span
-                  className={`w-[18px] h-[18px] rounded-full  absolute -top-2.5 -right-2.5 flex justify-center items-center text-[9px] ${
+                  className={`w-[18px] h-[18px] rounded-full absolute -top-2.5 -right-2.5 flex justify-center items-center text-[9px] ${
                     type === 3 ? "bg-qh3-blue text-white" : "bg-qyellow"
                   }`}
                 >
@@ -73,7 +116,7 @@ export default function Middlebar({ className, type }) {
                   </span>
                 </Link>
                 <span
-                  className={`w-[18px] h-[18px] rounded-full  absolute -top-2.5 -right-2.5 flex justify-center items-center text-[9px] ${
+                  className={`w-[18px] h-[18px] rounded-full absolute -top-2.5 -right-2.5 flex justify-center items-center text-[9px] ${
                     type === 3 ? "bg-qh3-blue text-white" : "bg-qyellow"
                   }`}
                 >
@@ -88,15 +131,13 @@ export default function Middlebar({ className, type }) {
                     </span>
                   </Link>
                   <span
-                    className={`w-[18px] h-[18px] rounded-full  absolute -top-2.5 -right-2.5 flex justify-center items-center text-[9px] ${
+                    className={`w-[18px] h-[18px] rounded-full absolute -top-2.5 -right-2.5 flex justify-center items-center text-[9px] ${
                       type === 3 ? "bg-qh3-blue text-white" : "bg-qyellow"
                     }`}
                   >
-                    15
+                    {cartCount}
                   </span>
                 </div>
-                {/* <div className="fixed left-0 top-0 w-full h-full z-40"></div> */}
-                {/* hidden group-hover:block" */}
                 <Cart
                   type={type}
                   className="absolute -right-[45px] top-11 z-50 hidden group-hover:block"
