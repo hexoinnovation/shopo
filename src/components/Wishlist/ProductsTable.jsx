@@ -14,7 +14,7 @@ export default function ProductsTable({   }) {
   useEffect(() => {
     const fetchWishlist = async () => {
       if (!currentUser || !currentUser.email) {
-        console.error("User is not logged in");
+        alert("Please log in to view your wishlist.");
         return;
       }
 
