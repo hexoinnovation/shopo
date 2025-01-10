@@ -17,20 +17,34 @@ const handleAddToCart = async (product) => {
 
   if (user) {
     try {
-      const sanitizedEmail = user.email ? user.email.replace(/\ /g, "_") : "unknown_user"; // Ensure email is a string
+      const sanitizedEmail = user.email ? user.email.replace(/\ /g, "_") : "unknown_user";
 
-      const cartRef = doc(db, "users", sanitizedEmail, "cart", String(product.id));  // Convert product.id to a string
+      // Fetch and convert the image to Base64
+      const imageBase64 = await fetch(product.src)
+        .then((res) => {
+          if (!res.ok) {
+            throw new Error("Failed to fetch image");
+          }
+          return res.blob();
+        })
+        .then((blob) => new Promise((resolve, reject) => {
+          const reader = new FileReader();
+          reader.onloadend = () => resolve(reader.result);
+          reader.onerror = reject;
+          reader.readAsDataURL(blob); // Converts the blob to a Base64 string
+        }));
 
-      // Check if the document exists
+      const cartRef = doc(db, "users", sanitizedEmail, "cart", String(product.id));
+
+      // Save the product with the Base64 image
       const docSnap = await getDoc(cartRef);
       
       if (!docSnap.exists()) {
-        // If document doesn't exist, create it
         await setDoc(cartRef, {
           items: [{
-            id: String(product.id),  // Ensure product.id is a string
+            id: String(product.id),
             name: product.name,
-            image: product.src,  // Ensure to use correct image field (src in your case)
+            image: imageBase64,
             title: product.title,
             category: product.category,
             description: product.description,
@@ -39,12 +53,11 @@ const handleAddToCart = async (product) => {
         });
         alert("Item added to cart (new document created)!");
       } else {
-        // Document exists, update the items field
         await updateDoc(cartRef, {
           items: arrayUnion({
             id: String(product.id),
             name: product.name,
-            image: product.src,
+            image: imageBase64,
             title: product.title,
             category: product.category,
             description: product.description,
@@ -61,6 +74,8 @@ const handleAddToCart = async (product) => {
     alert("Please log in to add items to your cart.");
   }
 };
+
+
 
 export default function ProductView({ className, reportHandler }) {
   const products = [
@@ -216,18 +231,31 @@ export default function ProductView({ className, reportHandler }) {
                 <button onClick={increment} type="button" className="text-base text-qgray">+</button>
               </div>
             </div>
-            <div className="w-[60px] h-full flex justify-center items-center border border-qgray-border">
-              <button type="button" onClick={() => handleAddToCart(products[0])}>
-                <span>
-                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path
-                      d="M17 1C14.9 1 13 2.9 13 5C13 5.9 13.5 6.7 14.3 7.2L12.1 9.3C10.5 9.9 9 11.7 9 13.4V18C9 18.6 9.4 19 10 19H12C12.6 19 13 18.6 13 18V14C13 13.4 13.4 13 14 13H17C17.6 13 18 13.4 18 14V17C18 17.6 17.6 18 17 18H14C13.4 18 13 18.4 13 19C13 19.6 13.4 20 14 20H17C18.1 20 19 19.1 19 18V14C19 12.9 18.1 12 17 12C16.5 12 16 11.5 16 11C16 10.4 16.4 10 17 10C17.6 10 18 9.6 18 9C18 8.4 17.6 8 17 8H14C13.4 8 13 7.6 13 7C13 6.4 13.4 6 14 6C15.1 6 16 5.1 16 4C16 2.9 15.1 2 14 2C13.4 2 13 2.4 13 3C13 3.6 13.4 4 14 4C14.6 4 15 4.4 15 5C15 5.6 14.6 6 14 6H13C12.4 6 12 5.6 12 5C12 4.4 12.4 4 13 4H15C16.1 4 17 4.9 17 5.9C17.4 6.5 17 7.5 17 7C17.6 8.8 17 9.4 17 10"
-                      fill="#A2A7AE"
-                    />
-                  </svg>
-                </span>
-              </button>
-            </div>
+            <div className="w-[210px] h-[60px] flex justify-center items-center border border-qgray-border">
+  <button
+    type="button"
+    onClick={() => handleAddToCart(products[0])}
+    className="bg-black text-white w-full h-full rounded-md flex items-center justify-center gap-2 hover:bg-gray-800 transition duration-300"
+  >
+    ADD TO CART
+    <span>
+      <svg
+        width="30"
+        height="32"
+        viewBox="0 0 26 24"
+        fill="none"
+        xmlns="http://www.w3.org/2000/svg"
+        className="fill-current text-white"
+      >
+        <path
+          d="M17 1C14.9 1 13 2.9 13 5C13 5.9 13.5 6.7 14.3 7.2L12.1 9.3C10.5 9.9 9 11.7 9 13.4V18C9 18.6 9.4 19 10 19H12C12.6 19 13 18.6 13 18V14C13 13.4 13.4 13 14 13H17C17.6 13 18 13.4 18 14V17C18 17.6 17.6 18 17 18H14C13.4 18 13 18.4 13 19C13 19.6 13.4 20 14 20H17C18.1 20 19 19.1 19 18V14C19 12.9 18.1 12 17 12C16.5 12 16 11.5 16 11C16 10.4 16.4 10 17 10C17.6 10 18 9.6 18 9C18 8.4 17.6 8 17 8H14C13.4 8 13 7.6 13 7C13 6.4 13.4 6 14 6C15.1 6 16 5.1 16 4C16 2.9 15.1 2 14 2C13.4 2 13 2.4 13 3C13 3.6 13.4 4 14 4C14.6 4 15 4.4 15 5C15 5.6 14.6 6 14 6H13C12.4 6 12 5.6 12 5C12 4.4 12.4 4 13 4H15C16.1 4 17 4.9 17 5.9C17.4 6.5 17 7.5 17 7C17.6 8.8 17 9.4 17 10"
+          fill="currentColor"
+        />
+      </svg>
+    </span>
+  </button>
+</div>
+
           </div>
 
         </div>

@@ -134,7 +134,7 @@ export default function CardPage({ cart = true }) {
                       </li>
                     </ul>
                   </div>
-                  <div className="shipping-calculation w-full mb-3">
+                  {/* <div className="shipping-calculation w-full mb-3">
                     <div className="title mb-[17px]">
                       <h1 className="text-[15px] font-medium">
                         Calculate Shipping
@@ -166,12 +166,12 @@ export default function CardPage({ cart = true }) {
                         placeholder="Postcode / ZIP"
                       />
                     </div>
-                  </div>
-                  <button type="button" className="w-full mb-10">
+                  </div> */}
+                  {/* <button type="button" className="w-full mb-10">
                     <div className="w-full h-[50px] bg-[#F6F6F6] flex justify-center items-center">
                       <span className="text-sm font-semibold">Update Cart</span>
                     </div>
-                  </button>
+                  </button> */}
                   <div className="total mb-6">
                     <div className=" flex justify-between">
                       <p className="text-[18px] font-medium text-qblack">

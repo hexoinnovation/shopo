@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import InputQuantityCom from "../Helpers/InputQuantityCom";
-import { getFirestore, doc, updateDoc, arrayUnion, getDoc, setDoc } from "firebase/firestore";
+import { getFirestore, doc, updateDoc, arrayUnion, getDocs, setDoc ,collection} from "firebase/firestore";
 import { getAuth } from "firebase/auth";
 
 export default function ProductsTable({ className }) {
@@ -16,46 +16,41 @@ export default function ProductsTable({ className }) {
     if (user) {
       try {
         const sanitizedEmail = user.email ? user.email.replace(/\ /g, "_") : "unknown_user";
-        // Assuming the cart is a subcollection of the user document
-        const cartRef = doc(db, "users", sanitizedEmail);
+        const cartCollectionRef = collection(db, "users", sanitizedEmail, "cart"); // Reference the cart subcollection
   
-        // Fetch the user document
-        const docSnap = await getDoc(cartRef);
+        // Fetch all documents in the "cart" subcollection
+        const querySnapshot = await getDocs(cartCollectionRef);
   
-        if (docSnap.exists()) {
-          const cartData = docSnap.data(); // This should contain cart data
-          console.log("Cart Data:", cartData);
+        // Map all items from each document in the subcollection
+        const items = querySnapshot.docs.flatMap((doc) => doc.data().items);
   
-          // Check if 'items' exists and is an array
-          if (cartData.items && Array.isArray(cartData.items)) {
-            setProducts(cartData.items);
-            setCartEmpty(cartData.items.length === 0);
-          } else {
-            setProducts([]);
-            setCartEmpty(true);
-          }
+        console.log("Cart Items:", items);
+  
+        if (items.length > 0) {
+          setProducts(items); // Update the state with fetched items
+          setCartEmpty(false); // Indicate the cart is not empty
         } else {
-          console.log("No cart found for this user.");
           setProducts([]);
-          setCartEmpty(true);
+          setCartEmpty(true); // Indicate the cart is empty
         }
       } catch (error) {
         console.error("Error fetching cart:", error);
         alert("Failed to fetch cart data.");
-        setProducts([]);
-        setCartEmpty(true);
+        setProducts([]); // Reset the state on error
+        setCartEmpty(true); // Indicate the cart is empty
       }
     } else {
       alert("Please log in to view your cart.");
       setProducts([]);
-      setCartEmpty(true);
+      setCartEmpty(true); // Indicate the cart is empty if the user is not logged in
     }
   };
   
-
   useEffect(() => {
     fetchCart();
   }, []);
+  
+  
 
   const handleQuantityChange = (id, newQuantity) => {
     const updatedProducts = products.map((product) =>
@@ -100,13 +95,13 @@ export default function ProductsTable({ className }) {
                 <tr className="bg-white border-b hover:bg-gray-50" key={product.id}>
                   <td className="pl-10 py-4 w-[380px]">
                     <div className="flex space-x-6 items-center">
-                      <div className="w-[80px] h-[80px] overflow-hidden flex justify-center items-center border border-[#EDEDED]">
-                        <img
-                          src={product.image}
-                          alt="product"
-                          className="w-full h-full object-contain"
-                        />
-                      </div>
+                    <div className="w-[80px] h-[80px] overflow-hidden flex justify-center items-center border border-[#EDEDED]">
+            <img
+              src={product.image || "fallback_image_url"} // Ensure you handle the base64 or URL properly
+              alt={product.name}
+              className="w-full h-full object-contain"
+            />
+          </div>
                       <div className="flex-1 flex flex-col">
                         <p className="font-medium text-[15px] text-qblack">{product.name}</p>
                         <p className="text-[12px] text-gray-500">{product.description}</p>
