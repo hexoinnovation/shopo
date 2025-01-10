@@ -10,6 +10,8 @@ const auth = getAuth();
 const currentUser = auth.currentUser;
 const [showPopup, setShowPopup] = useState(false);
   const [formData, setFormData] = useState({
+    firstName: "",
+    lastName: "",
     name: "",
     email: "",
     phone: "",
@@ -17,6 +19,7 @@ const [showPopup, setShowPopup] = useState(false);
     country: "",
     state: "",
     city: "",
+    postcode: "",
   });
 
   // Handle input changes
@@ -47,13 +50,15 @@ const [showPopup, setShowPopup] = useState(false);
       alert("Address added successfully!");
       setShowPopup(false); // Close the popup after successful submission
       setFormData({
-        name: "",
+        firstName: "",
+        lastName: "",
         email: "",
         phone: "",
         address:"",
         country: "",
         state: "",
         city: "",
+        postcode: "",
       });
     } catch (error) {
       console.error("Error adding address:", error);
@@ -181,7 +186,10 @@ const [showPopup, setShowPopup] = useState(false);
         </div>
         <div className="mt-5">
           <p>
-            <strong>Name:</strong> {address.name}
+            <strong>FirstName:</strong> {address.firstName}
+          </p>
+          <p>
+            <strong>LastName:</strong> {address.lastName}
           </p>
           <p>
             <strong>Email:</strong> {address.email}
@@ -200,6 +208,9 @@ const [showPopup, setShowPopup] = useState(false);
           </p>
           <p>
             <strong>City:</strong> {address.city}
+          </p>
+          <p>
+            <strong>Postcode:</strong> {address.postcode}
           </p>
         </div>
       </div>
@@ -224,107 +235,142 @@ const [showPopup, setShowPopup] = useState(false);
     <div className="bg-white p-6 rounded-lg shadow-lg w-[90%] max-w-lg h-auto max-h-[100%] overflow-y-auto">
       <h2 className="text-lg font-semibold mb-4">Add New Address</h2>
       <form onSubmit={handleSubmit}>
-        {/* Name */}
-        <div className="mb-4">
-          <label className="block text-gray-700">Name:</label>
-          <input
-            type="text"
-            name="name"
-            value={formData.name}
-            onChange={handleChange}
-            className="w-full border border-gray-300 p-2 rounded"
-            required
-          />
-        </div>
-        {/* Email */}
-        <div className="mb-4">
-          <label className="block text-gray-700">Email:</label>
-          <input
-            type="email"
-            name="email"
-            value={formData.email}
-            onChange={handleChange}
-            className="w-full border border-gray-300 p-2 rounded"
-            required
-          />
-        </div>
-        {/* Phone */}
-        <div className="mb-4">
-          <label className="block text-gray-700">Phone:</label>
-          <input
-            type="tel"
-            name="phone"
-            value={formData.phone}
-            onChange={handleChange}
-            className="w-full border border-gray-300 p-2 rounded"
-            required
-          />
-        </div>
-        {/* Address */}
-        <div className="mb-4">
-          <label className="block text-gray-700">Address:</label>
-          <input
-            type="text"
-            name="address"
-            value={formData.address}
-            onChange={handleChange}
-            className="w-full border border-gray-300 p-2 rounded"
-            required
-          />
-        </div>
-        {/* Country */}
-        <div className="mb-4">
-          <label className="block text-gray-700">Country:</label>
-          <input
-            type="text"
-            name="country"
-            value={formData.country}
-            onChange={handleChange}
-            className="w-full border border-gray-300 p-2 rounded"
-            required
-          />
-        </div>
-        {/* State */}
-        <div className="mb-4">
-          <label className="block text-gray-700">State:</label>
-          <input
-            type="text"
-            name="state"
-            value={formData.state}
-            onChange={handleChange}
-            className="w-full border border-gray-300 p-2 rounded"
-            required
-          />
-        </div>
-        {/* City */}
-        <div className="mb-4">
-          <label className="block text-gray-700">City:</label>
-          <input
-            type="text"
-            name="city"
-            value={formData.city}
-            onChange={handleChange}
-            className="w-full border border-gray-300 p-2 rounded"
-            required
-          />
-        </div>
-        {/* Submit and Cancel Buttons */}
-        <div className="flex justify-end gap-4">
-          <button
-            type="button"
-            className="px-4 py-2 bg-gray-300 rounded"
-            onClick={() => setShowPopup(false)}
-          >
-            Cancel
-          </button>
-          <button
-            type="submit"
-            className="px-4 py-2 bg-blue-500 text-white rounded"
-          >
-            Submit
-          </button>
-        </div>
-      </form>
+  {/* Row for FirstName and LastName */}
+  <div className="flex space-x-4 mb-4">
+    <div className="flex-1">
+      <label className="block text-gray-700 mb-1">FirstName:</label>
+      <input
+        type="text"
+        name="firstName"
+        value={formData.firstName}
+        onChange={handleChange}
+        className="w-full border border-gray-300 p-2 rounded"
+        required
+      />
+    </div>
+    <div className="flex-1">
+      <label className="block text-gray-700 mb-1">LastName:</label>
+      <input
+        type="text"
+        name="lastName"
+        value={formData.lastName}
+        onChange={handleChange}
+        className="w-full border border-gray-300 p-2 rounded"
+        required
+      />
+    </div>
+  </div>
+
+  {/* Row for Email and Phone */}
+  <div className="flex space-x-4 mb-4">
+    <div className="flex-1">
+      <label className="block text-gray-700 mb-1">Email:</label>
+      <input
+        type="email"
+        name="email"
+        value={formData.email}
+        onChange={handleChange}
+        className="w-full border border-gray-300 p-2 rounded"
+        required
+      />
+    </div>
+    <div className="flex-1">
+      <label className="block text-gray-700 mb-1">Phone:</label>
+      <input
+        type="tel"
+        name="phone"
+        value={formData.phone}
+        onChange={handleChange}
+        className="w-full border border-gray-300 p-2 rounded"
+        required
+      />
+    </div>
+  </div>
+
+  {/* Row for Address and Country */}
+  <div className="flex space-x-4 mb-4">
+    <div className="flex-1">
+      <label className="block text-gray-700 mb-1">Address:</label>
+      <input
+        type="text"
+        name="address"
+        value={formData.address}
+        onChange={handleChange}
+        className="w-full border border-gray-300 p-2 rounded"
+        required
+      />
+    </div>
+    <div className="flex-1">
+      <label className="block text-gray-700 mb-1">Country:</label>
+      <input
+        type="text"
+        name="country"
+        value={formData.country}
+        onChange={handleChange}
+        className="w-full border border-gray-300 p-2 rounded"
+        required
+      />
+    </div>
+  </div>
+
+  {/* Row for State and Postcode */}
+  <div className="flex space-x-4 mb-4">
+    <div className="flex-1">
+      <label className="block text-gray-700 mb-1">State:</label>
+      <input
+        type="text"
+        name="state"
+        value={formData.state}
+        onChange={handleChange}
+        className="w-full border border-gray-300 p-2 rounded"
+        required
+      />
+    </div>
+    <div className="flex-1">
+      <label className="block text-gray-700 mb-1">Postcode:</label>
+      <input
+        type="text"
+        name="postcode"
+        value={formData.postcode}
+        onChange={handleChange}
+        className="w-full border border-gray-300 p-2 rounded"
+        required
+      />
+    </div>
+  </div>
+{/* Row for State and Postcode */}
+<div className="flex space-x-4 mb-4">
+    <div className="flex-1">
+      <label className="block text-gray-700 mb-1">City:</label>
+      <input
+        type="text"
+        name="city"
+        value={formData.city}
+        onChange={handleChange}
+        className="w-full border border-gray-300 p-2 rounded"
+        required
+      />
+    </div>
+    <div className="flex-1">
+    </div>
+  </div>
+  {/* Submit and Cancel Buttons */}
+  <div className="flex justify-end gap-4">
+    <button
+      type="button"
+      className="px-4 py-2 bg-gray-300 rounded"
+      onClick={() => setShowPopup(false)}
+    >
+      Cancel
+    </button>
+    <button
+      type="submit"
+      className="px-4 py-2 bg-blue-500 text-white rounded"
+    >
+      Submit
+    </button>
+  </div>
+</form>
     </div>
   </div>
 )}
