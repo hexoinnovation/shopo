@@ -5,7 +5,7 @@ import ThinLove from "../../../Helpers/icons/ThinLove";
 import ThinPeople from "../../../Helpers/icons/ThinPeople";
 import SearchBox from "../../../Helpers/SearchBox";
 import { Link } from "react-router-dom";
-import { getFirestore, doc, onSnapshot } from "firebase/firestore";
+import { getFirestore, doc, onSnapshot,collection, getDocs } from "firebase/firestore";
 import { useState, useEffect } from "react";
 import { getAuth } from "firebase/auth";
 
@@ -49,8 +49,58 @@ const[product, setProduct] = useState(0);
     };
   }, [user, db]);
   
+  const [wishlistCount, setWishlistCount] = useState(0);
 
-   
+  useEffect(() => {
+    const fetchWishlistCount = async () => {
+      const auth = getAuth();
+      const currentUser = auth.currentUser;
+
+      if (currentUser) {
+        try {
+          const sanitizedEmail = currentUser.email.replace(/\s/g, "_");
+          const wishlistCollectionRef = collection(db, "users", sanitizedEmail, "wishlist");
+          const snapshot = await getDocs(wishlistCollectionRef);
+          setWishlistCount(snapshot.size); // Count of documents in the wishlist
+        } catch (error) {
+          console.error("Error fetching wishlist count: ", error);
+        }
+      }
+    };
+
+    fetchWishlistCount();
+  }, []); // Empty dependency array to fetch on component mount
+
+  const [showLoginPopup, setShowLoginPopup] = useState(false);
+
+  useEffect(() => {
+    const fetchWishlistCount = async () => {
+      const auth = getAuth();
+      const currentUser = auth.currentUser;
+
+      if (currentUser) {
+        try {
+          const sanitizedEmail = currentUser.email.replace(/\s/g, "_");
+          const wishlistCollectionRef = collection(db, "users", sanitizedEmail, "wishlist");
+          const snapshot = await getDocs(wishlistCollectionRef);
+          setWishlistCount(snapshot.size); // Count of documents in the wishlist
+        } catch (error) {
+          console.error("Error fetching wishlist count: ", error);
+        }
+      }
+    };
+
+    fetchWishlistCount();
+  }, []);
+
+  const handleWishlistClick = () => {
+    const auth = getAuth();
+    const currentUser = auth.currentUser;
+
+    if (!currentUser) {
+      setShowLoginPopup(true); // Show the login popup
+    }
+  };
    
   return (
     <div className={`w-full h-[86px] bg-white ${className}`}>
@@ -111,20 +161,23 @@ const[product, setProduct] = useState(0);
                   2
                 </span>
               </div>
-              <div className="favorite relative">
+              <div className="favorite relative group relative py-4">
+              <div className="favorite relative cursor-pointer">
       <Link to="/wishlist">
         <span>
           <ThinLove /> {/* Add the ThinLove component or your heart icon */}
         </span>
       </Link>
       <span
-                  className={`w-[18px] h-[18px] rounded-full absolute -top-2.5 -right-2.5 flex justify-center items-center text-[9px] ${
-                    type === 3 ? "bg-qh3-blue text-white" : "bg-qyellow"
-                  }`}
-                >
-                  2
-                </span>
+      className={`w-[18px] h-[18px] rounded-full absolute -top-2.5 -right-2.5 flex justify-center items-center text-[9px] ${
+       type === 3 ? "bg-qh3-blue text-white" : "bg-qyellow"
+      }`}
+    >
+      {wishlistCount}
+    </span>
     </div>
+    </div>
+    
               <div className="cart-wrapper group relative py-4">
                 <div className="cart relative cursor-pointer">
                   <Link to="/cart">

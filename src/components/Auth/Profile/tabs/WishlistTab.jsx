@@ -1,199 +1,141 @@
-import React from "react";
+import React, { useState,useEffect } from "react";
 import InputQuantityCom from "../../../Helpers/InputQuantityCom";
+import { doc, setDoc ,getDoc, getFirestore, collection, getDocs, deleteDoc } from "firebase/firestore";
+import { db } from "../../../firebse";
+import { getAuth } from "firebase/auth";
+import { FaTrash } from "react-icons/fa";
 
 export default function WishlistTab({ className }) {
+
+
+  const [wishlistItems, setWishlistItems] = useState([]);
+  const auth = getAuth();
+  const currentUser = auth.currentUser;
+  // Fetch wishlist data
+  useEffect(() => {
+    const fetchWishlist = async () => {
+      if (!currentUser || !currentUser.email) {
+        console.error("User is not logged in");
+        return;
+      }
+
+      try {
+        const sanitizedEmail = currentUser.email.replace(/\s/g, "_");
+        const wishlistRef = collection(db, "users", sanitizedEmail, "wishlist");
+        const querySnapshot = await getDocs(wishlistRef);
+
+        const items = querySnapshot.docs.map((doc) => ({
+          id: doc.id,
+          ...doc.data(),
+        }));
+
+        setWishlistItems(items);
+      } catch (error) {
+        console.error("Error fetching wishlist: ", error);
+      }
+    };
+
+    fetchWishlist();
+  }, [currentUser]);
+
+  // Handle delete wishlist item
+  const handleDelete = async (id) => {
+    try {
+      if (!currentUser || !currentUser.email) {
+        alert("Please log in to manage your wishlist.");
+        return;
+      }
+
+      const sanitizedEmail = currentUser.email.replace(/\s/g, "_");
+      const wishlistRef = doc(db, "users", sanitizedEmail, "wishlist", id);
+
+      await deleteDoc(wishlistRef);
+      setWishlistItems((prevItems) =>
+        prevItems.filter((item) => item.id !== id)
+      );
+      alert("Item deleted successfully!");
+    } catch (error) {
+      console.error("Error deleting item: ", error);
+      alert("Failed to delete the item.");
+    }
+  };
+
+
+
   return (
     <>
       <div className={`w-full ${className || ""}`}>
         <div className="relative w-full overflow-x-auto border border-[#EDEDED]">
-          <table className="w-full text-sm text-left text-gray-500 dark:text-gray-400">
-            <tbody>
-              {/* table heading */}
-              <tr className="text-[13px] font-medium text-black bg-[#F6F6F6] whitespace-nowrap px-2 border-b default-border-bottom uppercase">
-                <td className="py-4 pl-10 block whitespace-nowrap  w-[380px]">
-                  product
-                </td>
-                <td className="py-4 whitespace-nowrap text-center">
-                  stock status
-                </td>
-                <td className="py-4 whitespace-nowrap text-center">price</td>
-                <td className="py-4 whitespace-nowrap  text-center">
-                  quantity
-                </td>
-                <td className="py-4 whitespace-nowrap  text-center">total</td>
-                <td className="py-4 whitespace-nowrap text-right w-[114px] block"></td>
-              </tr>
-              {/* table heading end */}
-              <tr className="bg-white border-b hover:bg-gray-50">
-                <td className="pl-10  py-4 ">
-                  <div className="flex space-x-6 items-center">
-                    <div className="w-[80px] h-[80px] overflow-hidden flex justify-center items-center border border-[#EDEDED]">
-                      <img
-                        src={`${
-                          import.meta.env.VITE_PUBLIC_URL
-                        }/assets/images/product-img-1.jpg`}
-                        alt="product"
-                        className="w-full h-full object-contain"
-                      />
-                    </div>
-                    <div className="flex-1 flex flex-col">
-                      <p className="font-medium text-[15px] text-qblack">
-                        iPhone 12 Pro Max 128GB
-                      </p>
-                    </div>
-                  </div>
-                </td>
-                <td className="text-center py-4 px-2">
-                  <span className="text-[15px] font-normal">In Stock(23)</span>
-                </td>
-                <td className="text-center py-4 px-2">
-                  <div className="flex space-x-1 items-center justify-center">
-                    <span className="text-[15px] font-normal">$38</span>
-                  </div>
-                </td>
-                <td className=" py-4">
-                  <div className="flex justify-center items-center">
-                    <InputQuantityCom />
-                  </div>
-                </td>
-                <td className="text-right py-4">
-                  <div className="flex space-x-1 items-center justify-center">
-                    <span className="text-[15px] font-normal">$38</span>
-                  </div>
-                </td>
-                <td className="text-right py-4">
-                  <div className="flex space-x-1 items-center justify-center">
-                    <span>
-                      <svg
-                        width="10"
-                        height="10"
-                        viewBox="0 0 10 10"
-                        fill="none"
-                        xmlns="http://www.w3.org/2000/svg"
-                      >
-                        <path
-                          d="M9.7 0.3C9.3 -0.1 8.7 -0.1 8.3 0.3L5 3.6L1.7 0.3C1.3 -0.1 0.7 -0.1 0.3 0.3C-0.1 0.7 -0.1 1.3 0.3 1.7L3.6 5L0.3 8.3C-0.1 8.7 -0.1 9.3 0.3 9.7C0.7 10.1 1.3 10.1 1.7 9.7L5 6.4L8.3 9.7C8.7 10.1 9.3 10.1 9.7 9.7C10.1 9.3 10.1 8.7 9.7 8.3L6.4 5L9.7 1.7C10.1 1.3 10.1 0.7 9.7 0.3Z"
-                          fill="#AAAAAA"
-                        />
-                      </svg>
-                    </span>
-                  </div>
-                </td>
-              </tr>
-              <tr className="bg-white border-b hover:bg-gray-50">
-                <td className="pl-10  py-4  w-[380px]">
-                  <div className="flex space-x-6 items-center">
-                    <div className="w-[80px] h-[80px] overflow-hidden flex justify-center items-center border border-[#EDEDED]">
-                      <img
-                        src={`${
-                          import.meta.env.VITE_PUBLIC_URL
-                        }/assets/images/product-img-2.jpg`}
-                        alt="product"
-                        className="w-full h-full object-contain"
-                      />
-                    </div>
-                    <div className="flex-1 flex flex-col">
-                      <p className="font-medium text-[15px] text-qblack">
-                        iPhone 12 Pro Max 128GB
-                      </p>
-                    </div>
-                  </div>
-                </td>
-                <td className="text-center py-4 px-2">
-                  <span className="text-[15px] font-normal">In Stock(23)</span>
-                </td>
-                <td className="text-center py-4 px-2">
-                  <div className="flex space-x-1 items-center justify-center">
-                    <span className="text-[15px] font-normal">$38</span>
-                  </div>
-                </td>
-                <td className=" py-4">
-                  <div className="flex justify-center items-center">
-                    <InputQuantityCom />
-                  </div>
-                </td>
-                <td className="text-right py-4">
-                  <div className="flex space-x-1 items-center justify-center">
-                    <span className="text-[15px] font-normal">$38</span>
-                  </div>
-                </td>
-                <td className="text-right py-4">
-                  <div className="flex space-x-1 items-center justify-center">
-                    <span>
-                      <svg
-                        width="10"
-                        height="10"
-                        viewBox="0 0 10 10"
-                        fill="none"
-                        xmlns="http://www.w3.org/2000/svg"
-                      >
-                        <path
-                          d="M9.7 0.3C9.3 -0.1 8.7 -0.1 8.3 0.3L5 3.6L1.7 0.3C1.3 -0.1 0.7 -0.1 0.3 0.3C-0.1 0.7 -0.1 1.3 0.3 1.7L3.6 5L0.3 8.3C-0.1 8.7 -0.1 9.3 0.3 9.7C0.7 10.1 1.3 10.1 1.7 9.7L5 6.4L8.3 9.7C8.7 10.1 9.3 10.1 9.7 9.7C10.1 9.3 10.1 8.7 9.7 8.3L6.4 5L9.7 1.7C10.1 1.3 10.1 0.7 9.7 0.3Z"
-                          fill="#AAAAAA"
-                        />
-                      </svg>
-                    </span>
-                  </div>
-                </td>
-              </tr>
-              <tr className="bg-white border-b hover:bg-gray-50">
-                <td className="pl-10  py-4  w-[380px]">
-                  <div className="flex space-x-6 items-center">
-                    <div className="w-[80px] h-[80px] overflow-hidden flex justify-center items-center border border-[#EDEDED]">
-                      <img
-                        src={`${
-                          import.meta.env.VITE_PUBLIC_URL
-                        }/assets/images/product-img-3.jpg`}
-                        alt="product"
-                        className="w-full h-full object-contain"
-                      />
-                    </div>
-                    <div className="flex-1 flex flex-col">
-                      <p className="font-medium text-[15px] text-qblack">
-                        iPhone 12 Pro Max 128GB
-                      </p>
-                    </div>
-                  </div>
-                </td>
-                <td className="text-center py-4 px-2">
-                  <span className="text-[15px] font-normal">In Stock(23)</span>
-                </td>
-                <td className="text-center py-4 px-2">
-                  <div className="flex space-x-1 items-center justify-center">
-                    <span className="text-[15px] font-normal">$38</span>
-                  </div>
-                </td>
-                <td className=" py-4">
-                  <div className="flex justify-center items-center">
-                    <InputQuantityCom />
-                  </div>
-                </td>
-                <td className="text-right py-4">
-                  <div className="flex space-x-1 items-center justify-center">
-                    <span className="text-[15px] font-normal">$38</span>
-                  </div>
-                </td>
-                <td className="text-right py-4">
-                  <div className="flex space-x-1 items-center justify-center">
-                    <span>
-                      <svg
-                        width="10"
-                        height="10"
-                        viewBox="0 0 10 10"
-                        fill="none"
-                        xmlns="http://www.w3.org/2000/svg"
-                      >
-                        <path
-                          d="M9.7 0.3C9.3 -0.1 8.7 -0.1 8.3 0.3L5 3.6L1.7 0.3C1.3 -0.1 0.7 -0.1 0.3 0.3C-0.1 0.7 -0.1 1.3 0.3 1.7L3.6 5L0.3 8.3C-0.1 8.7 -0.1 9.3 0.3 9.7C0.7 10.1 1.3 10.1 1.7 9.7L5 6.4L8.3 9.7C8.7 10.1 9.3 10.1 9.7 9.7C10.1 9.3 10.1 8.7 9.7 8.3L6.4 5L9.7 1.7C10.1 1.3 10.1 0.7 9.7 0.3Z"
-                          fill="#AAAAAA"
-                        />
-                      </svg>
-                    </span>
-                  </div>
-                </td>
-              </tr>
-            </tbody>
-          </table>
+           <table className="w-full text-sm text-left text-gray-500 dark:text-gray-400">
+                    <tbody>
+                      {/* Table Heading */}
+                      <tr className="text-[13px] font-medium text-black bg-[#F6F6F6] whitespace-nowrap px-2 border-b default-border-bottom uppercase">
+                        <td className="py-4 pl-10 block whitespace-nowrap w-[380px]">Product</td>
+                        <td className="py-4 whitespace-nowrap text-center">Review</td>
+                        <td className="py-4 whitespace-nowrap text-center">Color</td>
+                        <td className="py-4 whitespace-nowrap text-center">Size</td>
+                        <td className="py-4 whitespace-nowrap text-center">Total</td>
+                        <td className="py-4 whitespace-nowrap text-center">Quantity</td>
+                        <td className="py-4 whitespace-nowrap text-right w-[114px] block"></td>
+                      </tr>
+                      
+                      {/* Table Data */}
+                      {wishlistItems.length > 0 ? (
+                        wishlistItems.map((item) => (
+                          <tr key={item.id} className="bg-white border-b hover:bg-gray-50">
+                            <td className="pl-10 py-4">
+                              <div className="flex space-x-6 items-center">
+                                <div className="w-[80px] h-[80px] overflow-hidden flex justify-center items-center border border-[#EDEDED]">
+                                  <img
+                                    src={item.imageUrl || `${import.meta.env.VITE_PUBLIC_URL}/assets/images/default-product.jpg`}
+                                    alt={item.title || "Product"}
+                                    className="w-full h-full object-contain"
+                                  />
+                                </div>
+                                <div className="flex-1 flex flex-col">
+                                  <p className="font-medium text-[15px] text-qblack">
+                                    {item.title || "Unnamed Product"}
+                                  </p>
+                                </div>
+                              </div>
+                            </td>
+                            <td className="text-center py-4 px-2 mr-12">{item.review || "N/A"}</td>
+                            <td className="text-center py-4 px-2">
+                              <div className="flex justify-center items-center">
+                                <span
+                                  className="w-[20px] h-[20px] block rounded-full"
+                                  style={{ backgroundColor: item.color || "#E4BC87" }}
+                                ></span>
+                              </div>
+                            </td>
+                            <td className="text-center py-4 px-2">{item.size || "N/A"}</td>
+                            <td className="text-center py-4 px-2">${item.offer_price || "0.00"}</td>
+                            <td className="py-4 text-center">{item.quantity || 1}</td>
+                            {/* <td className="text-center py-4">
+                              ${item.total || item.price || "0.00"}
+                            </td> */}
+                            <td className="text-right py-4">
+                              <button
+                                onClick={() => handleDelete(item.id)}
+                                className="text-gray-400 hover:text-red-500 mr-12 "
+                              >
+                                <FaTrash />
+                              </button>
+                            </td>
+                          </tr>
+                        ))
+                      ) : (
+                        <tr>
+                          <td
+                            colSpan="7"
+                            className="text-center py-4 text-gray-500 font-medium"
+                          >
+                            No items in wishlist.
+                          </td>
+                        </tr>
+                      )}
+                    </tbody>
+                  </table>
         </div>
       </div>
       <div className="w-full mt-[30px] flex sm:justify-end justify-start">
