@@ -1,51 +1,56 @@
 import { useState, useEffect } from "react";
-import { getFirestore, doc, deleteDoc, getDocs, collection } from "firebase/firestore";
+import { getFirestore, doc, deleteDoc, getDocs, collection,updateDoc ,setDoc} from "firebase/firestore";
 import { getAuth } from "firebase/auth";
 
 export default function ProductsTable({ className }) {
   const [products, setProducts] = useState([]);
   const [cartEmpty, setCartEmpty] = useState(false);
  const [product, setProduct] = useState([]);
-  // Fetch the cart data
-  const fetchCart = async () => {
-    const auth = getAuth();
-    const db = getFirestore();
-    const user = auth.currentUser;
+ const fetchCart = async () => {
+  const auth = getAuth();
+  const db = getFirestore();
+  const user = auth.currentUser;
 
-    if (user) {
-      try {
-        const sanitizedEmail = user.email ? user.email.replace(/\ /g, "_") : "unknown_user";
-        const cartCollectionRef = collection(db, "users", sanitizedEmail, "cart");
+  if (user) {
+    try {
+      const sanitizedEmail = user.email ? user.email.replace(/\ /g, ".") : "unknown_user";
+      const cartCollectionRef = collection(db, "users", sanitizedEmail, "cart");
 
-        const querySnapshot = await getDocs(cartCollectionRef);
-        const items = querySnapshot.docs.flatMap((doc) => doc.data().items);
-
-        console.log("Fetched Cart Items:", items);  // Debug log for fetched cart items
-
-        if (items.length > 0) {
-          setProducts(items);
-          setCartEmpty(false);
-        } else {
-          setProducts([]);
-          setCartEmpty(true);
+      const querySnapshot = await getDocs(cartCollectionRef);
+      const items = querySnapshot.docs.flatMap((doc) => {
+        const data = doc.data();
+        if (data && Array.isArray(data.items)) {
+          return data.items;
         }
-      } catch (error) {
-        console.error("Error fetching cart:", error);
-        alert("Failed to fetch cart data.");
-        setProducts([]);
-        setCartEmpty(true);
-      }
-    } else {
-      alert("Please log in to view your cart.");
+        return []; // Return an empty array if 'items' is undefined or not an array
+      });
+
+      // Ensure every product has an image
+      const productsWithImages = items.map((product) => ({
+        ...product,
+        image: product.image || "fallback_image_url" // Ensure image exists
+      }));
+
+      setProducts(productsWithImages);
+      setCartEmpty(items.length === 0);
+    } catch (error) {
+      console.error("Error fetching cart:", error);
+      alert("Failed to fetch cart data.");
       setProducts([]);
       setCartEmpty(true);
     }
-  };
+  } else {
+    alert("Please log in to view your cart.");
+    setProducts([]);
+    setCartEmpty(true);
+  }
+};
 
+  
   useEffect(() => {
     fetchCart();
   }, []);
-
+  
   // Handle product removal
   const handleRemoveProduct = async (id) => {
     const updatedProducts = products.filter((product) => product.id !== id);
@@ -80,18 +85,43 @@ export default function ProductsTable({ className }) {
       )
     );
   };
-
+  const saveSubtotalToFirestore = async (subtotal) => {
+    const auth = getAuth();
+    const db = getFirestore();
+    const user = auth.currentUser;
+  
+    if (user) {
+      try {
+        const sanitizedEmail = user.email.replace(/\ /g, "_"); // Replace dots in email to prevent Firestore path issues
+        const cartDocRef = doc(db, "users", sanitizedEmail, "cart", "amount");
+  
+        // Use setDoc to ensure the document is created if it doesn't exist
+        await setDoc(cartDocRef, { subtotal }, { merge: true });
+  
+        console.log("Subtotal saved to Firestore:", subtotal);
+      } catch (error) {
+        console.error("Error saving subtotal:", error);
+      }
+    } else {
+      console.error("No user is logged in. Unable to save subtotal.");
+    }
+  };
   const calculateTotal = () => {
-    return products.reduce((total, product) => {
-      // Convert product price and quantity to numbers and multiply them
-      const price = Number(product.price.replace("₹", "").trim()); // Remove ₹ symbol and trim any spaces
+    const subtotal = products.reduce((total, product) => {
+      const price = Number(product.price.replace("₹", "").trim());
       const quantity = Number(product.quantity);
       if (!isNaN(price) && !isNaN(quantity)) {
         return total + price * quantity;
       }
-      return total; // If either price or quantity is invalid, return the current total
+      return total;
     }, 0);
+
+    // Save subtotal to Firestore
+    saveSubtotalToFirestore(subtotal);
+
+    return subtotal;
   };
+  
   return (
     <div className={`w-full ${className || ""}`}>
       <div className="relative w-full overflow-x-auto border border-[#EDEDED]">
@@ -115,18 +145,20 @@ export default function ProductsTable({ className }) {
               </tr>
             ) : (
               products.map((product) => {
-               // const total = product.price * product.quantity;  // Calculate total for this product
+                // Ensure the product has an image before rendering
+                //const productImage = product.image || "fallback_image_url";  // Provide a fallback image
                 return (
                   <tr key={product.id}>
                     <td className="pl-10 py-4 w-[380px]">
                       <div className="flex space-x-6 items-center">
                         <div className="w-[80px] h-[80px] overflow-hidden flex justify-center items-center border border-[#EDEDED]">
-                          <img
-                            src={product.image || "fallback_image_url"}
-                            alt={product.name}
-                            className="w-full h-full object-contain"
-                          />
-                        </div>
+                        <img
+  src={product.image || "fallback_image_url"}  // Provide a fallback image URL if the product image is missing
+  alt={product.name}
+  className="w-full h-full object-contain"
+/>
+
+                          </div>
                         <div className="flex-1 flex flex-col">
                           <p className="font-medium text-[15px] text-qblack">{product.name}</p>
                           <p className="text-[12px] text-gray-500">{product.description}</p>

@@ -1,23 +1,18 @@
 import { Link } from "react-router-dom";
+import { useState, useEffect } from "react";
 import BreadcrumbCom from "../BreadcrumbCom";
 import EmptyCardError from "../EmptyCardError";
 import InputCom from "../Helpers/InputCom";
 import PageTitle from "../Helpers/PageTitle";
 import Layout from "../Partials/Layout";
 import ProductsTable from "./ProductsTable";
+import { getAuth } from "firebase/auth";
+import { getFirestore, doc, getDoc } from "firebase/firestore";
 
 export default function CardPage({ cart = true, products = [] }) {
-  // Function to calculate the subtotal
-  const calculateSubtotal = () => {
-    return products.reduce((total, product) => {
-      const price = Number(product.price.replace("₹", "").trim());
-      const quantity = Number(product.quantity);
-      if (!isNaN(price) && !isNaN(quantity)) {
-        return total + price * quantity;
-      }
-      return total;
-    }, 0);
-  };
+  const [subtotal, setSubtotal] = useState(0); // Set initial subtotal as 0
+
+  
 
   const tax = 50; // Fixed tax amount
   const shippingCharge = 80; // Fixed shipping charge
@@ -25,12 +20,45 @@ export default function CardPage({ cart = true, products = [] }) {
 
   // Calculate grand total
   const calculateGrandTotal = () => {
-    const subtotal = calculateSubtotal();
+   
     return subtotal + tax + shippingCharge - discount;
   };
 
-  const subtotal = calculateSubtotal();
   const grandTotal = calculateGrandTotal();
+
+  useEffect(() => {
+    const fetchSubtotalFromFirestore = async () => {
+      const auth = getAuth();
+      const db = getFirestore();
+      const user = auth.currentUser;
+
+      if (user) {
+        try {
+          const sanitizedEmail = user.email.replace(/\ /g, "_"); // Replace spaces in email to prevent Firestore path issues
+          const cartDocRef = doc(db, "users", sanitizedEmail, "cart", "amount");
+          const cartDoc = await getDoc(cartDocRef);
+
+          if (cartDoc.exists()) {
+            // If subtotal exists in Firestore, set it
+            const fetchedSubtotal = cartDoc.data().subtotal;
+            if (fetchedSubtotal) {
+              setSubtotal(fetchedSubtotal);
+            } else {
+              console.log("Subtotal not found in Firestore.");
+            }
+          } else {
+            console.log("No cart document found in Firestore.");
+          }
+        } catch (error) {
+          console.error("Error fetching subtotal from Firestore:", error);
+        }
+      } else {
+        console.error("No user is logged in. Unable to fetch subtotal.");
+      }
+    };
+
+    fetchSubtotalFromFirestore();
+  }, []);
 
   return (
     <Layout childrenClasses={cart ? "pt-0 pb-0" : ""}>
@@ -38,10 +66,7 @@ export default function CardPage({ cart = true, products = [] }) {
         <div className="cart-page-wrapper w-full">
           <div className="container-x mx-auto">
             <BreadcrumbCom
-              paths={[
-                { name: "home", path: "/" },
-                { name: "cart", path: "/cart" },
-              ]}
+              paths={[{ name: "home", path: "/" }, { name: "cart", path: "/cart" }]}
             />
             <EmptyCardError />
           </div>
@@ -51,10 +76,7 @@ export default function CardPage({ cart = true, products = [] }) {
           <div className="w-full">
             <PageTitle
               title="Your Cart"
-              breadcrumb={[
-                { name: "home", path: "/" },
-                { name: "cart", path: "/cart" },
-              ]}
+              breadcrumb={[{ name: "home", path: "/" }, { name: "cart", path: "/cart" }]}
             />
           </div>
           <div className="w-full mt-[23px]">
@@ -64,56 +86,36 @@ export default function CardPage({ cart = true, products = [] }) {
                 <div className="sm:w-[370px] w-full border border-[#EDEDED] px-[30px] py-[26px]">
                   <div className="sub-total mb-6">
                     <div className="flex justify-between mb-6">
-                      <p className="text-[15px] font-medium text-qblack">
-                        Subtotal
-                      </p>
+                      <p className="text-[15px] font-medium text-qblack">Subtotal</p>
                       <p className="text-[15px] font-medium text-qred">
-                        ₹{Math.round(subtotal)}
+                        ₹{Math.round(subtotal)} {/* Display rounded subtotal */}
                       </p>
                     </div>
                     <div className="w-full h-[1px] bg-[#EDEDED]"></div>
                   </div>
                   <div className="shipping mb-6">
                     <div className="flex justify-between">
-                      <p className="text-[15px] font-medium text-qblack">
-                        Tax
-                      </p>
-                      <p className="text-[15px] font-medium text-qgraytwo">
-                        ₹{tax}
-                      </p>
+                      <p className="text-[15px] font-medium text-qblack">Tax</p>
+                      <p className="text-[15px] font-medium text-qgraytwo">₹{tax}</p>
                     </div>
                     <div className="flex justify-between">
-                      <p className="text-[15px] font-medium text-qblack">
-                        Discount
-                      </p>
-                      <p className="text-[15px] font-medium text-qred">
-                        -₹{discount}
-                      </p>
+                      <p className="text-[15px] font-medium text-qblack">Discount</p>
+                      <p className="text-[15px] font-medium text-qred">-₹{discount}</p>
                     </div>
                     <div className="flex justify-between">
-                      <p className="text-[15px] font-medium text-qblack">
-                        Shipping
-                      </p>
-                      <p className="text-[15px] font-medium text-qgraytwo">
-                        ₹{shippingCharge}
-                      </p>
+                      <p className="text-[15px] font-medium text-qblack">Shipping</p>
+                      <p className="text-[15px] font-medium text-qgraytwo">₹{shippingCharge}</p>
                     </div>
                   </div>
                   <div className="total mb-6">
                     <div className="flex justify-between">
-                      <p className="text-[18px] font-medium text-qblack">
-                        Grand Total
-                      </p>
-                      <p className="text-[18px] font-medium text-qred">
-                        ₹{Math.round(grandTotal)}
-                      </p>
+                      <p className="text-[18px] font-medium text-qblack">Grand Total</p>
+                      <p className="text-[18px] font-medium text-qred">₹{Math.round(grandTotal)}</p>
                     </div>
                   </div>
                   <Link to="/checkout">
                     <div className="w-full h-[50px] black-btn flex justify-center items-center">
-                      <span className="text-sm font-semibold">
-                        Proceed to Checkout
-                      </span>
+                      <span className="text-sm font-semibold">Proceed to Checkout</span>
                     </div>
                   </Link>
                 </div>
