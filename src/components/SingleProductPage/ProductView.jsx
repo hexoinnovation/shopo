@@ -5,79 +5,6 @@ import { getFirestore, doc, updateDoc, arrayUnion,getDoc,setDoc, } from "firebas
 import { getAuth } from "firebase/auth";
 import { updateWishlist } from "../Partials/Headers/HeaderOne/wishlistUtils";
 import { useNavigate } from "react-router-dom";
-const handleAddToCart = async (product) => {
-  if (!product.id || !product.name || !product.src || !product.title || !product.category || !product.description || !product.price) {
-    console.error("Missing product fields", product);
-    alert("Failed to add item to cart. Some product details are missing.");
-    return;
-  }
-
-  const auth = getAuth();
-  const db = getFirestore();
-  const user = auth.currentUser;
-
-  if (user) {
-    try {
-      const sanitizedEmail = user.email ? user.email.replace(/\ /g, "_") : "unknown_user";
-
-      // Fetch and convert the image to Base64
-      const imageBase64 = await fetch(product.src)
-        .then((res) => {
-          if (!res.ok) {
-            throw new Error("Failed to fetch image");
-          }
-          const mimeType = res.headers.get("Content-Type"); // Get the MIME type of the image
-          return res.blob().then((blob) => ({ blob, mimeType }));
-        })
-        .then(({ blob, mimeType }) =>
-          new Promise((resolve, reject) => {
-            const reader = new FileReader();
-            reader.onloadend = () => resolve(reader.result); // Store the full Base64 string
-            reader.onerror = reject;
-            reader.readAsDataURL(blob);
-          })
-        );
-        
-      const cartRef = doc(db, "users", sanitizedEmail, "cart", String(product.id));
-
-      const docSnap = await getDoc(cartRef);
-      if (!docSnap.exists()) {
-        await setDoc(cartRef, {
-          items: [
-            {
-              id: String(product.id),
-              name: product.name,
-              image: imageBase64,
-              title: product.title,
-              category: product.category,
-              description: product.description,
-              price: product.price,
-            },
-          ],
-        });
-        alert("Item added to cart (new document created)!");
-      } else {
-        await updateDoc(cartRef, {
-          items: arrayUnion({
-            id: String(product.id),
-            name: product.name,
-            image: imageBase64,
-            title: product.title,
-            category: product.category,
-            description: product.description,
-            price: product.price,
-          }),
-        });
-        alert("Item added to cart!");
-      }
-    } catch (error) {
-      console.error("Error adding to cart:", error);
-      alert("Failed to add item to cart.");
-    }
-  } else {
-    alert("Please log in to add items to your cart.");
-  }
-};
 
 
 
@@ -107,19 +34,96 @@ export default function ProductView({ className, reportHandler }) {
   ];
 
   const [src, setSrc] = useState(products[0].src);
-  const changeImgHandler = (current) => {
-    setSrc(current);
-  };
+  const [selectedColor, setSelectedColor] = useState(""); // Initialize with an empty string or default color
 
-  const [quantity, setQuantity] = useState(1);
-  const increment = () => {
-    setQuantity((prev) => prev + 1);
-  };
-  const decrement = () => {
-    if (quantity > 1) {
-      setQuantity((prev) => prev - 1);
+const [selectedSize, setSelectedSize] = useState("");
+const [quantity, setQuantity] = useState(1);
+//const [isFavorite, setIsFavorite] = useState(false);
+const changeImgHandler = (color) => setSelectedColor(color);
+const selectSizeHandler = (size) => setSelectedSize(size);
+const increment = () => setQuantity((prev) => prev + 1);
+const decrement = () => setQuantity((prev) => Math.max(1, prev - 1));
+  const handleAddToCart = async (product) => {
+    if (!product.id || !product.name || !product.src || !product.title || !product.category || !product.description || !product.price) {
+      console.error("Missing product fields", product);
+      alert("Failed to add item to cart. Some product details are missing.");
+      return;
+    }
+  
+    const auth = getAuth();
+    const db = getFirestore();
+    const user = auth.currentUser;
+  
+    if (user) {
+      try {
+        const sanitizedEmail = user.email ? user.email.replace(/\ /g, "_") : "unknown_user";
+  
+        // Fetch and convert the image to Base64
+        const imageBase64 = await fetch(product.src)
+          .then((res) => {
+            if (!res.ok) {
+              throw new Error("Failed to fetch image");
+            }
+            const mimeType = res.headers.get("Content-Type"); // Get the MIME type of the image
+            return res.blob().then((blob) => ({ blob, mimeType }));
+          })
+          .then(({ blob, mimeType }) =>
+            new Promise((resolve, reject) => {
+              const reader = new FileReader();
+              reader.onloadend = () => resolve(reader.result); // Store the full Base64 string
+              reader.onerror = reject;
+              reader.readAsDataURL(blob);
+            })
+          );
+          
+        const cartRef = doc(db, "users", sanitizedEmail, "cart", String(product.id));
+  
+        const docSnap = await getDoc(cartRef);
+        if (!docSnap.exists()) {
+          await setDoc(cartRef, {
+            items: [
+              {
+                id: String(product.id),
+                name: product.name,
+                image: imageBase64,
+                title: product.title,
+                category: product.category,
+                description: product.description,
+                price: product.price,
+                color: selectedColor,
+          size: selectedSize,
+          quantity: quantity,
+              },
+            ],
+          });
+          alert("Item added to cart (new document created)!");
+        } else {
+          await updateDoc(cartRef, {
+            items: arrayUnion({
+              id: String(product.id),
+              name: product.name,
+              image: imageBase64,
+              title: product.title,
+              category: product.category,
+              description: product.description,
+              price: product.price,
+              color: selectedColor,
+          size: selectedSize,
+          quantity: quantity,
+            }),
+          });
+          alert("Item added to cart!");
+        }
+      } catch (error) {
+        console.error("Error adding to cart:", error);
+        alert("Failed to add item to cart.");
+      }
+    } else {
+      alert("Please log in to add items to your cart.");
     }
   };
+  
+  
   const [isFavorite, setIsFavorite] = useState(false);
   const { user, login } = getAuth();
   const navigate = useNavigate();
@@ -203,49 +207,33 @@ export default function ProductView({ className, reportHandler }) {
           </p>
 
           <div data-aos="fade-up" className="colors mb-[30px]">
-            <span className="text-sm font-normal uppercase text-qgray mb-[14px] inline-block">COLOR</span>
-            <div className="flex space-x-4 items-center">
-              {products.map((img) => (
-                <div key={img.id}>
-                  {img.color && img.color !== "" && (
-                    <button
-                      onClick={() => changeImgHandler(img.src)}
-                      type="button"
-                      style={{ "--tw-ring-color": `${img.color}` }}
-                      className="w-[20px] h-[20px] rounded-full focus:ring-2 ring-offset-2 flex justify-center items-center"
-                    >
-                      <span style={{ background: `${img.color}` }} className="w-[20px] h-[20px] block rounded-full border"></span>
-                    </button>
-                  )}
-                </div>
-              ))}
-            </div>
-          </div>
+  <span className="text-sm font-normal uppercase text-qgray mb-[14px] inline-block">COLOR</span>
+  <div className="flex space-x-4 items-center">
+    {products.map((img) => (
+      <button
+        key={img.id}
+        onClick={() => changeImgHandler(img.color)} // Update the color state
+        style={{ "--tw-ring-color": img.color }}
+        className="color-button"
+      >
+        <span style={{ background: img.color }} className="color-circle"></span>
+      </button>
+    ))}
+  </div>
+</div>
 
-          <div data-aos="fade-up" className="product-size mb-[30px]">
-            <span className="text-sm font-normal uppercase text-qgray mb-[14px] inline-block">SIZE</span>
-            <div className="w-full">
-              <div className="border border-qgray-border h-[50px] flex justify-between items-center px-6 cursor-pointer">
-                <Selectbox className="w-full" datas={["Small", "Medium", "Large", "Extra Large"]}>
-                  {({ item }) => (
-                    <>
-                      <div>
-                        <span className="text-[13px] text-qblack">{item}</span>
-                      </div>
-                      <div className="flex space-x-10 items-center">
-                        <span className="text-[13px] text-qblack">3”W x 3”D x 7”H</span>
-                        <span>
-                          <svg width="11" height="7" viewBox="0 0 11 7" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <path d="M5.4 6.8L0 1.4L1.4 0L5.4 4L9.4 0L10.8 1.4L5.4 6.8Z" fill="#222222" />
-                          </svg>
-                        </span>
-                      </div>
-                    </>
-                  )}
-                </Selectbox>
-              </div>
-            </div>
-          </div>
+<div data-aos="fade-up" className="product-size mb-[30px]">
+  <span className="text-sm font-normal uppercase text-qgray mb-[14px] inline-block">SIZE</span>
+  <div className="w-full">
+    <div className="border border-qgray-border h-[50px] flex justify-between items-center px-6 cursor-pointer">
+      <Selectbox
+        onSelect={selectSizeHandler} // Update the size state
+        datas={["Small", "Medium", "Large", "Extra Large"]}
+      />
+    </div>
+  </div>
+</div>
+
 
           <div data-aos="fade-up" className="quantity-card-wrapper w-full flex items-center h-[50px] space-x-[10px] mb-[30px]">
             <div className="w-[120px] h-full px-[26px] flex items-center border border-qgray-border">
