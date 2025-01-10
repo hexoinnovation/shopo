@@ -141,8 +141,7 @@ export default function ProductsTable({ className }) {
                     ? "0"
                     : Math.round(Number(product.price.replace("₹", "").trim()) * Number(product.quantity))}
                 </td>
-   
-                    <td className="text-right py-4">
+     <td className="text-right py-4">
                       <div className="flex space-x-1 items-center justify-center">
                         <button onClick={() => handleRemoveProduct(product.id)}>
                           <svg
