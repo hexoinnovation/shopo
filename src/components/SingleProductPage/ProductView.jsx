@@ -15,7 +15,7 @@ export default function ProductView({ className, reportHandler }) {
       src: "product-details-1.png",
       color: "#FFBC63",
       name: "Samsung Galaxy Z Fold3",
-      price: "$6.99",
+      price: "₹ 6.99",
       title: "3 colors in 512GB",
       category: "Mobile Phones",
       description: "It is a long established fact that a reader will be distracted by the readable content of a page.",
@@ -25,7 +25,7 @@ export default function ProductView({ className, reportHandler }) {
       src: "product-details-2.png",
       color: "#649EFF",
       name: "iPhone 12",
-      price: "$5.99",
+      price: "₹5.99",
       title: "64GB Storage",
       category: "Mobile Phones",
       description: "The quick brown fox jumps over the lazy dog.",
@@ -198,7 +198,7 @@ const decrement = () => setQuantity((prev) => Math.max(1, prev - 1));
           </div>
 
           <div data-aos="fade-up" className="flex space-x-2 items-center mb-7">
-            <span className="text-sm font-500 text-qgray line-through mt-2">$9.99</span>
+            <span className="text-sm font-500 text-qgray line-through mt-2">₹ 9.99</span>
             <span className="text-2xl font-500 text-qred">{products[0].price}</span>
           </div>
 
