@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import Compair from "../icons/Compair";
 import QuickViewIco from "../icons/QuickViewIco";
 import Star from "../icons/Star";
-import { doc, setDoc , getDoc } from "firebase/firestore";
+import { doc, setDoc , getDoc,deleteDoc } from "firebase/firestore";
 import { db } from "../../firebse";
 import { getAuth } from "firebase/auth";
 import ThinLove from "../icons/ThinLove";
@@ -13,7 +13,7 @@ export default function ProductCardStyleOne({ datas, type, product }) {
   const [isPink, setIsPink] = useState(false);
 
   useEffect(() => {
-    const initializeWishlistState = async () => {
+    const fetchWishlistStatus = async () => {
       if (!datas || !datas.id) return;
 
       const auth = getAuth();
@@ -25,14 +25,18 @@ export default function ProductCardStyleOne({ datas, type, product }) {
 
         try {
           const docSnap = await getDoc(wishlistRef);
-          setIsPink(docSnap.exists()); // Set pink if the item exists in the wishlist
+          if (docSnap.exists()) {
+            setIsPink(true); // Product is already in the wishlist
+          } else {
+            setIsPink(false); // Product is not in the wishlist
+          }
         } catch (error) {
-          console.error("Error checking wishlist: ", error);
+          console.error("Error checking wishlist status: ", error);
         }
       }
     };
 
-    initializeWishlistState();
+    fetchWishlistStatus();
   }, [datas]);
 
   const handleWishlistClick = async () => {
@@ -68,6 +72,7 @@ export default function ProductCardStyleOne({ datas, type, product }) {
       alert("Please log in to manage your wishlist.");
     }
   };
+
 
   const available =
     (datas.cam_product_sale /
