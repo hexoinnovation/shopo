@@ -3,7 +3,7 @@ import Star from "../Helpers/icons/Star";
 import Selectbox from "../Helpers/Selectbox";
 import { getFirestore, doc, updateDoc, arrayUnion,getDoc,setDoc, } from "firebase/firestore";
 import { getAuth } from "firebase/auth";
-import { updateWishlist } from "../Partials/Headers/HeaderOne/wishlistUtils";
+
 import { useNavigate } from "react-router-dom";
 
 
@@ -128,23 +128,7 @@ const decrement = () => setQuantity((prev) => Math.max(1, prev - 1));
   const { user, login } = getAuth();
   const navigate = useNavigate();
 
-  const handleClick = () => {
-    console.log("User:", user);
-    console.log("isFavorite:", isFavorite); // Check the current favorite state
-  
-    if (!user || user === null) {
-      alert("Please log in to add items to your wishlist.");
-      navigate("/login");
-    } else {
-      setIsFavorite(!isFavorite);
-      if (!isFavorite) {
-        updateWishlist(user.email, productId, "add");
-      } else {
-        updateWishlist(user.email, productId, "remove");
-      }
-    }
-  };
-  
+ 
   return (
     <div className={`product-view w-full lg:flex justify-between ${className || ""}`}>
       <div data-aos="fade-right" className="lg:w-1/2 xl:mr-[70px] lg:mr-[50px]">
@@ -244,7 +228,7 @@ const decrement = () => setQuantity((prev) => Math.max(1, prev - 1));
               </div>
             </div>
             <div className="w-[60px] h-full flex justify-center items-center border border-qgray-border">
-      <button type="button" onClick={handleClick}>
+      <button type="button" >
         <span>
           <svg
             width="24"
