@@ -8,7 +8,7 @@ import { Link } from "react-router-dom";
 import { getFirestore, doc, onSnapshot } from "firebase/firestore";
 import { useState, useEffect } from "react";
 import { getAuth } from "firebase/auth";
-import { getWishlistCount } from "./wishlistUtils";
+
 export default function Middlebar({ className, type }) {
   const [cartCount, setCartCount] = useState(0);
   const [User, setUser] = useState(0);
@@ -51,14 +51,7 @@ const[product, setProduct] = useState(0);
   
 
    
-    const [wishlistCount, setWishlistCount] = useState(0);
-  
-    useEffect(() => {
-      if (user) {
-        // Get the wishlist count from the database when the user is logged in
-        getWishlistCount(user.email).then((count) => setWishlistCount(count));
-      }
-    }, [user]);
+   
   return (
     <div className={`w-full h-[86px] bg-white ${className}`}>
       <div className="container-x mx-auto h-full">
@@ -125,12 +118,12 @@ const[product, setProduct] = useState(0);
         </span>
       </Link>
       <span
-        className={`w-[18px] h-[18px] rounded-full absolute -top-2.5 -right-2.5 flex justify-center items-center text-[9px] ${
-          wishlistCount > 0 ? "bg-qh3-blue text-white" : "bg-qyellow"
-        }`}
-      >
-        {wishlistCount > 0 ? wishlistCount : 0}
-      </span>
+                  className={`w-[18px] h-[18px] rounded-full absolute -top-2.5 -right-2.5 flex justify-center items-center text-[9px] ${
+                    type === 3 ? "bg-qh3-blue text-white" : "bg-qyellow"
+                  }`}
+                >
+                  2
+                </span>
     </div>
               <div className="cart-wrapper group relative py-4">
                 <div className="cart relative cursor-pointer">

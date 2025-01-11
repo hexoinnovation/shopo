@@ -3,7 +3,7 @@ import Star from "../Helpers/icons/Star";
 import Selectbox from "../Helpers/Selectbox";
 import { getFirestore, doc, updateDoc, arrayUnion,getDoc,setDoc, } from "firebase/firestore";
 import { getAuth } from "firebase/auth";
-import { updateWishlist } from "../Partials/Headers/HeaderOne/wishlistUtils";
+
 import { useNavigate } from "react-router-dom";
 
 
@@ -15,7 +15,7 @@ export default function ProductView({ className, reportHandler }) {
       src: "product-details-1.png",
       color: "#FFBC63",
       name: "Samsung Galaxy Z Fold3",
-      price: "$6.99",
+      price: "₹ 6.99",
       title: "3 colors in 512GB",
       category: "Mobile Phones",
       description: "It is a long established fact that a reader will be distracted by the readable content of a page.",
@@ -25,7 +25,7 @@ export default function ProductView({ className, reportHandler }) {
       src: "product-details-2.png",
       color: "#649EFF",
       name: "iPhone 12",
-      price: "$5.99",
+      price: "₹5.99",
       title: "64GB Storage",
       category: "Mobile Phones",
       description: "The quick brown fox jumps over the lazy dog.",
@@ -128,23 +128,7 @@ const decrement = () => setQuantity((prev) => Math.max(1, prev - 1));
   const { user, login } = getAuth();
   const navigate = useNavigate();
 
-  const handleClick = () => {
-    console.log("User:", user);
-    console.log("isFavorite:", isFavorite); // Check the current favorite state
-  
-    if (!user || user === null) {
-      alert("Please log in to add items to your wishlist.");
-      navigate("/login");
-    } else {
-      setIsFavorite(!isFavorite);
-      if (!isFavorite) {
-        updateWishlist(user.email, productId, "add");
-      } else {
-        updateWishlist(user.email, productId, "remove");
-      }
-    }
-  };
-  
+ 
   return (
     <div className={`product-view w-full lg:flex justify-between ${className || ""}`}>
       <div data-aos="fade-right" className="lg:w-1/2 xl:mr-[70px] lg:mr-[50px]">
@@ -198,7 +182,7 @@ const decrement = () => setQuantity((prev) => Math.max(1, prev - 1));
           </div>
 
           <div data-aos="fade-up" className="flex space-x-2 items-center mb-7">
-            <span className="text-sm font-500 text-qgray line-through mt-2">$9.99</span>
+            <span className="text-sm font-500 text-qgray line-through mt-2">₹ 9.99</span>
             <span className="text-2xl font-500 text-qred">{products[0].price}</span>
           </div>
 
@@ -244,7 +228,7 @@ const decrement = () => setQuantity((prev) => Math.max(1, prev - 1));
               </div>
             </div>
             <div className="w-[60px] h-full flex justify-center items-center border border-qgray-border">
-      <button type="button" onClick={handleClick}>
+      <button type="button" >
         <span>
           <svg
             width="24"

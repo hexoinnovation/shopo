@@ -5,7 +5,7 @@ import { getAuth } from "firebase/auth";
 export default function ProductsTable({ className }) {
   const [products, setProducts] = useState([]);
   const [cartEmpty, setCartEmpty] = useState(false);
-
+ const [product, setProduct] = useState([]);
   // Fetch the cart data
   const fetchCart = async () => {
     const auth = getAuth();
@@ -81,11 +81,17 @@ export default function ProductsTable({ className }) {
     );
   };
 
-  // Calculate total for all products in the cart
   const calculateTotal = () => {
-    return products.reduce((acc, product) => acc + product.price * product.quantity, 0);
+    return products.reduce((total, product) => {
+      // Convert product price and quantity to numbers and multiply them
+      const price = Number(product.price.replace("₹", "").trim()); // Remove ₹ symbol and trim any spaces
+      const quantity = Number(product.quantity);
+      if (!isNaN(price) && !isNaN(quantity)) {
+        return total + price * quantity;
+      }
+      return total; // If either price or quantity is invalid, return the current total
+    }, 0);
   };
-
   return (
     <div className={`w-full ${className || ""}`}>
       <div className="relative w-full overflow-x-auto border border-[#EDEDED]">
@@ -109,7 +115,7 @@ export default function ProductsTable({ className }) {
               </tr>
             ) : (
               products.map((product) => {
-                const total = product.price * product.quantity;  // Calculate total for this product
+               // const total = product.price * product.quantity;  // Calculate total for this product
                 return (
                   <tr key={product.id}>
                     <td className="pl-10 py-4 w-[380px]">
@@ -128,11 +134,14 @@ export default function ProductsTable({ className }) {
                       </div>
                     </td>
                     <td className="text-center py-4 px-2">{product.category}</td>
-                    <td className="text-center py-4 px-2">₹{product.price}</td>
-                    <td className="text-center py-4 px-2">
-                    {product.quantity}
-                    </td>
-                    <td className="text-center py-4">₹{total}</td>
+<td className="text-center py-4 px-2">{product.price}</td>
+<td className="text-center py-4 px-2">{product.quantity}</td>
+<td className="text-center py-4">
+                  ₹{(isNaN(Number(product.price.replace("₹", "").trim())) || isNaN(Number(product.quantity)) || Number(product.price.replace("₹", "").trim()) <= 0 || Number(product.quantity) <= 0)
+                    ? "0"
+                    : Math.round(Number(product.price.replace("₹", "").trim()) * Number(product.quantity))}
+                </td>
+   
                     <td className="text-right py-4">
                       <div className="flex space-x-1 items-center justify-center">
                         <button onClick={() => handleRemoveProduct(product.id)}>
@@ -157,7 +166,7 @@ export default function ProductsTable({ className }) {
             )}
             <tr>
               <td colSpan="4" className="py-4 text-right font-semibold text-lg">Total:</td>
-              <td colSpan="2" className="py-4 text-center font-semibold text-lg">₹{calculateTotal()}</td>
+              <td colSpan="2" className="py-4 text-center font-semibold text-lg"> ₹{Math.round(calculateTotal())}</td>
             </tr>
           </tbody>
         </table>
