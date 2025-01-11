@@ -67,11 +67,11 @@ export default function ProductsTable({   }) {
             {/* Table Heading */}
             <tr className="text-[13px] font-medium text-black bg-[#F6F6F6] whitespace-nowrap px-2 border-b default-border-bottom uppercase">
               <td className="py-4 pl-10 block whitespace-nowrap w-[380px]">Product</td>
+              <td className="py-4 whitespace-nowrap text-center">Review</td>
               <td className="py-4 whitespace-nowrap text-center">Color</td>
               <td className="py-4 whitespace-nowrap text-center">Size</td>
-              <td className="py-4 whitespace-nowrap text-center">Offer Price</td>
-              <td className="py-4 whitespace-nowrap text-center">Quantity</td>
               <td className="py-4 whitespace-nowrap text-center">Total</td>
+              <td className="py-4 whitespace-nowrap text-center">Quantity</td>
               <td className="py-4 whitespace-nowrap text-right w-[114px] block"></td>
             </tr>
 
@@ -95,6 +95,7 @@ export default function ProductsTable({   }) {
                       </div>
                     </div>
                   </td>
+                  <td className="text-center py-4 px-2 ">{item.review || "N/A"}</td>
                   <td className="text-center py-4 px-2">
                     <div className="flex justify-center items-center">
                       <span
@@ -106,9 +107,9 @@ export default function ProductsTable({   }) {
                   <td className="text-center py-4 px-2">{item.size || "N/A"}</td>
                   <td className="text-center py-4 px-2">${item.offer_price || "0.00"}</td>
                   <td className="py-4 text-center">{item.quantity || 1}</td>
-                  <td className="text-center py-4">
+                  {/* <td className="text-center py-4">
                     ${item.total || item.price || "0.00"}
-                  </td>
+                  </td> */}
                   <td className="text-right py-4">
                     <button
                       onClick={() => handleDelete(item.id)}
