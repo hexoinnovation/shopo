@@ -1,14 +1,14 @@
-import { useState } from "react";
+import { useState,useEffect  } from "react";
 import Star from "../Helpers/icons/Star";
 import Selectbox from "../Helpers/Selectbox";
-import { getFirestore, doc, updateDoc, arrayUnion,getDoc,setDoc, } from "firebase/firestore";
+import { getFirestore, doc, updateDoc, arrayUnion,getDoc,setDoc,deleteDoc } from "firebase/firestore";
 import { getAuth } from "firebase/auth";
-
+import { auth,db } from "../firebse";
 import { useNavigate } from "react-router-dom";
 
 
 
-export default function ProductView({ className, reportHandler }) {
+export default function ProductView({ className }) {
   const products = [
     {
       id: 1,
@@ -124,10 +124,73 @@ const decrement = () => setQuantity((prev) => Math.max(1, prev - 1));
   };
   
   
-  const [isFavorite, setIsFavorite] = useState(false);
-  const { user, login } = getAuth();
+
   const navigate = useNavigate();
 
+  const [user, setUser] = useState(null);
+  const [isFavorite, setIsFavorite] = useState(false);
+
+  // Monitor authentication state
+  useEffect(() => {
+    const unsubscribe = auth.onAuthStateChanged((currentUser) => {
+      setUser(currentUser);
+    });
+
+    return () => unsubscribe();
+  }, []);
+
+  const handleWishlistClick = async () => {
+    if (!user) {
+      return; // Do nothing if the user is not logged in
+    }
+  
+    const sanitizedEmail = user.email.replace(/\s/g, "_");
+    const wishlistRef = doc(db, "users", sanitizedEmail, "wishlist", String(products[0].id));
+  
+    try {
+      // Fetch and convert the image to Base64 (just like in your handleAddToCart function)
+      const imageBase64 = await fetch(products[0].src)
+        .then((res) => {
+          if (!res.ok) {
+            throw new Error("Failed to fetch image");
+          }
+          const mimeType = res.headers.get("Content-Type");
+          return res.blob().then((blob) => ({ blob, mimeType }));
+        })
+        .then(({ blob, mimeType }) =>
+          new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onloadend = () => resolve(reader.result); // Store the full Base64 string
+            reader.onerror = reject;
+            reader.readAsDataURL(blob);
+          })
+        );
+  
+      if (!isFavorite) {
+        // Add to wishlist
+        await setDoc(wishlistRef, {
+          id: String(products[0].id),
+          name: products[0].name,
+          image: imageBase64,
+          title: products[0].title,
+          category: products[0].category,
+          description: products[0].description,
+          price: products[0].price,
+          color: selectedColor,
+          size: selectedSize,
+          quantity: quantity, // Ensure you have a quantity variable in scope
+        });
+      } else {
+        // Remove from wishlist
+        await deleteDoc(wishlistRef);
+      }
+  
+      // Toggle favorite state
+      setIsFavorite((prev) => !prev);
+    } catch (error) {
+      console.error("Error updating wishlist:", error);
+    }
+  };
  
   return (
     <div className={`product-view w-full lg:flex justify-between ${className || ""}`}>
@@ -227,27 +290,31 @@ const decrement = () => setQuantity((prev) => Math.max(1, prev - 1));
                 <button onClick={increment} type="button" className="text-base text-qgray">+</button>
               </div>
             </div>
-            <div className="w-[60px] h-full flex justify-center items-center border border-qgray-border">
-      <button type="button" >
-        <span>
-          <svg
-            width="24"
-            height="24"
-            viewBox="0 0 24 24"
-            fill="none"
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            <path
-              d="M17 1C14.9 1 13.1 2.1 12 3.7C10.9 2.1 9.1 1 7 1C3.7 1 1 3.7 1 7C1 13 12 22 12 22C12 22 23 13 23 7C23 3.7 20.3 1 17 1Z"
-              stroke={isFavorite ? "red" : "#D5D5D5"}
-              strokeWidth="2"
-              strokeMiterlimit="10"
-              strokeLinecap="square"
-            />
-          </svg>
-        </span>
-      </button>
-    </div>
+            <div className="w-[60px] h-full flex justify-center items-center">
+  <button
+    type="button"
+    onClick={handleWishlistClick}
+    className={`w-full h-full flex justify-center items-center ${isFavorite ? 'bg-pink-500' : 'bg-transparent'}`}
+  >
+    <span>
+      <svg
+        width="24"
+        height="24"
+        viewBox="0 0 24 24"
+        fill="none"
+        xmlns="http://www.w3.org/2000/svg"
+      >
+        <path
+          d="M17 1C14.9 1 13.1 2.1 12 3.7C10.9 2.1 9.1 1 7 1C3.7 1 1 3.7 1 7C1 13 12 22 12 22C12 22 23 13 23 7C23 3.7 20.3 1 17 1Z"
+          stroke={isFavorite ? "white" : "#D5D5D5"} // Set the stroke color to white when pink
+          strokeWidth="2"
+          strokeMiterlimit="10"
+          strokeLinecap="square"
+        />
+      </svg>
+    </span>
+  </button>
+</div>
             <div className="w-[210px] h-[60px] flex justify-center items-center border border-qgray-border">
   <button
     type="button"
