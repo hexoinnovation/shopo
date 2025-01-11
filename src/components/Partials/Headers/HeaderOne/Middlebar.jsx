@@ -161,7 +161,8 @@ const[product, setProduct] = useState(0);
                   2
                 </span>
               </div>
-              <div className="favorite relative">
+              <div className="favorite relative group relative py-4">
+              <div className="favorite relative cursor-pointer">
       <Link to="/wishlist">
         <span>
           <ThinLove /> {/* Add the ThinLove component or your heart icon */}
@@ -169,12 +170,14 @@ const[product, setProduct] = useState(0);
       </Link>
       <span
       className={`w-[18px] h-[18px] rounded-full absolute -top-2.5 -right-2.5 flex justify-center items-center text-[9px] ${
-        wishlistCount > 0 ? "bg-qh3-blue text-white" : "bg-qyellow"
+       type === 3 ? "bg-qh3-blue text-white" : "bg-qyellow"
       }`}
     >
       {wishlistCount}
     </span>
     </div>
+    </div>
+    
               <div className="cart-wrapper group relative py-4">
                 <div className="cart relative cursor-pointer">
                   <Link to="/cart">
