@@ -3,7 +3,7 @@ import { doc, setDoc ,getDoc, getFirestore, collection, getDocs, deleteDoc } fro
 import { db } from "../../../firebse";
 import { getAuth } from "firebase/auth";
 import Swal from 'sweetalert2'; // Import SweetAlert2
-import Draggable from "react-draggable";
+
 
 export default function AddressesTab() {
 const auth = getAuth();

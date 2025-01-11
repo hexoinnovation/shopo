@@ -130,19 +130,7 @@ export default function ProductsTable({ className }) {
                     <td className="text-center py-4 px-2">{product.category}</td>
                     <td className="text-center py-4 px-2">₹{product.price}</td>
                     <td className="text-center py-4 px-2">
-                      <button
-                        onClick={() => updateQuantity(product.id, "decrement")}
-                        className="px-2 py-1 bg-gray-200 border rounded"
-                      >
-                        -
-                      </button>
-                      <span className="px-4">{product.quantity}</span>
-                      <button
-                        onClick={() => updateQuantity(product.id, "increment")}
-                        className="px-2 py-1 bg-gray-200 border rounded"
-                      >
-                        +
-                      </button>
+                    {product.quantity}
                     </td>
                     <td className="text-center py-4">₹{total}</td>
                     <td className="text-right py-4">
