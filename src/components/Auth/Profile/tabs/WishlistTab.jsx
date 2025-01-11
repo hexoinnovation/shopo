@@ -78,7 +78,7 @@ export default function WishlistTab({ className }) {
                         <td className="py-4 whitespace-nowrap text-center">Quantity</td>
                         <td className="py-4 whitespace-nowrap text-right w-[114px] block"></td>
                       </tr>
-          
+                      
                       {/* Table Data */}
                       {wishlistItems.length > 0 ? (
                         wishlistItems.map((item) => (
@@ -99,7 +99,7 @@ export default function WishlistTab({ className }) {
                                 </div>
                               </div>
                             </td>
-                            <td className="text-center py-4 px-2 ">{item.review || "N/A"}</td>
+                            <td className="text-center py-4 px-2 mr-12">{item.review || "N/A"}</td>
                             <td className="text-center py-4 px-2">
                               <div className="flex justify-center items-center">
                                 <span
