@@ -1,9 +1,75 @@
-import React from "react";
+import React, { useState,useEffect } from "react";
 import QuickViewIco from "../icons/QuickViewIco";
 import ThinLove from "../icons/ThinLove";
 import Compair from "../icons/Compair";
-
+import { doc, setDoc , getDoc,deleteDoc } from "firebase/firestore";
+import { db } from "../../firebse";
+import { getAuth } from "firebase/auth";
 function ProductCardStyleThree({ datas }) {
+   const [isPink, setIsPink] = useState(false);
+    
+      useEffect(() => {
+        const fetchWishlistStatus = async () => {
+          if (!datas || !datas.id) return;
+    
+          const auth = getAuth();
+          const currentUser = auth.currentUser;
+    
+          if (currentUser) {
+            const sanitizedEmail = currentUser.email.replace(/\s/g, "_");
+            const wishlistRef = doc(db, "users", sanitizedEmail, "wishlist", datas.id);
+    
+            try {
+              const docSnap = await getDoc(wishlistRef);
+              if (docSnap.exists()) {
+                setIsPink(true); // Product is already in the wishlist
+              } else {
+                setIsPink(false); // Product is not in the wishlist
+              }
+            } catch (error) {
+              console.error("Error checking wishlist status: ", error);
+            }
+          }
+        };
+    
+        fetchWishlistStatus();
+      }, [datas]);
+    
+      const handleWishlistClick = async () => {
+        if (!datas || !datas.id) {
+          alert("Invalid product data.");
+          return;
+        }
+    
+        const auth = getAuth();
+        const currentUser = auth.currentUser;
+    
+        if (currentUser) {
+          const sanitizedEmail = currentUser.email.replace(/\s/g, "_");
+          const wishlistRef = doc(db, "users", sanitizedEmail, "wishlist", datas.id);
+    
+          try {
+            if (isPink) {
+              // Remove from wishlist
+              await deleteDoc(wishlistRef);
+              console.log("Product removed from wishlist.");
+              setIsPink(false);
+            } else {
+              // Add to wishlist
+              await setDoc(wishlistRef, datas);
+              console.log("Product added to wishlist.");
+              setIsPink(true);
+            }
+          } catch (error) {
+            console.error("Error updating wishlist: ", error);
+            alert("An error occurred. Please try again.");
+          }
+        } else {
+          alert("Please log in to manage your wishlist.");
+        }
+      };
+    
+
   return (
     <div className="product-cart-three w-full group">
       {/* thumb */}
@@ -20,11 +86,24 @@ function ProductCardStyleThree({ datas }) {
               <QuickViewIco />
             </span>
           </a>
-          <a href="#">
-            <span className="w-10 h-10 flex justify-center items-center bg-primarygray rounded">
-              <ThinLove />
-            </span>
-          </a>
+
+           <a
+                              href="#"
+                              onClick={(e) => {
+                                e.preventDefault();
+                                handleWishlistClick();
+                              }}
+                            >
+                              <span
+                                className={`w-10 h-10 flex justify-center items-center ${
+                                  isPink ? "bg-pink-500" : "bg-primarygray"
+                                } rounded`}
+                              >
+                                <ThinLove />
+                              </span>
+                            </a>
+          
+          
           <a href="#">
             <span className="w-10 h-10 flex justify-center items-center bg-primarygray rounded">
               <Compair />
