@@ -31,6 +31,7 @@ export default function CardPage({ cart = true, products = [] }) {
       const auth = getAuth();
       const db = getFirestore();
       const user = auth.currentUser;
+      
 
       if (user) {
         try {
