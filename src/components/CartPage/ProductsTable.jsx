@@ -73,18 +73,7 @@ export default function ProductsTable({ className }) {
   };
 
   // Handle quantity update
-  const updateQuantity = (id, operation) => {
-    setProducts((prevProducts) =>
-      prevProducts.map((product) =>
-        product.id === id
-          ? {
-              ...product,
-              quantity: operation === "increment" ? product.quantity + 1 : product.quantity - 1,
-            }
-          : product
-      )
-    );
-  };
+  
   const saveSubtotalToFirestore = async (subtotal) => {
     const auth = getAuth();
     const db = getFirestore();

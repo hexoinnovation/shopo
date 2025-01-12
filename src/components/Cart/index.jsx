@@ -9,27 +9,58 @@ export default function Cart({ className, type }) {
   const user = auth.currentUser;
 
  
-    useEffect(() => {
-      if (user) {
-        const sanitizedEmail = user.email ? user.email.replace(/\ /g, "_") : "unknown_user";
+  useEffect(() => {
+    if (user) {
+      const sanitizedEmail = user.email ? user.email.replace(/\ /g, "_") : "unknown_user";
   
-        // Reference to the 'cart' collection for the specific user
-        const cartRef = collection(db, "users", sanitizedEmail, "cart");
+      // Reference to the 'cart' collection for the specific user
+      const cartRef = collection(db, "users", sanitizedEmail, "cart");
   
-        // Listen to all documents in the 'cart' collection
-        const unsubscribe = onSnapshot(cartRef, (querySnapshot) => {
+      // Debug: Log the collection path
+      console.log("Listening to collection path:", `users/${sanitizedEmail}/cart`);
+  
+      // Listen to all documents in the 'cart' collection
+      const unsubscribe = onSnapshot(
+        cartRef,
+        (querySnapshot) => {
           const items = [];
+  
+          // Debug: Log the number of documents in the snapshot
+          console.log("Snapshot size:", querySnapshot.size);
+  
           querySnapshot.forEach((doc) => {
             const data = doc.data();
-            items.push(...data.items); // Assuming each document has an items array
-          });
-          setCartItems(items);
-        });
   
-        return () => unsubscribe();
-      }
-    }, [user, db]);
-
+            // Debug: Log the document ID and data
+            console.log("Document ID:", doc.id);
+            console.log("Document data:", data);
+  
+            if (Array.isArray(data.items)) {
+              // Debug: Log the items being pushed
+              console.log("Items in document:", data.items);
+              items.push(...data.items);
+            } else {
+              // Debug: Log if the items array is missing or not an array
+              console.warn(`Document ${doc.id} does not have a valid 'items' array.`);
+            }
+          });
+  
+          // Debug: Log the final collected items array
+          console.log("Final items array:", items);
+  
+          setCartItems(items);
+        },
+        (error) => {
+          // Debug: Log any errors with the snapshot listener
+          console.error("Error fetching cart data:", error);
+        }
+      );
+  
+      // Cleanup the listener on unmount
+      return () => unsubscribe();
+    }
+  }, [user, db]);
+  
     const getImageSource = (image) => {
       if (typeof image === "string" && (image.startsWith("data:image/") || image.startsWith("http"))) {
         return image; // Return the image directly if valid
