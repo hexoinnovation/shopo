@@ -1,8 +1,50 @@
+import React, { useState } from 'react';
 import InputCom from "../Helpers/InputCom";
 import PageTitle from "../Helpers/PageTitle";
 import Layout from "../Partials/Layout";
 
 export default function Contact() {
+
+
+  const [firstName, setFirstName] = useState("");
+  const [email, setEmail] = useState("");
+  const [subject, setSubject] = useState("");
+  const [message, setMessage] = useState("");
+  const [status, setStatus] = useState("");
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    const data = { firstName, email, subject, message };
+
+    try {
+      const response = await fetch(
+        "https://<region>-<project-id>.cloudfunctions.net/sendContactEmail",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(data),
+        }
+      );
+
+      if (response.ok) {
+        setStatus("Email sent successfully!");
+        setFirstName("");
+        setEmail("");
+        setSubject("");
+        setMessage("");
+      } else {
+        setStatus("Failed to send email. Please try again.");
+      }
+    } catch (error) {
+      console.error("Error:", error);
+      setStatus("An error occurred. Please try again later.");
+    }
+  };
+
+
   return (
     <Layout childrenClasses="pt-0 pb-0">
       <div className="page-title mb-10">
@@ -153,70 +195,77 @@ export default function Contact() {
               </div>
             </div>
             <div className="flex-1 bg-white sm:p-10 p-3">
-              <div className="title flex flex-col items-center">
-                <h1 className="text-[34px] font-bold text-qblack">
-                  Get In Touch
-                </h1>
-                <span className="-mt-5 block">
-                  <svg
-                    width="354"
-                    height="30"
-                    viewBox="0 0 354 30"
-                    fill="none"
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    <path
-                      d="M1 28.8027C17.6508 20.3626 63.9476 8.17089 113.509 17.8802C166.729 28.3062 341.329 42.704 353 1"
-                      stroke="#FFBB38"
-                      strokeWidth="2"
-                      strokeLinecap="round"
-                    />
-                  </svg>
-                </span>
-              </div>
-              <div className="inputs mt-5">
-                <div className="mb-4">
-                  <InputCom
-                    label="Frist Name*"
-                    placeholder="Demo Name"
-                    name="first_name"
-                    inputClasses="h-[50px]"
-                  />
-                </div>
-                <div className="mb-4">
-                  <InputCom
-                    label="Email Address*"
-                    placeholder="info@quomodosoft.com"
-                    name="email"
-                    inputClasses="h-[50px]"
-                  />
-                </div>
-                <div className="mb-4">
-                  <InputCom
-                    label="Subject*"
-                    placeholder="Your Subject here"
-                    name="subject"
-                    inputClasses="h-[50px]"
-                  />
-                </div>
-                <div className="mb-5">
-                  <h6 className="input-label text-qgray capitalize text-[13px] font-normal block mb-2 ">
-                    Message*
-                  </h6>
-                  <textarea
-                    placeholder="Type your message here"
-                    className="w-full h-[105px] focus:ring-0 focus:outline-none p-3 border border-qgray-border placeholder:text-sm"
-                  ></textarea>
-                </div>
-                <div>
-                  <a href="#">
-                    <div className="black-btn text-sm font-semibold w-full h-[50px] flex justify-center items-center">
-                      <span>Send Now</span>
-                    </div>
-                  </a>
-                </div>
-              </div>
-            </div>
+      <div className="title flex flex-col items-center">
+        <h1 className="text-[34px] font-bold text-qblack">Get In Touch</h1>
+      </div>
+      <form onSubmit={handleSubmit} className="inputs mt-5">
+        <div className="mb-4">
+          <label htmlFor="firstName" className="font-bold">
+            First Name*
+          </label>
+          <input
+            type="text"
+            id="firstName"
+            value={firstName}
+            onChange={(e) => setFirstName(e.target.value)}
+            placeholder="Demo Name"
+            required
+            className="h-[50px] border p-2 rounded focus:outline-none focus:ring-2 focus:ring-indigo-500"
+          />
+        </div>
+        <div className="mb-4">
+          <label htmlFor="email" className="font-bold">
+            Email Address*
+          </label>
+          <input
+            type="email"
+            id="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            placeholder="info@example.com"
+            required
+            className="h-[50px] border p-2 rounded focus:outline-none focus:ring-2 focus:ring-indigo-500"
+          />
+        </div>
+        <div className="mb-4">
+          <label htmlFor="subject" className="font-bold">
+            Subject*
+          </label>
+          <input
+            type="text"
+            id="subject"
+            value={subject}
+            onChange={(e) => setSubject(e.target.value)}
+            placeholder="Your Subject Here"
+            required
+            className="h-[50px] border p-2 rounded focus:outline-none focus:ring-2 focus:ring-indigo-500"
+          />
+        </div>
+        <div className="mb-5">
+          <label htmlFor="message" className="font-bold">
+            Message*
+          </label>
+          <textarea
+            id="message"
+            value={message}
+            onChange={(e) => setMessage(e.target.value)}
+            placeholder="Type your message here"
+            required
+            className="w-full h-[105px] border p-3 rounded focus:outline-none focus:ring-2 focus:ring-indigo-500"
+          ></textarea>
+        </div>
+        <div>
+          <button
+            type="submit"
+            className="black-btn text-sm font-semibold w-full h-[50px] flex justify-center items-center bg-qblack text-white rounded"
+          >
+            Send Now
+          </button>
+        </div>
+        {status && <p className="mt-4 text-green-500">{status}</p>}
+      </form>
+    </div>
+
           </div>
         </div>
       </div>
