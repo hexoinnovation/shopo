@@ -1,8 +1,8 @@
 import InputCom from "../Helpers/InputCom";
 import PageTitle from "../Helpers/PageTitle";
 import Layout from "../Partials/Layout";
-import { getAuth } from "firebase/auth";
-import { doc, setDoc ,getDoc, getFirestore, collection, getDocs, deleteDoc,  } from "firebase/firestore";
+import { getAuth, onAuthStateChanged  } from "firebase/auth";
+import { doc, setDoc ,getDoc, getFirestore, collection, getDocs, deleteDoc, } from "firebase/firestore";
 import { db } from "../firebse";
 import React, { useState,useEffect } from "react";
 
@@ -140,6 +140,54 @@ const handlePlaceOrderClick = () => {
     alert("Payment method selected: " + selectedPaymentMethod);
   }
 };
+
+
+
+const [user, setUser] = useState(null);
+const [cartItem, setCartItem] = useState(null);
+const [error, setError] = useState(null);
+const [cartItems, setCartItems] = useState([]);
+const auth = getAuth();
+const db = getFirestore();
+
+// Monitor authentication state
+useEffect(() => {
+  const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+    setUser(currentUser);
+  });
+
+  return () => unsubscribe();
+}, [auth]);
+
+// Fetch cart item for the logged-in user
+useEffect(() => {
+  const fetchCartItem = async () => {
+    if (!user || !user.email) {
+      console.warn("User is not logged in or email is missing.");
+      return;
+    }
+
+    const sanitizedEmail = user.email.replace(/\s/g, "_"); // Sanitize email
+    const cartRef = doc(db, "users", sanitizedEmail, "cart", "1"); // Specific cart item ID (1)
+
+    try {
+      const cartSnapshot = await getDoc(cartRef);
+      if (cartSnapshot.exists()) {
+        console.log("Cart Item Data:", cartSnapshot.data()); // Debugging data
+        setCartItem(cartSnapshot.data());
+      } else {
+        console.warn("No cart item found at path:", cartRef.path);
+        setCartItem(null);
+      }
+    } catch (err) {
+      console.error("Error fetching cart item:", err);
+      setError(err.message);
+    }
+  };
+
+  fetchCartItem();
+}, [user, db]);
+
 
   return (
     <Layout childrenClasses="pt-0 pb-0">
@@ -350,81 +398,53 @@ const handlePlaceOrderClick = () => {
                 </h1>
 
                 <div className="w-full px-10 py-[30px] border border-[#EDEDED]">
-                  <div className="sub-total mb-6">
-                    <div className=" flex justify-between mb-5">
-                      <p className="text-[13px] font-medium text-qblack uppercase">
-                        PROduct
-                      </p>
-                      <p className="text-[13px] font-medium text-qblack uppercase">
-                        total
-                      </p>
-                    </div>
-                    <div className="w-full h-[1px] bg-[#EDEDED]"></div>
+                <div className="sub-total mb-6">
+        <div className="flex justify-between mb-5">
+          <p className="text-[13px] font-medium text-qblack uppercase">
+            Product
+          </p>
+          <p className="text-[13px] font-medium text-qblack uppercase">
+            Total
+          </p>
+        </div>
+        <div className="w-full h-[1px] bg-[#EDEDED]"></div>
+      </div>
+
+
+      <div>
+      <h1>Welcome, {user?.email || "Guest"}</h1>
+
+      <h2>Cart Items:</h2>
+      {error && <p className="error">Error: {error}</p>}
+
+      {cartItems.length > 0 ? (
+        <div className="product-list w-full mb-[30px]">
+          <ul className="flex flex-col space-y-5">
+            {cartItems.map((item, index) => (
+              <li key={index}>
+                <div className="flex justify-between items-center">
+                  <div>
+                    <h4 className="text-[15px] text-qblack mb-2.5">
+                      {item.name || "Unknown Product"}
+                    </h4>
+                    <p className="text-[13px] text-qgray">
+                      {item.description || "No description available."}
+                    </p>
                   </div>
-                  <div className="product-list w-full mb-[30px]">
-                    <ul className="flex flex-col space-y-5">
-                      <li>
-                        <div className="flex justify-between items-center">
-                          <div>
-                            <h4 className="text-[15px] text-qblack mb-2.5">
-                              Apple Watch
-                              <sup className="text-[13px] text-qgray ml-2 mt-2">
-                                x1
-                              </sup>
-                            </h4>
-                            <p className="text-[13px] text-qgray">
-                              64GB, Black, 44mm, Chain Belt
-                            </p>
-                          </div>
-                          <div>
-                            <span className="text-[15px] text-qblack font-medium">
-                              $38
-                            </span>
-                          </div>
-                        </div>
-                      </li>
-                      <li>
-                        <div className="flex justify-between items-center">
-                          <div>
-                            <h4 className="text-[15px] text-qblack mb-2.5">
-                              Apple Watch
-                              <sup className="text-[13px] text-qgray ml-2 mt-2">
-                                x1
-                              </sup>
-                            </h4>
-                            <p className="text-[13px] text-qgray">
-                              64GB, Black, 44mm, Chain Belt
-                            </p>
-                          </div>
-                          <div>
-                            <span className="text-[15px] text-qblack font-medium">
-                              $38
-                            </span>
-                          </div>
-                        </div>
-                      </li>
-                      <li>
-                        <div className="flex justify-between items-center">
-                          <div>
-                            <h4 className="text-[15px] text-qblack mb-2.5">
-                              Apple Watch
-                              <sup className="text-[13px] text-qgray ml-2 mt-2">
-                                x1
-                              </sup>
-                            </h4>
-                            <p className="text-[13px] text-qgray">
-                              64GB, Black, 44mm, Chain Belt
-                            </p>
-                          </div>
-                          <div>
-                            <span className="text-[15px] text-qblack font-medium">
-                              $38
-                            </span>
-                          </div>
-                        </div>
-                      </li>
-                    </ul>
+                  <div>
+                    <span className="text-[15px] text-qblack font-medium">
+                      ${item.price || "0.00"}
+                    </span>
                   </div>
+                </div>
+              </li>
+            ))}
+          </ul>
+        </div>
+      ) : (
+        <p>No cart items found.</p>
+      )}
+    </div>
                   <div className="w-full h-[1px] bg-[#EDEDED]"></div>
 
                   <div className="mt-[30px]">
