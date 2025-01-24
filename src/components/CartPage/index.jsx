@@ -137,3 +137,4 @@ export default function CardPage({ cart = true, products = [] }) {
     </Layout>
   );
 }
+
