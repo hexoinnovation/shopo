@@ -26,35 +26,25 @@ export default function Faq() {
               </h1>
               <div className="flex flex-col space-y-7 justify-between">
                 <Accodion
-                  title="01. How does information technology work?"
-                  des="There are many variations of passages of Lorem Ipsum available into the 
-but the majority have suffered alteration in some form, by injecte find to a
-humour, or randomised words"
+                  title="01. What types of mobile apps do you develop?"
+                  des="We develop a wide range of mobile apps, including native apps for iOS and Android, cross-platform apps using frameworks like Flutter and React Native, and progressive web apps (PWAs). Whether you need a consumer-facing app, an enterprise solution, or a specialized tool, we have the expertise to bring your vision to life."
                 />
                 <Accodion
                   init
-                  title="02. How can I become IT manager?"
-                  des="There are many variations of passages of Lorem Ipsum available into the 
-but the majority have suffered alteration in some form, by injecte find to a
-humour, or randomised words"
+                  title="02. How do you ensure the app meets our specific requirements?"
+                  des="We start every project with a detailed discovery phase where we gather your requirements, understand your goals, and define the app’s functionality. Our team then creates wireframes and prototypes to visualize the app’s design and features. We work closely with you throughout the process, incorporating your feedback to ensure the final product aligns perfectly with your needs."
                 />
                 <Accodion
-                  title="03. What are the latest trends in IT?"
-                  des="There are many variations of passages of Lorem Ipsum available into the 
-but the majority have suffered alteration in some form, by injecte find to a
-humour, or randomised words"
+                  title="03. What platforms do you support for mobile app development?"
+                  des="We support development for both iOS and Android platforms, as well as cross-platform development that allows your app to run seamlessly on multiple devices. Our developers are skilled in the latest tools and technologies to deliver high-quality apps tailored to your target audience."
                 />
                 <Accodion
-                  title="04. How long should a business plan be?"
-                  des="There are many variations of passages of Lorem Ipsum available into the 
-but the majority have suffered alteration in some form, by injecte find to a
-humour, or randomised words"
+                  title="04. How do you handle app design and user experience (UX)?"
+                  des="User experience is a top priority in our mobile app development process. Our designers create intuitive, user-friendly interfaces that are both visually appealing and easy to navigate. We conduct user testing and gather feedback to refine the design and ensure a seamless and enjoyable user experience."
                 />
                 <Accodion
-                  title="05. How work the support policy?"
-                  des="There are many variations of passages of Lorem Ipsum available into the 
-but the majority have suffered alteration in some form, by injecte find to a
-humour, or randomised words"
+                  title="05. Can you integrate the app with our existing systems or third-party services? "
+                  des="Yes, we specialize in integrating mobile apps with existing systems, databases, and third-party services. Whether you need integration with payment gateways, social media platforms, CRM systems, or custom APIs, we ensure smooth and secure connectivity to enhance the app’s functionality."
                 />
               </div>
             </div>
