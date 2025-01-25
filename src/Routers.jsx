@@ -1,4 +1,4 @@
-import { createBrowserRouter, RouterProvider } from "react-router-dom";
+import { createBrowserRouter, RouterProvider,Router, Route, Routes } from "react-router-dom";
 import About from "./components/About";
 import AllProductPage from "./components/AllProductPage";
 import Login from "./components/Auth/Login/index";
@@ -26,7 +26,7 @@ import Wishlist from "./components/Wishlist";
 import HomeThree from "./components/HomeThree";
 import HomeFour from "./components/HomeFour";
 import HomeFive from "./components/HomeFive";
-
+import ProductDetailPage from "./components/Helpers/Cards/ProductDetailPage.jsx";
 const router = createBrowserRouter([
   { path: "/", element: <Home /> },
   { path: "/home-two", element: <HomeTwo /> },
@@ -34,6 +34,7 @@ const router = createBrowserRouter([
   { path: "/home-four", element: <HomeFour /> },
   { path: "/home-five", element: <HomeFive /> },
   { path: "/all-products", element: <AllProductPage /> },
+  
   { path: "/single-product", element: <SingleProductPage /> },
   { path: "/cart", element: <CardPage /> },
   { path: "/checkout", element: <CheakoutPage /> },
@@ -56,7 +57,11 @@ const router = createBrowserRouter([
   { path: "/terms-condition", element: <TermsCondition /> },
   { path: "*", element: <FourZeroFour /> },
 ]);
-
+<Router>
+      <Routes>
+        <Route path="/product/:productId" element={<ProductDetailPage />} />
+      </Routes>
+    </Router>
 function Routers() {
   return <RouterProvider router={router} />;
 }

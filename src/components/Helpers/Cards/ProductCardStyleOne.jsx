@@ -1,210 +1,444 @@
-import React, { useState,useEffect } from "react";
-import { Link } from "react-router-dom";
-import Compair from "../icons/Compair";
-import QuickViewIco from "../icons/QuickViewIco";
-import Star from "../icons/Star";
-import { doc, setDoc , getDoc,deleteDoc } from "firebase/firestore";
-import { db } from "../../firebse";
-import { getAuth } from "firebase/auth";
-import ThinLove from "../icons/ThinLove";
+// import React, { useState, useEffect } from "react";
+// import { Link } from "react-router-dom";
+// import Compair from "../icons/Compair";
+// import QuickViewIco from "../icons/QuickViewIco";
+// import Star from "../icons/Star";
+// import { doc, setDoc, getDoc, deleteDoc, collection, getDocs } from "firebase/firestore";
+// import { db } from "../../firebse";
+// import { getAuth } from "firebase/auth";
+// import ThinLove from "../icons/ThinLove";
 
-export default function ProductCardStyleOne({ datas, type, product }) {
+// export default function ProductCardStyleOne({ datas, type, product }) {
 
-  const [isPink, setIsPink] = useState(false);
+//   const [isPink, setIsPink] = useState(false);
 
-  useEffect(() => {
-    const fetchWishlistStatus = async () => {
-      if (!datas || !datas.id) return;
+//   useEffect(() => {
+//     const fetchWishlistStatus = async () => {
+//       if (!datas || !datas.id) return;
 
-      const auth = getAuth();
-      const currentUser = auth.currentUser;
+//       const auth = getAuth();
+//       const currentUser = auth.currentUser;
 
-      if (currentUser) {
-        const sanitizedEmail = currentUser.email.replace(/\s/g, "_");
-        const wishlistRef = doc(db, "users", sanitizedEmail, "wishlist", datas.id);
+//       if (currentUser) {
+//         const sanitizedEmail = currentUser.email.replace(/\s/g, "_");
+//         const wishlistRef = doc(db, "users", sanitizedEmail, "wishlist", datas.id);
 
-        try {
-          const docSnap = await getDoc(wishlistRef);
-          if (docSnap.exists()) {
-            setIsPink(true); // Product is already in the wishlist
-          } else {
-            setIsPink(false); // Product is not in the wishlist
-          }
-        } catch (error) {
-          console.error("Error checking wishlist status: ", error);
-        }
-      }
-    };
+//         try {
+//           const docSnap = await getDoc(wishlistRef);
+//           if (docSnap.exists()) {
+//             setIsPink(true); // Product is already in the wishlist
+//           } else {
+//             setIsPink(false); // Product is not in the wishlist
+//           }
+//         } catch (error) {
+//           console.error("Error checking wishlist status: ", error);
+//         }
+//       }
+//     };
 
-    fetchWishlistStatus();
-  }, [datas]);
+//     fetchWishlistStatus();
+//   }, [datas]);
 
-  const handleWishlistClick = async () => {
-    if (!datas || !datas.id) {
-      alert("Invalid product data.");
-      return;
-    }
+//   const handleWishlistClick = async () => {
+//     if (!datas || !datas.id) {
+//       alert("Invalid product data.");
+//       return;
+//     }
 
-    const auth = getAuth();
-    const currentUser = auth.currentUser;
+//     const auth = getAuth();
+//     const currentUser = auth.currentUser;
 
-    if (currentUser) {
-      const sanitizedEmail = currentUser.email.replace(/\s/g, "_");
-      const wishlistRef = doc(db, "users", sanitizedEmail, "wishlist", datas.id);
+//     if (currentUser) {
+//       const sanitizedEmail = currentUser.email.replace(/\s/g, "_");
+//       const wishlistRef = doc(db, "users", sanitizedEmail, "wishlist", datas.id);
 
-      try {
-        if (isPink) {
-          // Remove from wishlist
-          await deleteDoc(wishlistRef);
-          console.log("Product removed from wishlist.");
-          setIsPink(false);
-        } else {
-          // Add to wishlist
-          await setDoc(wishlistRef, datas);
-          console.log("Product added to wishlist.");
-          setIsPink(true);
-        }
-      } catch (error) {
-        console.error("Error updating wishlist: ", error);
-        alert("An error occurred. Please try again.");
-      }
-    } else {
-      alert("Please log in to manage your wishlist.");
+//       try {
+//         if (isPink) {
+//           // Remove from wishlist
+//           await deleteDoc(wishlistRef);
+//           console.log("Product removed from wishlist.");
+//           setIsPink(false);
+//         } else {
+//           // Add to wishlist
+//           await setDoc(wishlistRef, datas);
+//           console.log("Product added to wishlist.");
+//           setIsPink(true);
+//         }
+//       } catch (error) {
+//         console.error("Error updating wishlist: ", error);
+//         alert("An error occurred. Please try again.");
+//       }
+//     } else {
+//       alert("Please log in to manage your wishlist.");
+//     }
+//   };
+
+//   const [products, setProducts] = useState([]);
+
+//   const fetchProducts = async () => {
+//     try {
+//       const collectionRef = collection(db, "Products");
+//       const querySnapshot = await getDocs(collectionRef);
+
+//       const fetchedProducts = querySnapshot.docs.map((doc) => ({
+//         id: doc.id,
+//         ...doc.data(),
+//       }));
+
+//       // Remove duplicates based on 'id'
+//       const uniqueProducts = Array.from(
+//         new Map(fetchedProducts.map((item) => [item.id, item])).values()
+//       );
+
+//       setProducts(uniqueProducts);
+//       console.log("Fetched Products:", uniqueProducts); // Log unique products
+//     } catch (error) {
+//       console.error("Error fetching products:", error);
+//       alert("Failed to fetch products. Please try again.");
+//     }
+//   };
+
+//   useEffect(() => {
+//     fetchProducts();
+//   }, []); // Empty dependency array ensures this runs only once on initial render
+
+//   return (
+   
+//       <div>
+//         <h2>Product List</h2>
+//         <div className="product-grid">
+//           {products.length > 0 ? (
+//             products.map((product) => (
+//               <div key={product.id} className="product-card">
+//                 <h3>{product.name}</h3>
+//                 <p><strong>Price:</strong> ${product.price}</p>
+//                 <p><strong>Description:</strong> {product.description}</p>
+//                 <p><strong>Stock:</strong> {product.stock}</p>
+//                 <p><strong>Category:</strong> {product.category}</p>
+//                 <p><strong>SKU:</strong> {product.sku}</p>
+//                 <p><strong>Discount Price:</strong> ${product.discountPrice || "N/A"}</p>
+//                 <p><strong>Tags:</strong> {product.tags?.join(", ")}</p>
+//                 <p><strong>Brand:</strong> {product.brand}</p>
+//                 <p><strong>Dimensions:</strong> {product.dimensions}</p>
+//                 <p><strong>Additional Notes:</strong> {product.additionalNotes}</p>
+//                 <p><strong>Shipping Weight:</strong> {product.shippingWeight}</p>
+//                 <p><strong>Shipping Class:</strong> {product.shippingClass}</p>
+//                 <p><strong>Tax Class:</strong> {product.taxClass}</p>
+//                 <p><strong>Product URL:</strong> <a href={product.productUrl} target="_blank" rel="noopener noreferrer">{product.productUrl}</a></p>
+//                 <p><strong>Availability:</strong> {product.availability}</p>
+//               </div>
+//             ))
+//           ) : (
+//             <p>No products available.</p>
+//           )}
+//         </div>
+//       </div>
+    
+//   );
+// }
+
+
+
+
+
+
+
+
+import React, { useState, useEffect } from "react";
+import { FaHeart, FaShoppingCart, FaStar, FaShoppingBag } from "react-icons/fa";
+import { useNavigate } from "react-router-dom";
+import { auth,db } from "../../firebse";
+import { collection, getDocs } from "firebase/firestore";
+import { getFirestore, doc, setDoc,deleteDoc,query,where } from "firebase/firestore";
+const ProductCardStyleOne = () => {
+  const [products, setProducts] = useState([]);
+  const [selectedSubcategory, setSelectedSubcategory] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
+  const [productsPerPage, setProductsPerPage] = useState(8); // Default to 8
+  const navigate = useNavigate();
+  
+  const [loginPrompt, setLoginPrompt] = useState(false); 
+  const [error, setError] = useState('');  // Add state for error message
+  const [successMessage, setSuccessMessage] = useState(''); // Success message
+  const [errorMessage, setErrorMessage] = useState('');
+  const [isSignup, setIsSignup] = useState(false);
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [username, setUsername] = useState('');
+  const [cartItems, setCartItems] = useState([]);
+  const [cartCount, setCartCount] = useState(0);
+
+
+
+const [quantity, setQuantity] = useState(1);
+  const [showModal, setShowModal] = useState(false); // Initially set to false   
+  // Fetch products from Firebase
+  const fetchProducts = async () => {
+    try {
+      const querySnapshot = await getDocs(collection(db, "Products"));
+      const productList = querySnapshot.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+      }));
+      setProducts(productList);
+    } catch (error) {
+      console.error("Error fetching products:", error);
     }
   };
 
+  // Adjust productsPerPage based on screen size
+  const adjustProductsPerPage = () => {
+    const screenWidth = window.innerWidth;
+    if (screenWidth >= 1024) {
+      setProductsPerPage(8); // 8 for larger screens
+    } else {
+      setProductsPerPage(4); // 4 for smaller screens
+    }
+  };
 
-  const available =
-    (datas.cam_product_sale /
-      (datas.cam_product_available + datas.cam_product_sale)) *
-    100;
+  useEffect(() => {
+    fetchProducts();
+    adjustProductsPerPage(); // Set initial productsPerPage
+    window.addEventListener("resize", adjustProductsPerPage); // Listen to resize events
+    return () => window.removeEventListener("resize", adjustProductsPerPage);
+  }, []);
+
+  // const handleSubcategorySelect = (subcategory) => {
+  //   setSelectedSubcategory(subcategory);
+  //   setCurrentPage(1);
+  // };
+
+  const handleProductClick = (productId) => {
+    navigate(`/product/${productId}`);
+  };
+
+  const filteredProducts = (selectedSubcategory || "")
+  ? products.filter((product) => {
+      const subcategory = product.subcategory || "";
+      return subcategory.trim().toLowerCase() === selectedSubcategory.trim().toLowerCase();
+    })
+  : products;
+
+  const indexOfLastProduct = currentPage * productsPerPage;
+  const indexOfFirstProduct = indexOfLastProduct - productsPerPage;
+  const currentProducts = filteredProducts.slice(
+    indexOfFirstProduct,
+    indexOfLastProduct
+  );
+  const totalPages = Math.ceil(filteredProducts.length / productsPerPage);
+
+  const handlePageChange = (pageNumber) => {
+    setCurrentPage(pageNumber);
+  };
+  const incrementCartCount = () => {
+    setCartCount((prevCount) => prevCount + 1); // Assuming `setCartCount` is a state setter
+  };
+  
+  const handleAddToCart = async (product) => {
+    if (!isLoggedIn) {
+      setLoginPrompt(true);
+    } else {
+      const auth = getAuth();
+      const db = getFirestore();
+      const user = auth.currentUser;
+  
+      if (user) {
+        // Check if the product is already in the cart
+        const productInCart = cartItems.find((item) => item.id === product.id);
+        if (productInCart) {
+          // Optionally, update the quantity if the product is already in the cart
+          setCartItems((prevItems) =>
+            prevItems.map((item) =>
+              item.id === product.id
+                ? { ...item, quantity: item.quantity + quantity } // Increment quantity by the selected quantity
+                : item
+            )
+          );
+        } else {
+          const productToAdd = { ...product, quantity };  // Ensure you are using the quantity state correctly
+          setCartItems((prevItems) => [...prevItems, productToAdd]); // Update local cart state
+        }
+  
+        try {
+          const userCartRef = collection(db, "users", user.email, "AddToCart");
+          await setDoc(doc(userCartRef, product.id.toString()), { ...product, quantity });  // Save with the quantity
+          setSuccessMessage("Your product has been added to the cart successfully!");
+          incrementCartCount();
+         // navigate("/cart");
+        } catch (error) {
+          console.error("Error adding product to Firestore:", error);
+          setErrorMessage("Failed to add product to the cart.");
+        }
+      }
+    }
+  };
+  
+  // Toggle modal visibility
+const handleModalToggle = () => {
+  handleDropdownClick()
+  setShowModal(!showModal); // Toggle modal visibility
+};
+const handleSubcategorySelect = (subcategory) => {
+  console.log("Selected Subcategory:", subcategory); // Debugging
+  setSelectedSubcategory(subcategory);
+};
+
+
+const handleCategoryClick = (category) => {
+  setSelectedSubcategory(category);
+};
+useEffect(() => {
+    const fetchProducts = async () => {
+      if (selectedSubcategory) {
+        try {
+          const q = query(
+            collection(db, "Products"),
+            
+          );
+          const querySnapshot = await getDocs(q);
+          const fetchedProducts = querySnapshot.docs.map((doc) => ({
+            id: doc.id,
+            ...doc.data(),
+          }));
+          setProducts(fetchedProducts);
+        } catch (error) {
+          console.error("Error fetching products: ", error);
+        }
+      }
+    };
+  
+    fetchProducts();
+  }, [selectedSubcategory]);
+
   return (
-    <div
-      className="product-card-one w-full h-full bg-white relative group overflow-hidden"
-      style={{ boxShadow: "0px 15px 64px 0px rgba(0, 0, 0, 0.05)" }}
-    >
-      <div
-        className="product-card-img w-full h-[300px]"
-        style={{
-          background: `url(${import.meta.env.VITE_PUBLIC_URL}/assets/images/${
-            datas.image
-          }) no-repeat center`,
-        }}
-      >
-        {/* product available progress */}
-        {datas.campaingn_product && (
-          <>
-            <div className="px-[30px] absolute left-0 top-3 w-full">
-              <div className="progress-title flex justify-between ">
-                <p className="text-xs text-qblack font-400 leading-6">
-                  Prodcuts Available
+    <div className="flex flex-col lg:flex-row">
+    
+
+      <div className="flex-2 w-full lg:w-[1700px] p-2 bg-white dark:bg-gray-900 dark:text-white rounded-lg shadow-md">
+      {/* <div className="flex space-x-4 mb-6">
+        {["Phone", "Laptops", "Tablet", "Accessories"].map((category) => (
+          <button
+            key={category}
+            onClick={() => handleCategoryClick(category)}
+            className={`px-4 py-2 rounded-lg ${
+              selectedSubcategory === category
+                ? "bg-primary text-white"
+                : "bg-gray-200 text-gray-800"
+            }`}
+          >
+            {category}
+          </button>
+        ))}
+      </div> 
+      <h2 className="text-2xl font-bold mb-6">All Products</h2> */}
+          {selectedSubcategory && (
+    <h4 className="text-lg font-medium mb-6">
+      Filtered by: <span className="text-primary">{selectedSubcategory}</span>
+    </h4>
+  )}
+
+
+        {currentProducts.length > 0 ? (
+         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+            {currentProducts.map((product) => (
+              <div
+                key={product.id}
+                className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 flex flex-col justify-between hover:shadow-xl transition-shadow duration-300"
+              >
+                <div className="relative mb-4 group">
+                <img
+                src={product.image}
+                alt={product.name}
+                className="w-full h-64 object-cover rounded-md cursor-pointer group-hover:scale-105 transform transition-all duration-300"
+                onClick={() => handleProductClick(product.id)}
+              />
+                  <FaHeart className="absolute top-4 right-4 text-gray-400 group-hover:text-red-500 cursor-pointer transition-colors" />
+                </div>
+                <h3 className="text-xl font-semibold text-gray-800 dark:text-gray-100">
+                  {product.name}
+                </h3>
+                <p className="text-sm text-gray-600 dark:text-gray-300 mb-2">
+                  {product.description}
                 </p>
-                <span className="text-sm text-qblack font-600 leading-6">
-                  {datas.cam_product_available}
-                </span>
+                <div className="flex items-center space-x-2">
+                  <span className="font-medium text-gray-700 dark:text-gray-400">
+                    Color:
+                  </span>
+                  <div
+  className="w-6 h-6 rounded-full"
+  style={{ backgroundColor: product.color ? product.color.toLowerCase() : 'defaultColor' }}
+></div>
+                </div>
+                <div className="flex items-center justify-between mt-4">
+                  <p className="text-lg font-bold text-gray-900 dark:text-white">
+                    ₹{product.price}
+                  </p>
+                </div>
+                <div className="mt-4 flex justify-between items-center space-x-2">
+  <button  onClick={() => handleAddToCart(product)}  className="flex items-center justify-center bg-primary text-xs text-white px-2 py-1 rounded shadow-md hover:bg-primary-dark transition">
+    <FaShoppingCart className="ml-1 " />
+    Add to Cart
+  </button>
+  <button   onClick={() => handleProductClick(product.id)} className="flex items-center justify-center bg-green-600 text-xs text-white px-2 py-1 rounded shadow-md hover:bg-green-700 transition">
+    <FaShoppingBag className="mr-1" />
+    Buy Now
+  </button>
+</div>
               </div>
-              <div className="progress w-full h-[5px] rounded-[22px] bg-primarygray relative overflow-hidden">
-                <div
-                  style={{
-                    width: `${datas.campaingn_product ? 100 - available : 0}%`,
-                  }}
-                  className={`h-full absolute left-0 top-0  ${
-                    type === 3 ? "bg-qh3-blue" : "bg-qyellow"
-                  }`}
-                ></div>
-              </div>
-            </div>
-          </>
+            ))}
+          </div>
+        ) : (
+          <p className="text-gray-700 dark:text-gray-300 text-center mt-12">
+            No products available for the selected category.
+          </p>
         )}
-        {/* product type */}
-        {datas.product_type && !datas.campaingn_product && (
-          <div className="product-type absolute right-[14px] top-[17px]">
-            <span
-              className={`text-[9px] font-700 leading-none py-[6px] px-3 uppercase text-white rounded-full tracking-wider ${
-                datas.product_type === "popular" ? "bg-[#19CC40]" : "bg-qyellow"
-              }`}
+ {/* Success or Error Message */}
+ {successMessage && (
+  <div className="flex items-center bg-white-500 text-yellow-800 p-3 rounded-lg shadow-lg mb-4 animate-slideIn">
+  <FaShoppingCart className="mr-3 text-7xl animate-bounce" />
+  <div className="flex flex-col">
+    <p className="text-center text-lg font-bold">{successMessage}</p>
+  </div>
+</div>
+)}
+
+
+
+      
+        {totalPages > 1 && (
+          <div className="flex justify-center mt-8 space-x-4">
+            <button
+              onClick={() => handlePageChange(currentPage - 1)}
+              disabled={currentPage === 1}
+              className="px-6 py-2 bg-gray-200 dark:bg-gray-700 rounded-md disabled:opacity-50"
             >
-              {datas.product_type}
-            </span>
+              Previous
+            </button>
+            {Array.from({ length: totalPages }, (_, index) => (
+              <button
+                key={index}
+                onClick={() => handlePageChange(index + 1)}
+                className={`px-4 py-2 rounded-md transition-all duration-300 ${
+                  currentPage === index + 1
+                    ? "bg-yellow-500 text-white"
+                    : "bg-gray-200 dark:bg-gray-700"
+                }`}
+              >
+                {index + 1}
+              </button>
+            ))}
+            <button
+              onClick={() => handlePageChange(currentPage + 1)}
+              disabled={currentPage === totalPages}
+              className="px-6 py-2 bg-gray-200 dark:bg-gray-700 rounded-md disabled:opacity-50"
+            >
+              Next
+            </button>
           </div>
         )}
       </div>
-      <div className="product-card-details px-[30px] pb-[30px] relative">
-        {/* add to card button */}
-        <div className="absolute w-full h-10 px-[30px] left-0 top-40 group-hover:top-[85px] transition-all duration-300 ease-in-out">
-          <button
-            type="button"
-            className={type === 3 ? "blue-btn" : "yellow-btn"}
-          >
-            <div className="flex items-center space-x-3">
-              <span>
-                <svg
-                  width="14"
-                  height="16"
-                  viewBox="0 0 14 16"
-                  fill="none"
-                  xmlns="http://www.w3.org/2000/svg"
-                  className="fill-current"
-                >
-                  <path d="M12.5664 4.14176C12.4665 3.87701 12.2378 3.85413 11.1135 3.85413H10.1792V3.43576C10.1792 2.78532 10.089 2.33099 9.86993 1.86359C9.47367 1.01704 8.81003 0.425438 7.94986 0.150881C7.53106 0.0201398 6.90607 -0.0354253 6.52592 0.0234083C5.47246 0.193372 4.57364 0.876496 4.11617 1.85052C3.89389 2.32772 3.80368 2.78532 3.80368 3.43576V3.8574H2.8662C1.74187 3.8574 1.51313 3.88028 1.41326 4.15483C1.36172 4.32807 0.878481 8.05093 0.6723 9.65578C0.491891 11.0547 0.324369 12.3752 0.201948 13.3688C-0.0106763 15.0815 -0.00423318 15.1077 0.00220999 15.1371V15.1404C0.0312043 15.2515 0.317925 15.5424 0.404908 15.6274L0.781834 16H13.1785L13.4588 15.7483C13.5844 15.6339 14 15.245 14 15.0521C14 14.9214 12.5922 4.21694 12.5664 4.14176ZM12.982 14.8037C12.9788 14.8266 12.953 14.8952 12.9079 14.9443L12.8435 15.0162H1.13943L0.971907 14.8331L1.63233 9.82901C1.86429 8.04766 2.07047 6.4951 2.19289 5.56684C2.24766 5.16154 2.27343 4.95563 2.28631 4.8543C2.72123 4.85103 4.62196 4.84776 6.98661 4.84776H11.6901L11.6966 4.88372C11.7481 5.1452 12.9594 14.5128 12.982 14.8037ZM4.77338 3.8574V3.48479C4.77338 3.23311 4.80559 2.88664 4.84103 2.72649C5.03111 1.90935 5.67864 1.24584 6.48726 1.03339C6.82553 0.948403 7.37964 0.97782 7.71791 1.10202H7.72113C8.0755 1.22296 8.36545 1.41907 8.63284 1.71978C9.06453 2.19698 9.2095 2.62516 9.2095 3.41615V3.8574H4.77338Z" />
-                </svg>
-              </span>
-              <span>Add To Cart</span>
-            </div>
-          </button>
-        </div>
-        <div className="reviews flex space-x-[1px] mb-3">
-          {Array.from(Array(datas.review), () => (
-            <span key={datas.review + Math.random()}>
-              <Star />
-            </span>
-          ))}
-        </div>
-        <Link to="/single-product">
-          <p className="title mb-2 text-[15px] font-600 text-qblack leading-[24px] line-clamp-2 hover:text-blue-600">
-            {datas.title}
-          </p>
-        </Link>
-        <p className="price">
-          <span className="main-price text-qgray line-through font-600 text-[18px]">
-            {datas.price}
-          </span>
-          <span className="offer-price text-qred font-600 text-[18px] ml-2">
-            {datas.offer_price}
-          </span>
-        </p>
-      </div>
-      {/* quick-access-btns */}
-      <div className="quick-access-btns flex flex-col space-y-2 absolute group-hover:right-4 -right-10 top-20  transition-all duration-300 ease-in-out">
-        <a href="#">
-          <span className="w-10 h-10 flex justify-center items-center bg-primarygray rounded">
-            <QuickViewIco />
-          </span>
-        </a>
-
-        <a
-      href="#"
-      onClick={(e) => {
-        e.preventDefault();
-        handleWishlistClick();
-      }}
-    >
-      <span
-        className={`w-10 h-10 flex justify-center items-center ${
-          isPink ? "bg-pink-500" : "bg-primarygray"
-        } rounded`}
-      >
-        <ThinLove />
-      </span>
-    </a>
-
-
-        <a href="#">
-          <span className="w-10 h-10 flex justify-center items-center bg-primarygray rounded">
-            <Compair />
-          </span>
-        </a>
-      </div>
     </div>
   );
-}
+};
+export default ProductCardStyleOne;
