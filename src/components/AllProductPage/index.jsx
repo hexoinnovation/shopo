@@ -42,15 +42,26 @@ export default function AllProductPage() {
       [name]: !prevState[name],
     }));
   };
+
   const [volume, setVolume] = useState({ min: 200, max: 500 });
 
   const [storage, setStorage] = useState(null);
   const filterStorage = (value) => {
     setStorage(value);
   };
+
   const [filterToggle, setToggle] = useState(false);
 
   const { products } = productDatas;
+
+  // Remove duplicates by ensuring unique products
+  const uniqueProducts = Array.from(
+    new Map(products.map((item) => [item.id, item])).values()
+  );
+
+  // Slice the uniqueProducts for different display sections
+  const firstSet = uniqueProducts.slice(0, 6); // First 6 products
+  const secondSet = uniqueProducts.slice(6, 15); // Next 9 products
 
   return (
     <>
@@ -131,8 +142,10 @@ export default function AllProductPage() {
                     </svg>
                   </button>
                 </div>
-                <div className="grid xl:grid-cols-3 sm:grid-cols-2 grid-cols-1  xl:gap-[30px] gap-5 mb-[40px]">
-                  <DataIteration datas={products} startLength={0} endLength={6}>
+
+                {/* First Set of Products */}
+                <div className="grid xl:grid-cols-3 sm:grid-cols-2 grid-cols-3 xl:gap-[30px] gap-5 mb-[40px]">
+                  <DataIteration datas={firstSet} startLength={0} endLength={1}>
                     {({ datas }) => (
                       <div data-aos="fade-up" key={datas.id}>
                         <ProductCardStyleOne datas={datas} />
@@ -150,9 +163,11 @@ export default function AllProductPage() {
                     className="w-full h-full object-contain"
                   />
                 </div>
+
+                {/* Second Set of Products */}
                 <div className="grid xl:grid-cols-3 sm:grid-cols-2 grid-cols-1 xl:gap-[30px] gap-5 mb-[40px]">
                   <DataIteration
-                    datas={products}
+                    datas={secondSet}
                     startLength={6}
                     endLength={15}
                   >
