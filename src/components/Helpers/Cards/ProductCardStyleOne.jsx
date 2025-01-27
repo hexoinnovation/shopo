@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { FaShoppingCart, FaTh, FaList } from "react-icons/fa"; // Importing the icons
 import { auth, db } from "../../firebse.js";
 import { collection, getDocs } from "firebase/firestore";
-import { getStorage, ref, getDownloadURL } from "firebase/storage"; // Firebase Storage imports
+import { getFirestore, doc, setDoc } from "firebase/firestore";
 
 const ProductCardStyleOne = () => {
   const [products, setProducts] = useState([]);
@@ -29,35 +29,19 @@ const ProductCardStyleOne = () => {
       );
       const snapshot = await getDocs(collectionRef);
 
-      const productsList = snapshot.docs.map((doc) => doc.data());
+      const productsList = snapshot.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+      }));
 
-      // Fetch image URLs for all products in parallel
-      const imagePromises = productsList.map((product) =>
-        getImageUrl(product.image).then((imageUrl) => ({
-          ...product,
-          image: imageUrl,
-        }))
+      // Remove duplicates based on 'id'
+      const uniqueProducts = Array.from(
+        new Map(productsList.map((item) => [item.id, item])).values()
       );
 
-      // Wait for all image URLs to be fetched
-      const productsWithImages = await Promise.all(imagePromises);
-
-      setProducts(productsWithImages); // Set products state with fetched data and images
+      setProducts(uniqueProducts); // Set products state with unique products
     } catch (error) {
       console.error("Error fetching products:", error);
-    }
-  };
-
-  // Function to get image URL from Firebase Storage
-  const getImageUrl = async (imagePath) => {
-    try {
-      const storage = getStorage();
-      const imageRef = ref(storage, imagePath);
-      const url = await getDownloadURL(imageRef); // Get the download URL of the image
-      return url;
-    } catch (error) {
-      console.error("Error fetching image URL:", error);
-      return ""; // Return an empty string if error occurs
     }
   };
 
@@ -222,15 +206,13 @@ const ProductCardStyleOne = () => {
                     ? "w-24 h-32 flex-none"
                     : "w-full flex justify-center"
                 }}
-              
+              >
                 <img
                   src={product.image || "https://via.placeholder.com/150"}
                   alt={product.name}
                   className="w-full h-28 object-cover rounded-md"
                 />
               </div>  */}
-
-               
 
               {/* Product Details */}
               <div className="flex flex-col flex-grow">
