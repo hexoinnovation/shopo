@@ -1,387 +1,271 @@
-// import React, { useState, useEffect } from "react";
-// import { Link } from "react-router-dom";
-// import Compair from "../icons/Compair";
-// import QuickViewIco from "../icons/QuickViewIco";
-// import Star from "../icons/Star";
-// import { doc, setDoc, getDoc, deleteDoc, collection, getDocs } from "firebase/firestore";
-// import { db } from "../../firebse";
-// import { getAuth } from "firebase/auth";
-// import ThinLove from "../icons/ThinLove";
-
-// export default function ProductCardStyleOne({ datas, type, product }) {
-
-//   const [isPink, setIsPink] = useState(false);
-
-//   useEffect(() => {
-//     const fetchWishlistStatus = async () => {
-//       if (!datas || !datas.id) return;
-
-//       const auth = getAuth();
-//       const currentUser = auth.currentUser;
-
-//       if (currentUser) {
-//         const sanitizedEmail = currentUser.email.replace(/\s/g, "_");
-//         const wishlistRef = doc(db, "users", sanitizedEmail, "wishlist", datas.id);
-
-//         try {
-//           const docSnap = await getDoc(wishlistRef);
-//           if (docSnap.exists()) {
-//             setIsPink(true); // Product is already in the wishlist
-//           } else {
-//             setIsPink(false); // Product is not in the wishlist
-//           }
-//         } catch (error) {
-//           console.error("Error checking wishlist status: ", error);
-//         }
-//       }
-//     };
-
-//     fetchWishlistStatus();
-//   }, [datas]);
-
-//   const handleWishlistClick = async () => {
-//     if (!datas || !datas.id) {
-//       alert("Invalid product data.");
-//       return;
-//     }
-
-//     const auth = getAuth();
-//     const currentUser = auth.currentUser;
-
-//     if (currentUser) {
-//       const sanitizedEmail = currentUser.email.replace(/\s/g, "_");
-//       const wishlistRef = doc(db, "users", sanitizedEmail, "wishlist", datas.id);
-
-//       try {
-//         if (isPink) {
-//           // Remove from wishlist
-//           await deleteDoc(wishlistRef);
-//           console.log("Product removed from wishlist.");
-//           setIsPink(false);
-//         } else {
-//           // Add to wishlist
-//           await setDoc(wishlistRef, datas);
-//           console.log("Product added to wishlist.");
-//           setIsPink(true);
-//         }
-//       } catch (error) {
-//         console.error("Error updating wishlist: ", error);
-//         alert("An error occurred. Please try again.");
-//       }
-//     } else {
-//       alert("Please log in to manage your wishlist.");
-//     }
-//   };
-
-//   const [products, setProducts] = useState([]);
-
-//   const fetchProducts = async () => {
-//     try {
-//       const collectionRef = collection(db, "Products");
-//       const querySnapshot = await getDocs(collectionRef);
-
-//       const fetchedProducts = querySnapshot.docs.map((doc) => ({
-//         id: doc.id,
-//         ...doc.data(),
-//       }));
-
-//       // Remove duplicates based on 'id'
-//       const uniqueProducts = Array.from(
-//         new Map(fetchedProducts.map((item) => [item.id, item])).values()
-//       );
-
-//       setProducts(uniqueProducts);
-//       console.log("Fetched Products:", uniqueProducts); // Log unique products
-//     } catch (error) {
-//       console.error("Error fetching products:", error);
-//       alert("Failed to fetch products. Please try again.");
-//     }
-//   };
-
-//   useEffect(() => {
-//     fetchProducts();
-//   }, []); // Empty dependency array ensures this runs only once on initial render
-
-//   return (
-   
-//       <div>
-//         <h2>Product List</h2>
-//         <div className="product-grid">
-//           {products.length > 0 ? (
-//             products.map((product) => (
-//               <div key={product.id} className="product-card">
-//                 <h3>{product.name}</h3>
-//                 <p><strong>Price:</strong> ${product.price}</p>
-//                 <p><strong>Description:</strong> {product.description}</p>
-//                 <p><strong>Stock:</strong> {product.stock}</p>
-//                 <p><strong>Category:</strong> {product.category}</p>
-//                 <p><strong>SKU:</strong> {product.sku}</p>
-//                 <p><strong>Discount Price:</strong> ${product.discountPrice || "N/A"}</p>
-//                 <p><strong>Tags:</strong> {product.tags?.join(", ")}</p>
-//                 <p><strong>Brand:</strong> {product.brand}</p>
-//                 <p><strong>Dimensions:</strong> {product.dimensions}</p>
-//                 <p><strong>Additional Notes:</strong> {product.additionalNotes}</p>
-//                 <p><strong>Shipping Weight:</strong> {product.shippingWeight}</p>
-//                 <p><strong>Shipping Class:</strong> {product.shippingClass}</p>
-//                 <p><strong>Tax Class:</strong> {product.taxClass}</p>
-//                 <p><strong>Product URL:</strong> <a href={product.productUrl} target="_blank" rel="noopener noreferrer">{product.productUrl}</a></p>
-//                 <p><strong>Availability:</strong> {product.availability}</p>
-//               </div>
-//             ))
-//           ) : (
-//             <p>No products available.</p>
-//           )}
-//         </div>
-//       </div>
-    
-//   );
-// }
-
-
-
-
-
-
-
-
 import React, { useState, useEffect } from "react";
-import { FaHeart, FaShoppingCart, FaStar, FaShoppingBag } from "react-icons/fa";
-import { useNavigate } from "react-router-dom";
-import { auth,db } from "../../firebse";
+import { FaShoppingCart, FaTh, FaList } from "react-icons/fa"; // Importing the icons
+import { auth, db } from "../../firebse.js";
 import { collection, getDocs } from "firebase/firestore";
-import { getFirestore, doc, setDoc,deleteDoc,query,where } from "firebase/firestore";
+import { getFirestore, doc, setDoc } from "firebase/firestore";
+
 const ProductCardStyleOne = () => {
   const [products, setProducts] = useState([]);
-  const [selectedSubcategory, setSelectedSubcategory] = useState("");
-  const [currentPage, setCurrentPage] = useState(1);
-  const [productsPerPage, setProductsPerPage] = useState(8); // Default to 8
-  const navigate = useNavigate();
-  
-  const [loginPrompt, setLoginPrompt] = useState(false); 
-  const [error, setError] = useState('');  // Add state for error message
-  const [successMessage, setSuccessMessage] = useState(''); // Success message
-  const [errorMessage, setErrorMessage] = useState('');
-  const [isSignup, setIsSignup] = useState(false);
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [username, setUsername] = useState('');
   const [cartItems, setCartItems] = useState([]);
   const [cartCount, setCartCount] = useState(0);
+  const [quantity, setQuantity] = useState(1);
+  const [successMessage, setSuccessMessage] = useState("");
+  const [errorMessage, setErrorMessage] = useState("");
+  const [viewMode, setViewMode] = useState("grid"); // State for toggling view mode
+  const [priceFilter, setPriceFilter] = useState(""); // Dropdown value for price filter
 
+  useEffect(() => {
+    fetchProducts(); // Fetch products on mount
+  }, []);
 
+  // Fetch products from Firestore
+  const fetchProducts = async () => {
+    try {
+      const collectionRef = collection(
+        db,
+        "admin",
+        "nithya123@gmail.com",
+        "products"
+      );
+      const snapshot = await getDocs(collectionRef);
 
-const [quantity, setQuantity] = useState(1);
-  const [showModal, setShowModal] = useState(false); // Initially set to false   
-  
+      const productsList = snapshot.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+      }));
 
-  // Adjust productsPerPage based on screen size
-  const adjustProductsPerPage = () => {
-    const screenWidth = window.innerWidth;
-    if (screenWidth >= 1024) {
-      setProductsPerPage(8); // 8 for larger screens
-    } else {
-      setProductsPerPage(4); // 4 for smaller screens
+      // Remove duplicates based on 'id'
+      const uniqueProducts = Array.from(
+        new Map(productsList.map((item) => [item.id, item])).values()
+      );
+
+      setProducts(uniqueProducts); // Set products state with unique products
+    } catch (error) {
+      console.error("Error fetching products:", error);
     }
   };
 
-  useEffect(() => {
-    fetchProducts();
-    adjustProductsPerPage(); // Set initial productsPerPage
-    window.addEventListener("resize", adjustProductsPerPage); // Listen to resize events
-    return () => window.removeEventListener("resize", adjustProductsPerPage);
-  }, []);
-
-  // const handleSubcategorySelect = (subcategory) => {
-  //   setSelectedSubcategory(subcategory);
-  //   setCurrentPage(1);
-  // };
-
-  const handleProductClick = (productId) => {
-    navigate(`/product/${productId}`);
-  };
-
-  const filteredProducts = (selectedSubcategory || "")
-  ? products.filter((product) => {
-      const subcategory = product.subcategory || "";
-      return subcategory.trim().toLowerCase() === selectedSubcategory.trim().toLowerCase();
-    })
-  : products;
-
-  const indexOfLastProduct = currentPage * productsPerPage;
-  const indexOfFirstProduct = indexOfLastProduct - productsPerPage;
-  const currentProducts = filteredProducts.slice(
-    indexOfFirstProduct,
-    indexOfLastProduct
-  );
-  const totalPages = Math.ceil(filteredProducts.length / productsPerPage);
-
-  const handlePageChange = (pageNumber) => {
-    setCurrentPage(pageNumber);
-  };
-  const incrementCartCount = () => {
-    setCartCount((prevCount) => prevCount + 1); // Assuming `setCartCount` is a state setter
-  };
-  
   const handleAddToCart = async (product) => {
-    if (!isLoggedIn) {
-      setLoginPrompt(true);
-    } else {
-      const auth = getAuth();
-      const db = getFirestore();
-      const user = auth.currentUser;
-  
-      if (user) {
-        // Check if the product is already in the cart
-        const productInCart = cartItems.find((item) => item.id === product.id);
-        if (productInCart) {
-          // Optionally, update the quantity if the product is already in the cart
-          setCartItems((prevItems) =>
-            prevItems.map((item) =>
-              item.id === product.id
-                ? { ...item, quantity: item.quantity + quantity } // Increment quantity by the selected quantity
-                : item
-            )
-          );
-        } else {
-          const productToAdd = { ...product, quantity };  // Ensure you are using the quantity state correctly
-          setCartItems((prevItems) => [...prevItems, productToAdd]); // Update local cart state
-        }
-  
-        try {
-          const userCartRef = collection(db, "users", user.email, "AddToCart");
-          await setDoc(doc(userCartRef, product.id.toString()), { ...product, quantity });  // Save with the quantity
-          setSuccessMessage("Your product has been added to the cart successfully!");
-          incrementCartCount();
-         // navigate("/cart");
-        } catch (error) {
-          console.error("Error adding product to Firestore:", error);
-          setErrorMessage("Failed to add product to the cart.");
-        }
+    if (!auth.currentUser) {
+      setErrorMessage("Please log in to add products to the cart.");
+      return;
+    }
+
+    const user = auth.currentUser;
+    if (user) {
+      const productInCart = cartItems.find((item) => item.id === product.id);
+      if (productInCart) {
+        setCartItems((prevItems) =>
+          prevItems.map((item) =>
+            item.id === product.id
+              ? { ...item, quantity: item.quantity + quantity }
+              : item
+          )
+        );
+      } else {
+        setCartItems((prevItems) => [...prevItems, { ...product, quantity }]);
+      }
+
+      try {
+        const userCartRef = collection(db, "users", user.email, "AddToCart");
+        await setDoc(doc(userCartRef, product.id.toString()), {
+          ...product,
+          quantity,
+        });
+        setSuccessMessage("Product added to cart successfully!");
+        setCartCount(cartCount + 1); // Update cart count
+      } catch (error) {
+        setErrorMessage("Failed to add product to cart.");
       }
     }
   };
-  
-  // Toggle modal visibility
-const handleModalToggle = () => {
-  handleDropdownClick()
-  setShowModal(!showModal); // Toggle modal visibility
-};
-const handleSubcategorySelect = (subcategory) => {
-  console.log("Selected Subcategory:", subcategory); // Debugging
-  setSelectedSubcategory(subcategory);
-};
 
+  const handleBuyNow = (product) => {
+    alert(`Buy Now functionality for ${product.name}`);
+  };
 
-const handleCategoryClick = (category) => {
-  setSelectedSubcategory(category);
-}; 
+  // Filter products based on the selected price range
+  const getPriceRangeFilter = (range) => {
+    switch (range) {
+      case "under50":
+        return (product) => product.price < 50;
+      case "50to100":
+        return (product) => product.price >= 50 && product.price <= 100;
+      case "100to200":
+        return (product) => product.price > 100 && product.price <= 200;
+      case "over200":
+        return (product) => product.price > 200;
+      default:
+        return () => true; // No filter if no range is selected
+    }
+  };
 
-// Fetch products from Firestore
-const fetchProducts = async () => {
-  try {
-    const collectionRef = collection( db, "admin","nithya123@gmail.com",
-      "products");
-    const snapshot = await getDocs(collectionRef);
-
-    // Map the data
-    const productsList = snapshot.docs.map((doc) => ({
-      id: doc.id,
-      ...doc.data(),
-    }));
-
-    setProducts(productsList);
-  } catch (error) {
-    console.error("Error fetching products:", error);
-  }
-};
-
-useEffect(() => {
-  fetchProducts();
-}, []);
-
+  // Apply price filter
+  const filteredProducts = products.filter(getPriceRangeFilter(priceFilter));
 
   return (
-
-    <div className="container mx-auto p-4">
-    <h1 className="text-2xl font-bold mb-4">Product List</h1>
-    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-2 gap-6">
-      {products.map((product) => (
-        <div
-          key={product.id}
-          className="border border-gray-300 p-4 rounded-lg shadow-md"
-        >
-          <img
-            src={product.image || "https://via.placeholder.com/150"}
-            alt={product.name}
-            className="w-full h-40 object-cover rounded-md mb-4"
-          />
-          <h2 className="text-lg font-semibold">{product.name}</h2>
-          <p className="text-sm text-gray-500">SKU: {product.sku}</p>
-          <p className="text-sm text-gray-500">Brand: {product.brand}</p>
-          <p className="text-lg font-bold text-gray-800">${product.price}</p>
-          <p
-            className={`text-sm mt-2 ${
-              product.availability === "In Stock"
-                ? "text-green-600"
-                : "text-red-600"
-            }`}
-          >
-            {product.availability}
-          </p>
+    <div className="p-2">
+      {/* Success or Error Message */}
+      {successMessage && (
+        <div className="flex items-center bg-green-500 text-white p-3 rounded-lg shadow-lg mb-2">
+          <FaShoppingCart className="mr-3 text-7xl animate-bounce" />
+          <div className="flex flex-col">
+            <p className="text-lg font-bold">{successMessage}</p>
+          </div>
         </div>
-      ))}
+      )}
 
+      {errorMessage && (
+        <div className="flex items-center bg-red-500 text-white p-3 rounded-lg shadow-lg mb-4">
+          <FaShoppingCart className="mr-3 text-7xl animate-bounce" />
+          <div className="flex flex-col">
+            <p className="text-lg font-bold">{errorMessage}</p>
+          </div>
+        </div>
+      )}
 
- {/* Success or Error Message */}
- {successMessage && (
-  <div className="flex items-center bg-white-500 text-yellow-800 p-3 rounded-lg shadow-lg mb-4 animate-slideIn">
-  <FaShoppingCart className="mr-3 text-7xl animate-bounce" />
-  <div className="flex flex-col">
-    <p className="text-center text-lg font-bold">{successMessage}</p>
-  </div>
-</div>
-)}
+      <h1 className="text-2xl font-bold mb-2">Product List</h1>
 
+      {/* Controls for Price Filter, Grid/List View */}
+      <div className="flex justify-between mb-4 items-center">
+        {/* Price Filter Dropdown */}
+        <div className="flex items-center">
+          <label htmlFor="priceFilter" className="mr-2">
+            Filter by Price:
+          </label>
+          <select
+            id="priceFilter"
+            value={priceFilter}
+            onChange={(e) => setPriceFilter(e.target.value)}
+            className="border p-2 rounded"
+          >
+            <option value="">All Prices</option>
+            <option value="under50">Under $50</option>
+            <option value="50to100">$50 - $100</option>
+            <option value="100to200">$100 - $200</option>
+            <option value="over200">Over $200</option>
+          </select>
+        </div>
 
+        {/* View Mode Icons */}
+        <div className="flex space-x-3">
+          <button
+            className={`${
+              viewMode === "grid" ? "bg-blue-500 text-white" : "bg-gray-200"
+            } p-2 rounded-lg`}
+            onClick={() => setViewMode("grid")}
+          >
+            <FaTh size={20} />
+          </button>
+          <button
+            className={`${
+              viewMode === "list" ? "bg-blue-500 text-white" : "bg-gray-200"
+            } p-2 rounded-lg`}
+            onClick={() => setViewMode("list")}
+          >
+            <FaList size={20} />
+          </button>
+        </div>
+      </div>
 
-      
-        {totalPages > 1 && (
-          <div className="flex justify-center mt-8 space-x-4">
-            <button
-              onClick={() => handlePageChange(currentPage - 1)}
-              disabled={currentPage === 1}
-              className="px-6 py-2 bg-gray-200 dark:bg-gray-700 rounded-md disabled:opacity-50"
+      {/* Render Products Based on View Mode */}
+      <div
+        className={`${
+          viewMode === "grid"
+            ? "grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4"
+            : "space-y-6"
+        }`}
+      >
+        {filteredProducts.length > 0 ? (
+          filteredProducts.map((product) => (
+            <div
+              key={product.id}
+              className={`${
+                viewMode === "list"
+                  ? "flex items-center space-x-6 border p-4"
+                  : "border p-4 flex flex-col"
+              }`}
             >
-              Previous
-            </button>
-            {Array.from({ length: totalPages }, (_, index) => (
-              <button
-                key={index}
-                onClick={() => handlePageChange(index + 1)}
-                className={`px-4 py-2 rounded-md transition-all duration-300 ${
-                  currentPage === index + 1
-                    ? "bg-yellow-500 text-white"
-                    : "bg-gray-200 dark:bg-gray-700"
+              {/* Product Image */}
+              <div
+                className={`${
+                  viewMode === "list"
+                    ? "w-24 h-24 flex-none"
+                    : "w-full flex justify-center"
                 }`}
               >
-                {index + 1}
-              </button>
-            ))}
-            <button
-              onClick={() => handlePageChange(currentPage + 1)}
-              disabled={currentPage === totalPages}
-              className="px-6 py-2 bg-gray-200 dark:bg-gray-700 rounded-md disabled:opacity-50"
-            >
-              Next
-            </button>
+                <img
+                  src={product.image || "https://via.placeholder.com/150"}
+                  alt={product.name}
+                  className="w-full h-24 object-cover rounded-md"
+                />
+              </div>
+
+              {/* Product Details */}
+              <div className="flex flex-col flex-grow">
+                {/* SKU, Brand, and Price - Grid View */}
+                {viewMode === "grid" && (
+                  <div className="flex flex-col mt-2">
+                    <h3 className="text-lg font-semibold ">{product.name}</h3>
+                    <p className="text-sm text-gray-500">SKU: {product.sku}</p>
+                    <p className="text-sm text-gray-500">
+                      Brand: {product.brand}
+                    </p>
+                    <p className="text-xl font-semibold text-black">
+                      ${product.price}
+                    </p>
+                  </div>
+                )}
+
+                {/* SKU, Brand, and Price - List View */}
+                {viewMode === "list" && (
+                  <div className="grid grid-cols-6 gap-20 mt-4">
+                    <h3 className="text-lg font-bold ">{product.name}</h3>
+                    <p className="text-sm text-gray-900">SKU: {product.sku}</p>
+                    <p className="text-sm text-gray-900">
+                      Brand: {product.brand}
+                    </p>
+                    <p className="text-1xl font-semibold text-black">
+                      ${product.price}
+                    </p>
+                    <p
+                      className={`text-sm ${
+                        product.availability === "In Stock"
+                          ? "text-green-600"
+                          : "text-red-900"
+                      }`}
+                    >
+                      {product.availability}
+                    </p>
+                  </div>
+                )}
+              </div>
+
+              {/* Buttons Section */}
+              <div className="flex space-x-8 mt-4 w-full justify-start">
+                <button
+                  onClick={() => handleAddToCart(product)}
+                  className="py-1 px-3 bg-yellow-500 text-white rounded-lg hover:bg-yellow-600"
+                >
+                  Add to Cart
+                </button>
+                <button
+                  onClick={() => handleBuyNow(product)}
+                  className="py-1 px-3 text-sm bg-green-500 text-white rounded-lg hover:bg-green-600"
+                >
+                  Buy Now
+                </button>
+              </div>
+            </div>
+          ))
+        ) : (
+          <div className="text-center text-gray-500">
+            No products available.
           </div>
         )}
       </div>
-
     </div>
- 
-   
   );
 };
+
 export default ProductCardStyleOne;
