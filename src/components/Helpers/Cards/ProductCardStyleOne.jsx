@@ -168,116 +168,96 @@ const ProductCardStyleOne = () => {
         </div>
       </div>
 
-      {/* Render Products Based on View Mode */}
       <div
-        className={`${
-          viewMode === "grid"
-            ? "grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4"
-            : "space-y-6"
-        }`}
-      >
-        {filteredProducts.length > 0 ? (
-          filteredProducts.map((product) => (
-            <div
-              key={product.id}
-              className={`${
-                viewMode === "list"
-                  ? "flex items-center space-x-6 border p-4"
-                  : "border p-4 flex flex-col"
-              }`}
-            >
-              <div
   className={`${
-    viewMode === "list"
-      ? "w-28 h-32 flex-none"
-      : "w-full flex justify-center"
+    viewMode === "grid"
+      ? "grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4"
+      : "space-y-6"
   }`}
 >
-  <img
-    src={product.image || "https://via.placeholder.com/150"}
-    alt={product.name}
-    className="w-full object-cover rounded-md"
-    style={{ height: "250px",width:"300px" }} 
-  />
-</div>
-{/* <div
-                className={${
-                  viewMode === "list"
-                    ? "w-24 h-32 flex-none"
-                    : "w-full flex justify-center"
-                }}
-              >
-                <img
-                  src={product.image || "https://via.placeholder.com/150"}
-                  alt={product.name}
-                  className="w-full h-28 object-cover rounded-md"
-                />
-              </div>  */}
-
-              {/* Product Details */}
-              <div className="flex flex-col flex-grow">
-                {/* SKU, Brand, and Price - Grid View */}
-                {viewMode === "grid" && (
-                  <div className="flex flex-col mt-2">
-                    <h3 className="text-lg font-semibold ">{product.name}</h3>
-                    <p className="text-sm text-gray-500">SKU: {product.sku}</p>
-                    <p className="text-sm text-gray-500">
-                      Brand: {product.brand}
-                    </p>
-                    <p className="text-xl font-semibold text-black">
-                      ${product.price}
-                    </p>
-                  </div>
-                )}
-
-                {/* SKU, Brand, and Price - List View */}
-                {viewMode === "list" && (
-                  <div className="grid grid-cols-6 gap-20 mt-4">
-                    <h3 className="text-lg font-bold ">{product.name}</h3>
-                    <p className="text-sm text-gray-900">SKU: {product.sku}</p>
-                    <p className="text-sm text-gray-900">
-                      Brand: {product.brand}
-                    </p>
-                    <p className="text-1xl font-semibold text-black">
-                      ${product.price}
-                    </p>
-                    <p
-                      className={`text-sm ${
-                        product.availability === "In Stock"
-                          ? "text-green-600"
-                          : "text-red-900"
-                      }`}
-                    >
-                      {product.availability}
-                    </p>
-                  </div>
-                )}
-              </div>
-
-              {/* Buttons Section */}
-              <div className="flex space-x-8 mt-4 w-full justify-start">
-                <button
-                  onClick={() => handleAddToCart(product)}
-                  className="py-1 px-3 bg-yellow-500 text-white rounded-lg hover:bg-yellow-600"
-                >
-                  Add to Cart
-                </button>
-                <button
-                  onClick={() => handleBuyNow(product)}
-                  className="py-1 px-3 text-sm bg-green-500 text-white rounded-lg hover:bg-green-600"
-                >
-                  Buy Now
-                </button>
-              </div>
+  {filteredProducts.length > 0 ? (
+    filteredProducts.map((product) => (
+      <div
+        key={product.id}
+        className={`${
+          viewMode === "list"
+            ? "flex items-center space-x-6 border p-4"
+            : "border p-4 flex flex-col"
+        }`}
+      >
+        {/* Image Container */}
+        <div
+          className={`${
+            viewMode === "list"
+              ? "w-28 h-32 flex-none mb-10" // for list view
+              : "w-full flex justify-center" // for grid view
+          }`}
+        >
+          <img
+            src={product.image || "https://via.placeholder.com/150"}
+            alt={product.name}
+            className="object-cover rounded-md"
+            style={{
+              height: viewMode === "list" ? "150px" : "250px", // Different height for list and grid
+              width: viewMode === "list" ? "150px" : "340px"
+             
+            }}
+          />
+        </div>
+        {/* Product Details */}
+        <div className="flex flex-col flex-grow">
+          {/* SKU, Brand, and Price - Grid View */}
+          {viewMode === "grid" && (
+            <div className="flex flex-col mt-2">
+              <h3 className="text-lg font-semibold ">{product.name}</h3>
+              <p className="text-sm text-gray-500">SKU: {product.sku}</p>
+              <p className="text-sm text-gray-500">Brand: {product.brand}</p>
+              <p className="text-xl font-semibold text-black">${product.price}</p>
             </div>
-          ))
-        ) : (
-          <div className="text-center text-gray-500">
-            No products available.
-          </div>
-        )}
+          )}
+
+          {/* SKU, Brand, and Price - List View */}
+          {viewMode === "list" && (
+            <div className="grid grid-cols-6 gap-24 mt-4">
+              <h3 className="text-lg font-bold ">{product.name}</h3>
+              <p className="text-sm text-gray-900">SKU: {product.sku}</p>
+              <p className="text-sm text-gray-900">Brand: {product.brand}</p>
+              <p className="text-1xl font-semibold text-black">${product.price}</p>
+              <p
+                className={`text-sm ${
+                  product.availability === "In Stock"
+                    ? "text-green-600"
+                    : "text-red-900"
+                }`}
+              >
+                {product.availability}
+              </p>
+            </div>
+          )}
+        </div>
+
+        {/* Buttons Section */}
+        <div className="flex space-x-8 mt-4 w-full justify-start ">
+          <button
+            onClick={() => handleAddToCart(product)}
+            className="py-1 px-3 bg-yellow-500 text-white rounded-lg hover:bg-yellow-600  "
+          >
+            Add to Cart
+          </button>
+          <button
+            onClick={() => handleBuyNow(product)}
+            className="py-1 px-3 text-sm bg-green-500 text-white rounded-lg hover:bg-green-600 "
+          >
+            Buy Now
+          </button>
+        </div>
       </div>
-    </div>
+    ))
+  ) : (
+    <div className="text-center text-gray-500">No products available.</div>
+  )}
+</div>
+</div>
   );
 };
 
