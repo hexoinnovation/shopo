@@ -312,7 +312,7 @@ useEffect(() => {
   }, [selectedSubcategory]);
 
   return (
-    <div className="flex flex-col lg:flex-row">
+    <div className="flex flex-col lg:flex-row ">
     
 
       <div className="flex-2 w-full lg:w-[1700px] p-2 bg-white dark:bg-gray-900 dark:text-white rounded-lg shadow-md">
@@ -338,61 +338,54 @@ useEffect(() => {
     </h4>
   )}
 
-
-        {currentProducts.length > 0 ? (
-         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-            {currentProducts.map((product) => (
-              <div
-                key={product.id}
-                className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 flex flex-col justify-between hover:shadow-xl transition-shadow duration-300"
-              >
-                <div className="relative mb-4 group">
-                <img
-                src={product.image}
-                alt={product.name}
-                className="w-full h-64 object-cover rounded-md cursor-pointer group-hover:scale-105 transform transition-all duration-300"
-                onClick={() => handleProductClick(product.id)}
-              />
-                  <FaHeart className="absolute top-4 right-4 text-gray-400 group-hover:text-red-500 cursor-pointer transition-colors" />
-                </div>
-                <h3 className="text-xl font-semibold text-gray-800 dark:text-gray-100">
-                  {product.name}
-                </h3>
-                <p className="text-sm text-gray-600 dark:text-gray-300 mb-2">
-                  {product.description}
-                </p>
-                <div className="flex items-center space-x-2">
-                  <span className="font-medium text-gray-700 dark:text-gray-400">
-                    Color:
-                  </span>
-                  <div
-  className="w-6 h-6 rounded-full"
-  style={{ backgroundColor: product.color ? product.color.toLowerCase() : 'defaultColor' }}
-></div>
-                </div>
-                <div className="flex items-center justify-between mt-4">
-                  <p className="text-lg font-bold text-gray-900 dark:text-white">
-                    ₹{product.price}
-                  </p>
-                </div>
-                <div className="mt-4 flex justify-between items-center space-x-2">
-  <button  onClick={() => handleAddToCart(product)}  className="flex items-center justify-center bg-primary text-xs text-white px-2 py-1 rounded shadow-md hover:bg-primary-dark transition">
-    <FaShoppingCart className="ml-1 " />
-    Add to Cart
-  </button>
-  <button   onClick={() => handleProductClick(product.id)} className="flex items-center justify-center bg-green-600 text-xs text-white px-2 py-1 rounded shadow-md hover:bg-green-700 transition">
-    <FaShoppingBag className="mr-1" />
-    Buy Now
-  </button>
-</div>
-              </div>
-            ))}
-          </div>
-        ) : (
-          <p className="text-gray-700 dark:text-gray-300 text-center mt-12">
-            No products available for the selected category.
+{[...new Map(currentProducts.map(product => [product.id, product])).values()].length > 0 ? (
+  <div className=" bg-pink-600 gap-4 ">
+    {[...new Map(currentProducts.map(product => [product.id, product])).values()].map((product) => (
+      <div
+        key={product.id}
+        className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 flex flex-col justify-between hover:shadow-xl transition-shadow duration-300"
+      >
+        <div className="relative mb-4 group">
+          <img
+            src={product.image}
+            alt={product.name}
+            className="w-full h-64 object-cover rounded-md cursor-pointer group-hover:scale-105 transform transition-all duration-300"
+            onClick={() => handleProductClick(product.id)}
+          />
+          <FaHeart className="absolute top-4 right-4 text-gray-400 group-hover:text-red-500 cursor-pointer transition-colors" />
+        </div>
+        <h3 className="text-xl font-semibold text-gray-800 dark:text-gray-100">
+          {product.name}
+        </h3>
+        <p className="text-sm text-gray-600 dark:text-gray-300 mb-2">
+          {product.description}
+        </p>
+        <div className="flex items-center justify-between mt-4">
+          <p className="text-lg font-bold text-gray-900 dark:text-white">
+            ₹{product.price}
           </p>
-        )}
+        </div>
+        <div className="mt-4 flex justify-between items-center space-x-2">
+          <button onClick={() => handleAddToCart(product)} className="flex items-center justify-center bg-pink-600 text-xs text-white px-2 py-1 rounded shadow-md hover:bg-green-700 transition">
+            <FaShoppingCart className="ml-1" />
+            Add to Cart
+          </button>
+          <button onClick={() => handleProductClick(product.id)} className="flex items-center justify-center bg-green-600 text-xs text-white px-2 py-1 rounded shadow-md hover:bg-green-700 transition">
+            <FaShoppingBag className="mr-1" />
+            Buy Now
+          </button>
+        </div>
+      </div>
+    ))}
+  </div>
+) : (
+  <p className="text-gray-700 dark:text-gray-300 text-center mt-12">
+    No products available for the selected category.
+  </p>
+)}
+
+
+
  {/* Success or Error Message */}
  {successMessage && (
   <div className="flex items-center bg-white-500 text-yellow-800 p-3 rounded-lg shadow-lg mb-4 animate-slideIn">
