@@ -186,20 +186,33 @@ const ProductCardStyleOne = () => {
                   : "border p-4 flex flex-col"
               }`}
             >
-              {/* Product Image */}
               <div
-                className={`${
+  className={`${
+    viewMode === "list"
+      ? "w-28 h-32 flex-none"
+      : "w-full flex justify-center"
+  }`}
+>
+  <img
+    src={product.image || "https://via.placeholder.com/150"}
+    alt={product.name}
+    className="w-full object-cover rounded-md"
+    style={{ height: "250px",width:"300px" }} 
+  />
+</div>
+{/* <div
+                className={${
                   viewMode === "list"
-                    ? "w-24 h-24 flex-none"
+                    ? "w-24 h-32 flex-none"
                     : "w-full flex justify-center"
-                }`}
+                }}
               >
                 <img
                   src={product.image || "https://via.placeholder.com/150"}
                   alt={product.name}
-                  className="w-full h-24 object-cover rounded-md"
+                  className="w-full h-28 object-cover rounded-md"
                 />
-              </div>
+              </div>  */}
 
               {/* Product Details */}
               <div className="flex flex-col flex-grow">
