@@ -145,6 +145,7 @@ export default function ProductCardRowStyleTwo({ className, datas, type }) {
                 ))}
               </div>
   
+  
               {/* Product Name */}
               <Link to="/single-product">
                 <p className="text-lg font-semibold text-qblack leading-[24px] hover:text-blue-600">

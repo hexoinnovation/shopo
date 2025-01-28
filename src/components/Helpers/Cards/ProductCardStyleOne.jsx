@@ -204,9 +204,7 @@ const ProductCardStyleOne = () => {
     }}
   />
   
-  {viewMode === "list" && (
-    <h3 className="text-lg font-semibold whitespace-nowrap">{product.name}</h3>
-  )}
+  
 </div>
 
 {/* <div
@@ -241,26 +239,26 @@ const ProductCardStyleOne = () => {
 
                 {/* SKU, Brand, and Price - List View */}
                 {viewMode === "list" && (
-                  <div className="grid grid-cols-6 gap-20 mt-8 ">
-                   
-                    <p className="text-sm text-gray-900 ml-4">SKU: {product.sku}</p>
-                    <p className="text-sm text-gray-900">
-                      Brand: {product.brand}
-                    </p>
-                    <p className="text-1xl font-semibold text-black">
-                      ${product.price}
-                    </p>
-                    <p
-                      className={`text-sm ${
-                        product.availability === "In Stock"
-                          ? "text-green-600"
-                          : "text-red-900"
-                      }`}
-                    >
-                      {product.availability}
-                    </p>
-                  </div>
-                )}
+  <div className="grid grid-cols-6 gap-6 ">
+    {/* Product Name Moved to the Top */}
+    <h3 className="text-lg font-semibold whitespace-nowrap col-span-6 ml-4">
+      {product.name}
+    </h3>
+
+    <p className="text-1xl text-gray-900 ml-4 mt-2">{product.sku}</p>
+    <p className="text-1xl text-gray-900 ml-2 mt-2"> {product.brand}</p>
+    <p className="text-1xl font-semibold text-black ml-10 mt-2">${product.price}</p>
+    <p
+      className={`text-sm ml-12 ${
+        product.availability === "In Stock"
+          ? "text-green-600"
+          : "text-red-900"
+      }`}
+    >
+      {product.availability}
+    </p>
+  </div>
+)}
               </div>
 
               {/* Buttons Section */}
