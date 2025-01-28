@@ -105,7 +105,7 @@ const ProductCardStyleOne = () => {
       <h1 className="text-2xl font-bold mb-4">Product List</h1>
 
       {/* Product List */}
-      <div className="grid grid-cols-1 gap-6">
+      <div className="grid grid-rows-1 gap-6">
         {products.length > 0 ? (
           products.map((product) => (
             <div
