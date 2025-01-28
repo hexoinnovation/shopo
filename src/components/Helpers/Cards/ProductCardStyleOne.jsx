@@ -2,7 +2,8 @@ import React, { useState, useEffect } from "react";
 import { FaShoppingCart, FaTh, FaList } from "react-icons/fa"; // Importing the icons
 import { auth, db } from "../../firebse.js";
 import { collection, getDocs } from "firebase/firestore";
-import { getStorage, ref, getDownloadURL } from "firebase/storage"; // Firebase Storage imports
+import { getFirestore, doc, setDoc } from "firebase/firestore";
+import { getStorage, ref, getDownloadURL } from "firebase/storage";
 
 const ProductCardStyleOne = () => {
   const [products, setProducts] = useState([]);
@@ -19,6 +20,7 @@ const ProductCardStyleOne = () => {
   }, []);
 
   // Fetch products from Firestore
+
   const fetchProducts = async () => {
     try {
       const collectionRef = collection(
@@ -29,20 +31,21 @@ const ProductCardStyleOne = () => {
       );
       const snapshot = await getDocs(collectionRef);
 
-      const productsList = snapshot.docs.map((doc) => doc.data());
+      const productsList = snapshot.docs.map(async (doc) => {
+        const data = doc.data();
+        const imageUrl = await getImageUrl(data.image); // Assuming 'image' is the Firebase Storage path
+        return { id: doc.id, ...data, image: imageUrl }; // Add the image URL
+      });
+      // Resolve all promises to ensure the image URL is fetched
+      const productsWithImages = await Promise.all(productsList);
+      console.log("Fetched Products: ", productsWithImages); // Log the products
 
-      // Fetch image URLs for all products in parallel
-      const imagePromises = productsList.map((product) =>
-        getImageUrl(product.image).then((imageUrl) => ({
-          ...product,
-          image: imageUrl,
-        }))
+      // Remove duplicates based on 'id'
+      const uniqueProducts = Array.from(
+        new Map(productsWithImages.map((item) => [item.id, item])).values()
       );
 
-      // Wait for all image URLs to be fetched
-      const productsWithImages = await Promise.all(imagePromises);
-
-      setProducts(productsWithImages); // Set products state with fetched data and images
+      setProducts(uniqueProducts); // Set products state with unique products
     } catch (error) {
       console.error("Error fetching products:", error);
     }
@@ -222,7 +225,6 @@ const ProductCardStyleOne = () => {
                   </div>
                 )}
               </div>
-
               {/* Product Details */}
               <div className="flex flex-col flex-grow">
                 {/* SKU, Brand, and Price - Grid View */}
