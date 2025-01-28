@@ -28,7 +28,6 @@ export default function CheakoutPage() {
       [name]: type === "checkbox" ? checked : value,
     }));
   };
-
   const handleSubmit = async (e) => {
     e.preventDefault();
   
@@ -41,12 +40,16 @@ export default function CheakoutPage() {
     }
   
     const sanitizedEmail = currentUser.email.replace(/\s/g, "_");
+  
+    // Updated path to include "admin", "nithya123@gmail.com", and "users"
     const docRef = doc(
       db,
+      "admin",
+      "nithya123@gmail.com",
       "users",
       sanitizedEmail,
       "Deliveryaddress",
-      formData.email.replace(/\s/g, "_")
+      formData.email.replace(/\s/g, "_") // Unique address ID
     );
   
     try {
@@ -78,6 +81,7 @@ export default function CheakoutPage() {
       alert("Failed to add address. Please try again.");
     }
   };
+  
 
   const [addresses, setAddresses] = useState([]); // Store fetched addresses
   const [loading, setLoading] = useState(true);  // For loading status
@@ -92,11 +96,15 @@ export default function CheakoutPage() {
       }
   
       const sanitizedEmail = currentUser.email.replace(/\s/g, "_");
+  
+      // Updated collection path with "admin" and "nithya123@gmail.com"
       const collectionRef = collection(
         db,
-        "users",
-        sanitizedEmail,
-        "Deliveryaddress"
+        "admin", // "admin" collection
+        "nithya123@gmail.com", // The admin email
+        "users", // "users" subcollection
+        sanitizedEmail, // Current user's sanitized email
+        "Deliveryaddress" // The specific subcollection where delivery addresses are stored
       );
   
       try {
@@ -122,7 +130,7 @@ export default function CheakoutPage() {
   
     fetchData();
   }, []);
-
+  
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState("");
 
   // Handle radio button selection

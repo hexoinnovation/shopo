@@ -20,7 +20,7 @@ export default function Login() {
   const loginUser = async () => {
     const email = document.getElementById("email")?.value.trim();
     const password = document.getElementById("password")?.value.trim();
-
+  
     if (!email || !password) {
       Swal.fire({
         icon: "warning",
@@ -29,16 +29,18 @@ export default function Login() {
       });
       return;
     }
-
+  
     try {
       // Sign in with Firebase Authentication
       await signInWithEmailAndPassword(auth, email, password);
-
-      // Fetch additional user details from Firestore (optional)
+  
+      // Fetch additional user details from Firestore
       const sanitizedEmail = email.replace(/\ /g, "_");
-      const docRef = doc(db, "users", sanitizedEmail);
+      
+      // Fetch user data from Firestore with the updated path structure
+      const docRef = doc(db, "admin", "nithya123@gmail.com", "users", sanitizedEmail); // Modify path here
       const docSnap = await getDoc(docRef);
-
+  
       if (docSnap.exists()) {
         Swal.fire({
           icon: "success",
