@@ -187,7 +187,7 @@ const ProductCardStyleOne = () => {
                   : "border p-4 flex flex-col"
               }`}
             >
-              <div
+             <div
   className={`${
     viewMode === "list"
       ? "w-28 h-32 flex-none"
@@ -195,12 +195,20 @@ const ProductCardStyleOne = () => {
   }`}
 >
   <img
-    src={product.image || "https://via.placeholder.com/150"}
+    src={product.image || "https://via.placeholder.csom/150"}
     alt={product.name}
     className="w-full object-cover rounded-md"
-    style={{ height: "250px",width:"300px" }} 
+    style={{
+      height: viewMode === "list" ? "120px" : "250px",
+      width: viewMode === "list" ? "200px" : "300px"
+    }}
   />
+  
+  {viewMode === "list" && (
+    <h3 className="text-lg font-semibold whitespace-nowrap">{product.name}</h3>
+  )}
 </div>
+
 {/* <div
                 className={${
                   viewMode === "list"
@@ -216,7 +224,7 @@ const ProductCardStyleOne = () => {
               </div>  */}
 
               {/* Product Details */}
-              <div className="flex flex-col flex-grow">
+              <div className="flex flex-col flex-grow h-[140px]">
                 {/* SKU, Brand, and Price - Grid View */}
                 {viewMode === "grid" && (
                   <div className="flex flex-col mt-2">
@@ -233,9 +241,9 @@ const ProductCardStyleOne = () => {
 
                 {/* SKU, Brand, and Price - List View */}
                 {viewMode === "list" && (
-                  <div className="grid grid-cols-6 gap-20 mt-4">
-                    <h3 className="text-lg font-bold ">{product.name}</h3>
-                    <p className="text-sm text-gray-900">SKU: {product.sku}</p>
+                  <div className="grid grid-cols-6 gap-20 mt-8 ">
+                   
+                    <p className="text-sm text-gray-900 ml-4">SKU: {product.sku}</p>
                     <p className="text-sm text-gray-900">
                       Brand: {product.brand}
                     </p>
