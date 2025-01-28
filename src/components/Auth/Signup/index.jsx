@@ -84,6 +84,7 @@ export default function Signup() {
   
       console.log("User created in Firebase Auth:", user);
   
+      
       // Save additional user details in Firestore under the path: "admin/nithya123@gmail.com/users/sanitizedEmail"
       await setDoc(doc(db, "admin", "nithya123@gmail.com", "users", sanitizedEmail), userDetails);
   
