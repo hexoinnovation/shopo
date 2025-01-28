@@ -5,11 +5,11 @@ import Youtube from "../../../Helpers/icons/Youtube";
 
 export default function Footer({ type }) {
   return (
-    <footer className="footer-section-wrapper bg-white print:hidden">
-      <div className="container-x block mx-auto pt-[56px]">
-        <div className="w-full flex flex-col items-center mb-[50px]">
+    <footer className="footer-section-wrapper bg-purple-800 print:hidden py-4">
+      <div className="container-x block mx-auto pt-[8px]">
+        <div className="w-full flex flex-col items-center mb-[30px]">
           {/* logo area */}
-          <div className="mb-[40px]">
+          <div className="mb-[20px]">
             {type === 3 ? (
               <Link to="/">
                 <img
@@ -34,40 +34,44 @@ export default function Footer({ type }) {
               </Link>
             )}
           </div>
-          <div className="w-full h-[1px] bg-[#E9E9E9]"></div>
+          <div className="w-full h-[1px] bg-yellow-400"></div>
         </div>
-        <div className="lg:flex justify-between mb-[50px]">
-          <div className="lg:w-[424px]  ml-0 w-full mb-10 lg:mb-0">
-            <h1 className="text-[18] font-500 text-[#2F2F2F] mb-5">About Us</h1>
-            <p className="text-[#9A9A9A] text-[15px] w-[247px] leading-[28px]">
-              We know there are a lot of threa developers our but we pride into
-              a firm in the industry.
+        <div className="lg:flex justify-between mb-[30px]">
+          <div className="lg:w-[424px] ml-0 w-full mb-8 lg:mb-0">
+            <h1 className="text-[16px] font-500 text-yellow-400 mb-4">
+              About Us
+            </h1>
+            <p className="text-yellow-200 text-[14px] w-[247px] leading-[24px]">
+              We specialize in producing premium crackers, from savory to sweet.
+              We aim to bring the best flavor to your table.
             </p>
           </div>
           <div className="flex-1 lg:flex">
-            <div className="lg:w-1/3 w-full mb-10 lg:mb-0">
-              <div className="mb-5">
-                <h6 className="text-[18] font-500 text-[#2F2F2F]">Feature</h6>
+            <div className="lg:w-1/3 w-full mb-8 lg:mb-0">
+              <div className="mb-4">
+                <h6 className="text-[16px] font-500 text-yellow-400">
+                  Features
+                </h6>
               </div>
               <div>
-                <ul className="flex flex-col space-y-4 ">
+                <ul className="flex flex-col space-y-3">
                   <li>
                     <Link to="/about">
-                      <span className="text-[#9A9A9A] text-[15px] hover:text-qblack border-b border-transparent hover:border-qblack cursor-pointer capitalize">
+                      <span className="text-yellow-200 text-[14px] hover:text-yellow-400 border-b border-transparent hover:border-yellow-400 cursor-pointer capitalize">
                         About Us
                       </span>
                     </Link>
                   </li>
                   <li>
                     <Link to="/terms-condition">
-                      <span className="text-[#9A9A9A] text-[15px] hover:text-qblack border-b border-transparent hover:border-qblack cursor-pointer capitalize">
-                        Terms Condition
+                      <span className="text-yellow-200 text-[14px] hover:text-yellow-400 border-b border-transparent hover:border-yellow-400 cursor-pointer capitalize">
+                        Terms & Conditions
                       </span>
                     </Link>
                   </li>
                   <li>
                     <Link to="/all-products">
-                      <span className="text-[#9A9A9A] text-[15px] hover:text-qblack border-b border-transparent hover:border-qblack cursor-pointer capitalize">
+                      <span className="text-yellow-200 text-[14px] hover:text-yellow-400 border-b border-transparent hover:border-yellow-400 cursor-pointer capitalize">
                         Best Products
                       </span>
                     </Link>
@@ -75,101 +79,99 @@ export default function Footer({ type }) {
                 </ul>
               </div>
             </div>
-            <div className="lg:w-1/3 lg:flex lg:flex-col items-center w-full mb-10 lg:mb-0 ">
+            <div className="lg:w-1/3 w-full mb-8 lg:mb-0">
+              <div className="mb-4">
+                <h6 className="text-[16px] font-500 text-yellow-400">
+                  General Links
+                </h6>
+              </div>
               <div>
-                <div className="mb-5">
-                  <h6 className="text-[18] font-500 text-[#2F2F2F]">
-                    General Links
-                  </h6>
-                </div>
-                <div>
-                  <ul className="flex flex-col space-y-4 ">
-                    <li>
-                      <Link to="/blogs">
-                        <span className="text-[#9A9A9A] text-[15px] hover:text-qblack border-b border-transparent hover:border-qblack cursor-pointer capitalize">
-                          Blog
-                        </span>
-                      </Link>
-                    </li>
-                    <li>
-                      <Link to="/tracking-order">
-                        <span className="text-[#9A9A9A] text-[15px] hover:text-qblack border-b border-transparent hover:border-qblack cursor-pointer capitalize">
-                          Tracking Order
-                        </span>
-                      </Link>
-                    </li>
-                    <li>
-                      <Link to="/become-saller">
-                        <span className="text-[#9A9A9A] text-[15px] hover:text-qblack border-b border-transparent hover:border-qblack cursor-pointer capitalize">
-                          Become Seller
-                        </span>
-                      </Link>
-                    </li>
-                  </ul>
-                </div>
+                <ul className="flex flex-col space-y-3">
+                  <li>
+                    <Link to="/blogs">
+                      <span className="text-yellow-200 text-[14px] hover:text-yellow-400 border-b border-transparent hover:border-yellow-400 cursor-pointer capitalize">
+                        Blog
+                      </span>
+                    </Link>
+                  </li>
+                  <li>
+                    <Link to="/tracking-order">
+                      <span className="text-yellow-200 text-[14px] hover:text-yellow-400 border-b border-transparent hover:border-yellow-400 cursor-pointer capitalize">
+                        Track Order
+                      </span>
+                    </Link>
+                  </li>
+                  <li>
+                    <Link to="/become-seller">
+                      <span className="text-yellow-200 text-[14px] hover:text-yellow-400 border-b border-transparent hover:border-yellow-400 cursor-pointer capitalize">
+                        Become a Seller
+                      </span>
+                    </Link>
+                  </li>
+                </ul>
               </div>
             </div>
-            <div className="lg:w-1/3 lg:flex lg:flex-col items-center w-full mb-10 lg:mb-0">
+            <div className="lg:w-1/3 w-full mb-8 lg:mb-0">
+              <div className="mb-4">
+                <h6 className="text-[16px] font-500 text-yellow-400">
+                  Helpful
+                </h6>
+              </div>
               <div>
-                <div className="mb-5">
-                  <h6 className="text-[18] font-500 text-[#2F2F2F]">Helpful</h6>
-                </div>
-                <div>
-                  <ul className="flex flex-col space-y-4 ">
-                    <li>
-                      <Link to="/flash-sale">
-                        <span className="text-[#9A9A9A] text-[15px] hover:text-qblack border-b border-transparent hover:border-qblack cursor-pointer capitalize">
-                          Flash Sale
-                        </span>
-                      </Link>
-                    </li>
-                    <li>
-                      <Link to="/faq">
-                        <span className="text-[#9A9A9A] text-[15px] hover:text-qblack border-b border-transparent hover:border-qblack cursor-pointer capitalize">
-                          FAQ
-                        </span>
-                      </Link>
-                    </li>
-                    <li>
-                      <Link to="/about">
-                        <span className="text-[#9A9A9A] text-[15px] hover:text-qblack border-b border-transparent hover:border-qblack cursor-pointer capitalize">
-                          Support
-                        </span>
-                      </Link>
-                    </li>
-                  </ul>
-                </div>
+                <ul className="flex flex-col space-y-3">
+                  <li>
+                    <Link to="/flash-sale">
+                      <span className="text-yellow-200 text-[14px] hover:text-yellow-400 border-b border-transparent hover:border-yellow-400 cursor-pointer capitalize">
+                        Flash Sale
+                      </span>
+                    </Link>
+                  </li>
+                  <li>
+                    <Link to="/faq">
+                      <span className="text-yellow-200 text-[14px] hover:text-yellow-400 border-b border-transparent hover:border-yellow-400 cursor-pointer capitalize">
+                        FAQ
+                      </span>
+                    </Link>
+                  </li>
+                  <li>
+                    <Link to="/support">
+                      <span className="text-yellow-200 text-[14px] hover:text-yellow-400 border-b border-transparent hover:border-yellow-400 cursor-pointer capitalize">
+                        Support
+                      </span>
+                    </Link>
+                  </li>
+                </ul>
               </div>
             </div>
           </div>
         </div>
-        <div className="bottom-bar border-t border-qgray-border lg:h-[82px] lg:flex justify-between items-center">
+        <div className="bottom-bar border-t border-yellow-400 lg:h-[60px] lg:flex justify-between items-center">
           <div className="flex lg:space-x-5 justify-between items-center mb-3">
             <div className="flex space-x-5 items-center">
               <a href="#">
-                <Instagram className="fill-current text-qgray hover:text-qblack" />
+                <Instagram className="fill-current text-yellow-200 hover:text-yellow-400" />
               </a>
               <a href="#">
-                <Facebook className="fill-current text-qgray hover:text-qblack" />
+                <Facebook className="fill-current text-yellow-200 hover:text-yellow-400" />
               </a>
               <a href="#">
-                <Youtube className="fill-current text-qgray hover:text-qblack" />
+                <Youtube className="fill-current text-yellow-200 hover:text-yellow-400" />
               </a>
             </div>
-            <span className="sm:text-base text-[10px] text-qgray font-300">
+            <span className="sm:text-base text-[10px] text-yellow-200 font-300">
               ©2022
               <a
                 href="https://quomodosoft.com/"
                 target="_blank"
                 rel="noreferrer"
-                className="font-500 text-qblack mx-1"
+                className="font-500 text-yellow-400 mx-1"
               >
                 Quomodosoft
               </a>
               All rights reserved
             </span>
           </div>
-          <div className="">
+          <div>
             <a href="#">
               <img
                 width="318"

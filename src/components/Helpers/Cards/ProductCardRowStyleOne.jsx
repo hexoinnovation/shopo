@@ -3,8 +3,8 @@ import Compair from "../icons/Compair";
 import QuickViewIco from "../icons/QuickViewIco";
 import Star from "../icons/Star";
 import ThinLove from "../icons/ThinLove";
-import React, { useState,useEffect } from "react";
-import { doc, setDoc , getDoc,deleteDoc } from "firebase/firestore";
+import React, { useState, useEffect } from "react";
+import { doc, setDoc, getDoc, deleteDoc } from "firebase/firestore";
 import { db } from "../../firebse";
 import { getAuth } from "firebase/auth";
 
@@ -20,7 +20,13 @@ export default function ProductCardRowStyleTwo({ className, datas, type }) {
 
       if (currentUser) {
         const sanitizedEmail = currentUser.email.replace(/\s/g, "_");
-        const wishlistRef = doc(db, "users", sanitizedEmail, "wishlist", datas.id);
+        const wishlistRef = doc(
+          db,
+          "users",
+          sanitizedEmail,
+          "wishlist",
+          datas.id
+        );
 
         try {
           const docSnap = await getDoc(wishlistRef);
@@ -49,7 +55,13 @@ export default function ProductCardRowStyleTwo({ className, datas, type }) {
 
     if (currentUser) {
       const sanitizedEmail = currentUser.email.replace(/\s/g, "_");
-      const wishlistRef = doc(db, "users", sanitizedEmail, "wishlist", datas.id);
+      const wishlistRef = doc(
+        db,
+        "users",
+        sanitizedEmail,
+        "wishlist",
+        datas.id
+      );
 
       try {
         if (isPink) {
@@ -130,20 +142,20 @@ export default function ProductCardRowStyleTwo({ className, datas, type }) {
         </a>
 
         <a
-             href="#"
-             onClick={(e) => {
-               e.preventDefault();
-               handleWishlistClick();
-             }}
-           >
-             <span
-               className={`w-10 h-10 flex justify-center items-center ${
-                 isPink ? "bg-pink-500" : "bg-primarygray"
-               } rounded`}
-             >
-               <ThinLove />
-             </span>
-           </a>
+          href="#"
+          onClick={(e) => {
+            e.preventDefault();
+            handleWishlistClick();
+          }}
+        >
+          <span
+            className={`w-10 h-10 flex justify-center items-center ${
+              isPink ? "bg-pink-500" : "bg-primarygray"
+            } rounded`}
+          >
+            <ThinLove />
+          </span>
+        </a>
 
         <a href="#">
           <span className="w-10 h-10 flex justify-center items-center bg-primarygray rounded">

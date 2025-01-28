@@ -3,18 +3,18 @@ import { Link } from "react-router-dom";
 export default function Ads({ handler }) {
   return (
     <>
-      <div className="w-full h-full flex fixed left-0 top-0 justify-center z-40 items-center">
+      <div className="w-full h-full flex fixed left-0 top-0 justify-center items-center z-40">
         <div
           onClick={handler}
-          className="w-full h-full fixed left-0 right-0 bg-black  bg-opacity-25"
+          className="w-full h-full fixed left-0 right-0 bg-black bg-opacity-50"
         ></div>
         <div
-          className="md:w-[812px] w-[310px] md:h-[509px] relative z-50 bg-slate-700 md:pl-10 pl-3 py-[108px] flex flex-col justify-between"
+          className="md:w-[812px] w-[310px] md:h-[509px] relative z-50 bg-gradient-to-r from-purple-500 to-purple-700 md:pl-10 pl-3 py-[108px] flex flex-col justify-between rounded-lg"
           style={{
-            background: `url(${
-              import.meta.env.VITE_PUBLIC_URL
-            }/assets/images/primary-ads.png) no-repeat`,
-            backgroundSize: "cover",
+            // Removed the background image and replaced with purple gradient
+            background: "linear-gradient(to right, #7e57c2, #6a1b9a)", // Purple gradient background
+            border: "5px solid #6a1b9a", // Adding a border for the cracked design effect
+            boxShadow: "0 8px 15px rgba(0, 0, 0, 0.3)",
           }}
         >
           <div>
@@ -30,20 +30,20 @@ export default function Ads({ handler }) {
                 />
               </Link>
             </div>
-            <p className="md:text-[22px] text-sm text-qblack mb-2">
-              by Subscribe our Newsletter
+            <p className="md:text-[22px] text-sm text-white mb-2">
+              Subscribe to our Newsletter
             </p>
-            <h1 className="md:text-[30px] text-xl font-bold text-qblack mb-1">
-              Get <span className="mx-1 text-[#EB5757]">20% Off</span> Discount
+            <h1 className="md:text-[30px] text-xl font-bold text-white mb-1">
+              Get <span className="mx-1 text-[#FBBF24]">20% Off</span> Discount
               Coupon
             </h1>
-            <p className="text-qgray">
+            <p className="text-white opacity-75">
               Get has been the industry's standard dummy text ever since <br />
-              the ey of type andmen unlimiedted offer book.
+              the eye of type and unlimited offer book.
             </p>
           </div>
           <div className="md:w-[415px] w-full h-[54px] sm:flex mt-8">
-            <div className="flex-1 bg-white pl-4 flex space-x-2 items-center h-full focus-within:text-qyellow text-qblack">
+            <div className="flex-1 bg-white pl-4 flex space-x-2 items-center h-full focus-within:text-purple-600 text-purple-800">
               <span>
                 <svg
                   width="17"
@@ -71,13 +71,13 @@ export default function Ads({ handler }) {
               <input
                 type="email"
                 name="email"
-                className="w-full h-full focus:outline-none text-sm placeholder:text-xs placeholder:text-qblack text-qblack font-400 tracking-wider"
+                className="w-full h-full focus:outline-none text-sm placeholder:text-xs placeholder:text-purple-600 text-purple-800 font-400 tracking-wider"
                 placeholder="EMAIL ADDRESS"
               />
             </div>
             <button
               type="button"
-              className="w-[120px] h-full bg-qyellow text-sm font-600"
+              className="w-[120px] h-full bg-[#7e57c2] text-white text-sm font-600 hover:bg-[#5e35b1] transition-colors duration-300"
             >
               Subscribe
             </button>
