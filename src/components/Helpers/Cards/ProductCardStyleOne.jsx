@@ -162,7 +162,7 @@ const ProductCardStyleOne = () => {
             <option value="under50">Under $50</option>
             <option value="50to100">$50 - $100</option>
             <option value="100to200">$100 - $200</option>
-            <option value="over200">Over $200</option>
+            <option value="over200">Over $250</option>
           </select>
         </div>
 
