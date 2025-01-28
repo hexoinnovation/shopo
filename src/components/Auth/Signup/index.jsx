@@ -84,8 +84,8 @@ export default function Signup() {
   
       console.log("User created in Firebase Auth:", user);
   
-      // Save additional user details in Firestore
-      await setDoc(doc(db, "users", sanitizedEmail), userDetails);
+      // Save additional user details in Firestore under the path: "admin/nithya123@gmail.com/users/sanitizedEmail"
+      await setDoc(doc(db, "admin", "nithya123@gmail.com", "users", sanitizedEmail), userDetails);
   
       Swal.fire({
         icon: "success",
@@ -102,6 +102,7 @@ export default function Signup() {
       });
     }
   };
+  
   
   return (
     <Layout childrenClasses="pt-0 pb-0">
