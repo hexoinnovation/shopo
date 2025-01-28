@@ -116,12 +116,12 @@ export default function ProductCardRowStyleTwo({ className, datas, type }) {
   };
 
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-20 w-full">
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-40 w-full">
     {products.slice(0, 4).map((product) => (
       <div
         key={product.id}
         data-aos="fade-left"
-        className={`product-row-card-style-one w-[500px] h-[350px] bg-white group relative overflow-hidden ${className || ""}`}
+        className={`product-row-card-style-one w-[450px] h-[250px] bg-white group relative overflow-hidden ${className || ""}`}
       >
         <div className="flex space-x-5 items-center w-full h-full lg:p-[30px] sm:p-5 p-2">
           {/* Image Section */}
