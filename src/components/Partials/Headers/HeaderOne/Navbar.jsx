@@ -194,7 +194,7 @@ export default function Navbar({ className, type }) {
               )}
             </div>
             <div className="become-seller-btn">
-              <Link to="/become-seller">
+              <Link to="/become-saller">
                 <div className="yellow-btn ml-8 w-[200px] h-[90px] flex justify-center items-center cursor-pointer">
                   <div className="flex space-x-2 items-center">
                     <span className="text-lg font-600">Become a Seller</span>
