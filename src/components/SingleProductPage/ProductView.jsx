@@ -1,39 +1,18 @@
 import { useState,useEffect  } from "react";
 import Star from "../Helpers/icons/Star";
 import Selectbox from "../Helpers/Selectbox";
-import { getFirestore, doc, updateDoc, arrayUnion,getDoc,setDoc,deleteDoc } from "firebase/firestore";
+import { getFirestore, doc, updateDoc, arrayUnion,getDoc,setDoc,deleteDoc ,getDocs,collection } from "firebase/firestore";
 import { getAuth } from "firebase/auth";
 import { auth,db } from "../firebse";
-import { useNavigate } from "react-router-dom";
+import { useNavigate,useParams } from "react-router-dom";
 
 
 
 export default function ProductView({ className }) {
-  const products = [
-    {
-      id: 1,
-      src: "product-details-1.png",
-      color: "#FFBC63",
-      name: "Samsung Galaxy Z Fold3",
-      price: "₹ 6.99",
-      title: "3 colors in 512GB",
-      category: "Mobile Phones",
-      description: "It is a long established fact that a reader will be distracted by the readable content of a page.",
-    },
-    {
-      id: 2,
-      src: "product-details-2.png",
-      color: "#649EFF",
-      name: "iPhone 12",
-      price: "₹5.99",
-      title: "64GB Storage",
-      category: "Mobile Phones",
-      description: "The quick brown fox jumps over the lazy dog.",
-    },
-    // Add more products as needed
-  ];
+  const[products,setProducts]=useState([]);
+  const { id } = useParams();
 
-  const [src, setSrc] = useState(products[0].src);
+  // const [src, setSrc] = useState(products[0].src);
   const [selectedColor, setSelectedColor] = useState(""); // Initialize with an empty string or default color
 
 const [selectedSize, setSelectedSize] = useState("");
@@ -43,87 +22,125 @@ const changeImgHandler = (color) => setSelectedColor(color);
 const selectSizeHandler = (size) => setSelectedSize(size);
 const increment = () => setQuantity((prev) => prev + 1);
 const decrement = () => setQuantity((prev) => Math.max(1, prev - 1));
-  const handleAddToCart = async (product) => {
-    if (!product.id || !product.name || !product.src || !product.title || !product.category || !product.description || !product.price) {
-      console.error("Missing product fields", product);
-      alert("Failed to add item to cart. Some product details are missing.");
-      return;
-    }
+
+  // const handleAddToCart = async (product) => {
+  //   if (!product.id || !product.name || !product.src || !product.title || !product.category || !product.description || !product.price) {
+  //     console.error("Missing product fields", product);
+  //     alert("Failed to add item to cart. Some product details are missing.");
+  //     return;
+  //   }
   
-    const auth = getAuth();
-    const db = getFirestore();
-    const user = auth.currentUser;
+  //   const auth = getAuth();
+  //   const db = getFirestore();
+  //   const user = auth.currentUser;
   
-    if (user) {
-      try {
-        const sanitizedEmail = user.email ? user.email.replace(/\ /g, "_") : "unknown_user";
+  //   if (user) {
+  //     try {
+  //       const sanitizedEmail = user.email ? user.email.replace(/\ /g, "_") : "unknown_user";
   
         // Fetch and convert the image to Base64
-        const imageBase64 = await fetch(product.src)
-          .then((res) => {
-            if (!res.ok) {
-              throw new Error("Failed to fetch image");
-            }
-            const mimeType = res.headers.get("Content-Type"); // Get the MIME type of the image
-            return res.blob().then((blob) => ({ blob, mimeType }));
-          })
-          .then(({ blob, mimeType }) =>
-            new Promise((resolve, reject) => {
-              const reader = new FileReader();
-              reader.onloadend = () => resolve(reader.result); // Store the full Base64 string
-              reader.onerror = reject;
-              reader.readAsDataURL(blob);
-            })
-          );
+        // const imageBase64 = await fetch(product.src)
+        //   .then((res) => {
+        //     if (!res.ok) {
+        //       throw new Error("Failed to fetch image");
+        //     }
+        //     const mimeType = res.headers.get("Content-Type"); // Get the MIME type of the image
+        //     return res.blob().then((blob) => ({ blob, mimeType }));
+        //   })
+        //   .then(({ blob, mimeType }) =>
+        //     new Promise((resolve, reject) => {
+        //       const reader = new FileReader();
+        //       reader.onloadend = () => resolve(reader.result); // Store the full Base64 string
+        //       reader.onerror = reject;
+        //       reader.readAsDataURL(blob);
+        //     })
+        //   );
           
-        const cartRef = doc(db, "users", sanitizedEmail, "cart", String(product.id));
+  //       const cartRef = doc(db, "users", sanitizedEmail, "cart", String(product.id));
   
-        const docSnap = await getDoc(cartRef);
-        if (!docSnap.exists()) {
-          await setDoc(cartRef, {
-            items: [
-              {
-                id: String(product.id),
-                name: product.name,
-                image: imageBase64,
-                title: product.title,
-                category: product.category,
-                description: product.description,
-                price: product.price,
-                color: selectedColor,
-          size: selectedSize,
-          quantity: quantity,
-              },
-            ],
-          });
-          alert("Item added to cart (new document created)!");
-        } else {
-          await updateDoc(cartRef, {
-            items: arrayUnion({
-              id: String(product.id),
-              name: product.name,
-              image: imageBase64,
-              title: product.title,
-              category: product.category,
-              description: product.description,
-              price: product.price,
-              color: selectedColor,
-          size: selectedSize,
-          quantity: quantity,
-            }),
-          });
-          alert("Item added to cart!");
-        }
-      } catch (error) {
-        console.error("Error adding to cart:", error);
-        alert("Failed to add item to cart.");
-      }
-    } else {
-      alert("Please log in to add items to your cart.");
+  //       const docSnap = await getDoc(cartRef);
+  //       if (!docSnap.exists()) {
+  //         await setDoc(cartRef, {
+  //           items: [
+  //             {
+  //               id: String(product.id),
+  //               name: product.name,
+  //               // image: imageBase64,
+  //               title: product.title,
+  //               category: product.category,
+  //               description: product.description,
+  //               price: product.price,
+  //               color: selectedColor,
+  //         size: selectedSize,
+  //         quantity: quantity,
+  //             },
+  //           ],
+  //         });
+  //         alert("Item added to cart (new document created)!");
+  //       } else {
+  //         await updateDoc(cartRef, {
+  //           items: arrayUnion({
+  //             id: String(product.id),
+  //             name: product.name,
+  //             // image: imageBase64,
+  //             title: product.title,
+  //             category: product.category,
+  //             description: product.description,
+  //             price: product.price,
+  //             color: selectedColor,
+  //         size: selectedSize,
+  //         quantity: quantity,
+  //           }),
+  //         });
+  //         alert("Item added to cart!");
+  //       }
+  //     } catch (error) {
+  //       console.error("Error adding to cart:", error);
+  //       alert("Failed to add item to cart.");
+  //     }
+  //   } else {
+  //     alert("Please log in to add items to your cart.");
+  //   }
+  // };
+
+  const fetchProducts = async () => {
+    try {
+      const collectionRef = collection(
+        db,
+        "admin",
+        "nithya123@gmail.com",
+        "products"
+      );
+      const snapshot = await getDocs(collectionRef);
+  
+      const productsList = snapshot.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+      }));
+  
+      // Remove duplicates based on 'id'
+      const uniqueProducts = Array.from(
+        new Map(productsList.map((item) => [item.id, item])).values()
+      );
+  
+      setProducts(uniqueProducts); // Set products state with unique products
+    } catch (error) {
+      console.error("Error fetching products:", error);
     }
   };
-  
-  
+  useEffect(() => {
+    if (id) {
+      setLoading(true); // Set loading to true when fetching starts
+      fetchProducts(id); // Call fetchProduct with the correct 'id'
+    }
+  }, [id]); 
+
+  //  useEffect(() => {
+  //   if (id) {
+  //     setLoading(true); // Set loading to true when fetching starts
+  //     fetchProduct(id); // Call fetchProduct with the correct 'id'
+  //   }
+  // }, [id]); 
 
   const navigate = useNavigate();
 
@@ -131,72 +148,72 @@ const decrement = () => setQuantity((prev) => Math.max(1, prev - 1));
   const [isFavorite, setIsFavorite] = useState(false);
 
   // Monitor authentication state
-  useEffect(() => {
-    const unsubscribe = auth.onAuthStateChanged((currentUser) => {
-      setUser(currentUser);
-    });
+  // useEffect(() => {
+  //   const unsubscribe = auth.onAuthStateChanged((currentUser) => {
+  //     setUser(currentUser);
+  //   });
 
-    return () => unsubscribe();
-  }, []);
+  //   return () => unsubscribe();
+  // }, []);
 
-  const handleWishlistClick = async () => {
-    if (!user) {
-      return; // Do nothing if the user is not logged in
-    }
+  // const handleWishlistClick = async () => {
+  //   if (!user) {
+  //     return; // Do nothing if the user is not logged in
+  //   }
   
-    const sanitizedEmail = user.email.replace(/\s/g, "_");
-    const wishlistRef = doc(db, "users", sanitizedEmail, "wishlist", String(products[0].id));
+  //   const sanitizedEmail = user.email.replace(/\s/g, "_");
+  //   const wishlistRef = doc(db, "users", sanitizedEmail, "wishlist", String(products[0].id));
   
-    try {
+  //   try {
       // Fetch and convert the image to Base64 (just like in your handleAddToCart function)
-      const imageBase64 = await fetch(products[0].src)
-        .then((res) => {
-          if (!res.ok) {
-            throw new Error("Failed to fetch image");
-          }
-          const mimeType = res.headers.get("Content-Type");
-          return res.blob().then((blob) => ({ blob, mimeType }));
-        })
-        .then(({ blob, mimeType }) =>
-          new Promise((resolve, reject) => {
-            const reader = new FileReader();
-            reader.onloadend = () => resolve(reader.result); // Store the full Base64 string
-            reader.onerror = reject;
-            reader.readAsDataURL(blob);
-          })
-        );
+      // const imageBase64 = await fetch(products[0].src)
+      //   .then((res) => {
+      //     if (!res.ok) {
+      //       throw new Error("Failed to fetch image");
+      //     }
+      //     const mimeType = res.headers.get("Content-Type");
+      //     return res.blob().then((blob) => ({ blob, mimeType }));
+      //   })
+      //   .then(({ blob, mimeType }) =>
+      //     new Promise((resolve, reject) => {
+      //       const reader = new FileReader();
+      //       reader.onloadend = () => resolve(reader.result); // Store the full Base64 string
+      //       reader.onerror = reject;
+      //       reader.readAsDataURL(blob);
+      //     })
+      //   );
   
-      if (!isFavorite) {
-        // Add to wishlist
-        await setDoc(wishlistRef, {
-          id: String(products[0].id),
-          name: products[0].name,
-          image: imageBase64,
-          title: products[0].title,
-          category: products[0].category,
-          description: products[0].description,
-          price: products[0].price,
-          color: selectedColor,
-          size: selectedSize,
-          quantity: quantity, // Ensure you have a quantity variable in scope
-        });
-      } else {
-        // Remove from wishlist
-        await deleteDoc(wishlistRef);
-      }
+  //     if (!isFavorite) {
+  //       // Add to wishlist
+  //       await setDoc(wishlistRef, {
+  //         id: String(products[0].id),
+  //         name: products[0].name,
+  //         // image: imageBase64,
+  //         title: products[0].title,
+  //         category: products[0].category,
+  //         description: products[0].description,
+  //         price: products[0].price,
+  //         color: selectedColor,
+  //         size: selectedSize,
+  //         quantity: quantity, // Ensure you have a quantity variable in scope
+  //       });
+  //     } else {
+  //       // Remove from wishlist
+  //       await deleteDoc(wishlistRef);
+  //     }
   
-      // Toggle favorite state
-      setIsFavorite((prev) => !prev);
-    } catch (error) {
-      console.error("Error updating wishlist:", error);
-    }
-  };
+  //     // Toggle favorite state
+  //     setIsFavorite((prev) => !prev);
+  //   } catch (error) {
+  //     console.error("Error updating wishlist:", error);
+  //   }
+  // };
  
   return (
     <div className={`product-view w-full lg:flex justify-between ${className || ""}`}>
       <div data-aos="fade-right" className="lg:w-1/2 xl:mr-[70px] lg:mr-[50px]">
         <div className="w-full">
-          <div className="w-full h-[600px] border border-qgray-border flex justify-center items-center overflow-hidden relative mb-3">
+          {/* <div className="w-full h-[600px] border border-qgray-border flex justify-center items-center overflow-hidden relative mb-3">
             <img
               src={`${import.meta.env.VITE_PUBLIC_URL}/assets/images/${src}`}
               alt=""
@@ -205,8 +222,8 @@ const decrement = () => setQuantity((prev) => Math.max(1, prev - 1));
             <div className="w-[80px] h-[80px] rounded-full bg-qyellow text-qblack flex justify-center items-center text-xl font-medium absolute left-[30px] top-[30px]">
               <span>-50%</span>
             </div>
-          </div>
-          <div className="flex gap-2 flex-wrap">
+          </div> */}
+          {/* <div className="flex gap-2 flex-wrap">
             {products.map((img) => (
               <div
                 onClick={() => changeImgHandler(img.src)}
@@ -220,17 +237,17 @@ const decrement = () => setQuantity((prev) => Math.max(1, prev - 1));
                 />
               </div>
             ))}
-          </div>
+          </div> */}
         </div>
       </div>
 
       <div className="flex-1">
         <div className="product-details w-full mt-10 lg:mt-0">
           <span data-aos="fade-up" className="text-qgray text-xs font-normal uppercase tracking-wider mb-2 inline-block">
-            {products[0].category}
+            {products.category}
           </span>
           <p data-aos="fade-up" className="text-xl font-medium text-qblack mb-4">
-            {products[0].name} {products[0].title}
+            {products.name} 
           </p>
 
           <div data-aos="fade-up" className="flex space-x-[10px] items-center mb-6">
@@ -246,12 +263,12 @@ const decrement = () => setQuantity((prev) => Math.max(1, prev - 1));
 
           <div data-aos="fade-up" className="flex space-x-2 items-center mb-7">
             <span className="text-sm font-500 text-qgray line-through mt-2">₹ 9.99</span>
-            <span className="text-2xl font-500 text-qred">{products[0].price}</span>
+            <span className="text-2xl font-500 text-qred">{products.price}</span>
           </div>
 
-          <p data-aos="fade-up" className="text-qgray text-sm text-normal mb-[30px] leading-7">
+          {/* <p data-aos="fade-up" className="text-qgray text-sm text-normal mb-[30px] leading-7">
             {products[0].description}
-          </p>
+          </p> */}
 
           <div data-aos="fade-up" className="colors mb-[30px]">
   <span className="text-sm font-normal uppercase text-qgray mb-[14px] inline-block">COLOR</span>
@@ -266,6 +283,39 @@ const decrement = () => setQuantity((prev) => Math.max(1, prev - 1));
         <span style={{ background: img.color }} className="color-circle"></span>
       </button>
     ))}
+  </div>
+</div>
+<div className="product-details w-full mt-10 lg:mt-0">
+  <span data-aos="fade-up" className="text-qgray text-xs font-normal uppercase tracking-wider mb-2 inline-block">
+    {products.category}
+  </span>
+  <p data-aos="fade-up" className="text-xl font-medium text-qblack mb-4">
+    {products.name}
+  </p>
+
+  {/* Brand */}
+  <div data-aos="fade-up" className="flex space-x-2 items-center mb-3">
+    <span className="text-sm font-500 text-qgray">Brand:</span>
+    <span className="text-sm font-500 text-qblack">{products.brand}</span>
+  </div>
+
+  {/* Availability */}
+  <div data-aos="fade-up" className="flex space-x-2 items-center mb-3">
+    <span className="text-sm font-500 text-qgray">Availability:</span>
+    <span className={`text-sm font-500 ${products.availability === "In Stock" ? "text-green-600" : "text-qred"}`}>
+      {products.availability}
+    </span>
+  </div>
+
+  {/* Additional Notes */}
+  <p data-aos="fade-up" className="text-qgray text-sm text-normal mb-[30px] leading-7">
+    {products.additionalNotes}
+  </p>
+
+  {/* Other details */}
+  <div data-aos="fade-up" className="flex space-x-2 items-center mb-7">
+    <span className="text-sm font-500 text-qgray line-through mt-2">₹ 9.99</span>
+    <span className="text-2xl font-500 text-qred">{products.price}</span>
   </div>
 </div>
 
@@ -293,7 +343,7 @@ const decrement = () => setQuantity((prev) => Math.max(1, prev - 1));
             <div className="w-[60px] h-full flex justify-center items-center">
   <button
     type="button"
-    onClick={handleWishlistClick}
+    // onClick={handleWishlistClick}
     className={`w-full h-full flex justify-center items-center ${isFavorite ? 'bg-pink-500' : 'bg-transparent'}`}
   >
     <span>

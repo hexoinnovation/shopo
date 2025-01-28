@@ -3,7 +3,7 @@ import { FaShoppingCart, FaTh, FaList } from "react-icons/fa"; // Importing the 
 import { auth, db } from "../../firebse.js";
 import { collection, getDocs } from "firebase/firestore";
 import { getFirestore, doc, setDoc } from "firebase/firestore";
-
+import { Link, useNavigate } from "react-router-dom"; 
 const ProductCardStyleOne = () => {
   const [products, setProducts] = useState([]);
   const [cartItems, setCartItems] = useState([]);
@@ -13,7 +13,7 @@ const ProductCardStyleOne = () => {
   const [errorMessage, setErrorMessage] = useState("");
   const [viewMode, setViewMode] = useState("grid"); // State for toggling view mode
   const [priceFilter, setPriceFilter] = useState(""); // Dropdown value for price filter
-
+  const navigate = useNavigate();
   useEffect(() => {
     fetchProducts(); // Fetch products on mount
   }, []);
@@ -102,7 +102,10 @@ const ProductCardStyleOne = () => {
 
   // Apply price filter
   const filteredProducts = products.filter(getPriceRangeFilter(priceFilter));
-
+  
+  const handleProductClick = (productId) => {
+    navigate(`/product/${productId}`);
+  };
   return (
     <div className="p-2">
       {/* Success or Error Message */}
@@ -193,16 +196,20 @@ const ProductCardStyleOne = () => {
               : "w-full flex justify-center" // for grid view
           }`}
         >
+          
+       
           <img
-            src={product.image || "https://via.placeholder.com/150"}
-            alt={product.name}
-            className="object-cover rounded-md"
-            style={{
-              height: viewMode === "list" ? "150px" : "250px", // Different height for list and grid
-              width: viewMode === "list" ? "150px" : "340px"
-             
-            }}
-          />
+  src={product.image || "https://via.placeholder.com/150"}
+  alt={product.name || "Product Image"}
+  className="object-cover rounded-md"
+  onClick={() => handleProductClick(product?.id)} // Ensure product.id is accessed safely
+  style={{
+    height: viewMode === "list" ? "150px" : "250px", // Different height for list and grid
+    width: viewMode === "list" ? "150px" : "340px", // Different width for list and grid
+  }}
+/>
+
+ 
         </div>
         {/* Product Details */}
         <div className="flex flex-col flex-grow">

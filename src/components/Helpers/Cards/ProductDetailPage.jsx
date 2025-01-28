@@ -1,15 +1,23 @@
 // ProductDetailPage.js
 import React from 'react';
-import { useParams } from 'react-router-dom';
+import { useNavigate} from 'react-router-dom';
 import ProductCardStyleOne from './ProductCardStyleOne';
+import ProductView from '../../SingleProductPage/ProductView';
 
 const ProductDetailPage = () => {
-  const { productId } = useParams(); // Get productId from URL
+  const navigate = useNavigate();
 
+  const handleProductClick = (id) => {
+    navigate(`/product/${id}`);
+  };
   return (
-    <div className="product-detail-page">
-      <ProductCardStyleOne productId={productId} />
-    </div>
+   
+    <div className="sm:mt-20 mt-10">
+    <Routes>
+      <Route path="/" element={<ProductCardStyleOne />} />
+      <Route path="/product/:id" element={<ProductView />} />
+    </Routes>
+  </div>
   );
 };
 
