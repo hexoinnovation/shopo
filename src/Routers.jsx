@@ -27,6 +27,7 @@ import HomeThree from "./components/HomeThree";
 import HomeFour from "./components/HomeFour";
 import HomeFive from "./components/HomeFive";
 import ProductDetailPage from "./components/Helpers/Cards/ProductDetailPage.jsx";
+import CategoryPage from "./components/Partials/Headers/HeaderOne/CategoryPage.jsx"
 const router = createBrowserRouter([
   { path: "/", element: <Home /> },
   { path: "/home-two", element: <HomeTwo /> },
@@ -56,10 +57,13 @@ const router = createBrowserRouter([
   { path: "/privacy-policy", element: <PrivacyPolicy /> },
   { path: "/terms-condition", element: <TermsCondition /> },
   { path: "*", element: <FourZeroFour /> },
+  { path: "/category/:categoryName", element: <CategoryPage /> }
 ]);
 <Router>
       <Routes>
         <Route path="/product/:productId" element={<ProductDetailPage />} />
+      
+        <Route path="/category/:categoryName" element={<CategoryPage />} />
       </Routes>
     </Router>
 function Routers() {
