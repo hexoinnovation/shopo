@@ -100,6 +100,7 @@ export default function ProductCardRowStyleTwo({ className, datas, type }) {
             alt=""
             className="w-full h-full object-contain"
           />
+        
         </div>
         <div className="flex-1 flex flex-col justify-center h-full">
           <div>
