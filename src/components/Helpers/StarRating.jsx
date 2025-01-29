@@ -32,3 +32,6 @@ const StarRating = ({ rating, ratingHandler, hoverRating, hoverHandler }) => (
 );
 
 export default StarRating;
+
+
+
