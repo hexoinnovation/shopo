@@ -253,3 +253,4 @@ export default function Navbar({ className, type }) {
     </div>
   );
 }
+
