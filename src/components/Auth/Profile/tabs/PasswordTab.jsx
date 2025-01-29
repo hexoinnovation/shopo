@@ -46,13 +46,23 @@ export default function PasswordTab() {
   const fetchUserDetails = async () => {
     const user = auth.currentUser;
     if (user) {
-      const userDocRef = doc(db, "users", user.email.replace(/\ /g, "_"));
-      const docSnap = await getDoc(userDocRef);
-      if (docSnap.exists()) {
-        const userDetails = docSnap.data();
-        document.getElementById("old_password").value = userDetails.password;
-      } else {
-        console.error("No such document!");
+      // Sanitize the user's email
+      const sanitizedEmail = user.email.replace(/\s/g, "_");
+  
+      // Reference to the Firestore document under /admin/nithya123@gmail.com/users/{sanitizedEmail}
+      const userDocRef = doc(db, "admin", "nithya123@gmail.com", "users", sanitizedEmail);
+  
+      try {
+        const docSnap = await getDoc(userDocRef);
+        if (docSnap.exists()) {
+          const userDetails = docSnap.data();
+          // Populate the form with the user's password (or any other details you want)
+          document.getElementById("old_password").value = userDetails.password;
+        } else {
+          console.error("No such document!");
+        }
+      } catch (error) {
+        console.error("Error fetching user details:", error);
       }
     }
   };
@@ -60,6 +70,7 @@ export default function PasswordTab() {
   useEffect(() => {
     fetchUserDetails();
   }, []);
+  
   
   const saveUserDetails = async () => {
     const oldPassword = document.getElementById("old_password").value.trim();
@@ -87,7 +98,12 @@ export default function PasswordTab() {
     const user = auth.currentUser;
   
     if (user) {
-      const userDocRef = doc(db, "users", user.email.replace(/\ /g, "_"));
+      // Sanitize the email
+      const sanitizedEmail = user.email.replace(/\s/g, "_");
+  
+      // Reference to the Firestore document under /admin/nithya123@gmail.com/users/{sanitizedEmail}
+      const userDocRef = doc(db, "admin", "nithya123@gmail.com", "users", sanitizedEmail);
+  
       const docSnap = await getDoc(userDocRef);
   
       if (docSnap.exists()) {

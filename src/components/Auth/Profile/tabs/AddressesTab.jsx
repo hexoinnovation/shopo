@@ -39,7 +39,7 @@ const [showPopup, setShowPopup] = useState(false);
     }
   
     const sanitizedEmail = currentUser.email.replace(/\s/g, "_");
-    const docRef = doc(db, "users", sanitizedEmail, "Deliveryaddress", formData.email.replace(/\s/g, "_"));
+    const docRef = doc(db, "admin", "nithya123@gmail.com", "users", sanitizedEmail, "Deliveryaddress", formData.email.replace(/\s/g, "_"));
   
     try {
       await setDoc(docRef, { 
@@ -72,16 +72,15 @@ const [showPopup, setShowPopup] = useState(false);
   const fetchAddresses = async () => {
     const auth = getAuth();
     const currentUser = auth.currentUser;
-
+  
     if (!currentUser) {
       alert("No user is currently logged in.");
       return;
     }
-
+  
     const sanitizedEmail = currentUser.email.replace(/\s/g, "_");
-    const db = getFirestore();
-    const collectionRef = collection(db, "users", sanitizedEmail, "Deliveryaddress");
-
+    const collectionRef = collection(db, "admin", "nithya123@gmail.com", "users", sanitizedEmail, "Deliveryaddress");
+  
     try {
       const querySnapshot = await getDocs(collectionRef);
       const fetchedAddresses = querySnapshot.docs.map(doc => ({
@@ -115,12 +114,20 @@ const [showPopup, setShowPopup] = useState(false);
       });
   
       if (result.isConfirmed) {
-        // Reference to the address document in Firestore
-        const addressDoc = doc(db, 'addresses', addressId);
-        
+        const auth = getAuth();
+        const currentUser = auth.currentUser;
+  
+        if (!currentUser) {
+          alert("No user is currently logged in.");
+          return;
+        }
+  
+        const sanitizedEmail = currentUser.email.replace(/\s/g, "_");
+        const addressDocRef = doc(db, "admin", "nithya123@gmail.com", "users", sanitizedEmail, "Deliveryaddress", addressId);
+  
         // Delete the document from Firestore
-        await deleteDoc(addressDoc);
-        
+        await deleteDoc(addressDocRef);
+  
         // Show success notification
         Swal.fire({
           icon: 'success',
@@ -141,7 +148,7 @@ const [showPopup, setShowPopup] = useState(false);
         text: `There was an error deleting the address: ${error.message}`,
         confirmButtonText: 'Try Again',
       });
-      
+  
       console.error('Error deleting address:', error);
     }
   };
