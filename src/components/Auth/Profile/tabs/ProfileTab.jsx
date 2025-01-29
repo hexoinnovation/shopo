@@ -32,10 +32,24 @@ const PersonalInfo = () => {
 
   const fetchPersonalInfo = async (email) => {
     try {
-      const docRef = doc(db, "users", email);
+      // Sanitize the email (remove spaces or special characters)
+      const sanitizedEmail = email.replace(/\s/g, "_");
+  
+      // Reference to the user's document under the specific admin's collection
+      const docRef = doc(db, "admin", "nithya123@gmail.com", "users", sanitizedEmail, "Profileinfo", "Profile");
+  
+      // Fetch the document from Firestore
       const docSnap = await getDoc(docRef);
+  
+      // If the document exists, set the personal information and the image
       if (docSnap.exists()) {
-        setPersonalInfo(docSnap.data());
+        const data = docSnap.data();
+        setPersonalInfo({
+          ...data,  // Spread the existing fields
+          image: data.image || ""  // Ensure to handle image field
+        });
+      } else {
+        console.log("No such document!");
       }
     } catch (error) {
       console.error("Error fetching personal info:", error);
@@ -72,8 +86,21 @@ const PersonalInfo = () => {
     }
   
     try {
-      const docRef = doc(db, "users", user.email);
-      await setDoc(docRef, personalInfo);
+      // Sanitize the email (remove spaces or special characters)
+      const sanitizedEmail = user.email.replace(/\s/g, "_");
+  
+      // Reference to the Firestore document under /admin/{adminEmail}/users/{sanitizedEmail}
+      const docRef = doc(db, "admin", "nithya123@gmail.com", "users", sanitizedEmail);
+  
+      // Reference to the Profileinfo subcollection inside the user document
+      const profileInfoRef = collection(docRef, "Profileinfo");
+  
+      // Reference to the 'Profile' document inside the Profileinfo subcollection
+      const profileDocRef = doc(profileInfoRef, "Profile");
+  
+      // Update the personal info in Firestore
+      await setDoc(profileDocRef, personalInfo);
+  
       Swal.fire({
         title: 'Success',
         text: 'Personal information updated successfully!',
@@ -90,6 +117,7 @@ const PersonalInfo = () => {
       });
     }
   };
+  
 
   return (
     <div className="flex space-x-8">
@@ -127,7 +155,6 @@ const PersonalInfo = () => {
               value={personalInfo.email}
               placeholder="demoemail@gmail.com"
               onChange={handleInputChange}
-              disabled
               className="w-full h-[50px] border border-gray-300 px-3"
             />
           </div>
