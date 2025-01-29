@@ -8,6 +8,7 @@ export default function SectionStyleTwo({ className, products, type }) {
         className || ""
       }`}
     >
+      
       <DataIteration datas={products} startLength={0} endLength={1}>
         {({ datas }) => (
           <div key={datas.id} className="item w-full">

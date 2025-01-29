@@ -133,6 +133,7 @@ export default function ProductCardRowStyleTwo({ className, datas, type }) {
             className || ""
           } flex flex-col justify-between p-5 shadow-lg rounded-lg`}
         >
+          
           <div className="w-full h-1/3 flex justify-center items-center">
             <img
               src={product.image || "https://via.placeholder.com/150"}
