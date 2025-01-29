@@ -3,6 +3,7 @@ import InputCom from "../../Helpers/InputCom";
 import Layout from "../../Partials/Layout";
 import { Link } from "react-router-dom";
 import { signInWithEmailAndPassword, getAuth } from "firebase/auth";
+import { doc,getDoc } from "firebase/firestore";
 import { db, app } from "../../firebse";
 import Swal from "sweetalert2";
 import { useNavigate } from "react-router-dom";
