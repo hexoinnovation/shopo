@@ -6,7 +6,7 @@ export default function TopBar({ className }) {
   return (
     <>
       <div
-        className={`w-full bg-white h-10 border-b border-qgray-border ${
+        className={`w-full bg-purple-900 h-10 border-b border-qgray-border ${
           className || ""
         }`}
       >
@@ -16,21 +16,21 @@ export default function TopBar({ className }) {
               <ul className="flex space-x-6">
                 <li>
                   <Link to="/">
-                    <span className="text-xs leading-6 text-qblack font-500">
+                    <span className="text-xs leading-6 text-yellow-400 font-500">
                       Account
                     </span>
                   </Link>
                 </li>
                 <li>
                   <Link to="/tracking-order">
-                    <span className="text-xs leading-6 text-qblack font-500">
+                    <span className="text-xs leading-6 text-yellow-400 font-500">
                       Track Order
                     </span>
                   </Link>
                 </li>
                 <li>
                   <Link to="/faq">
-                    <span className="text-xs leading-6 text-qblack font-500">
+                    <span className="text-xs leading-6 text-yellow-400 font-500">
                       Support
                     </span>
                   </Link>
@@ -56,16 +56,16 @@ export default function TopBar({ className }) {
                     datas={["United State", "Bangladesh", "India"]}
                   />
                   <div>
-                    <Arrow className="fill-current qblack" />
+                    <Arrow className="fill-current text-yellow-400" />
                   </div>
                 </div>
                 <div className="currency-select flex space-x-1 items-center">
                   <Selectbox className="w-fit" datas={["USD", "BDT"]} />
-                  <Arrow className="fill-current qblack" />
+                  <Arrow className="fill-current text-yellow-400" />
                 </div>
                 <div className="language-select flex space-x-1 items-center">
                   <Selectbox className="w-fit" datas={["Bangla", "english"]} />
-                  <Arrow className="fill-current qblack" />
+                  <Arrow className="fill-current text-yellow-400" />
                 </div>
               </div>
             </div>
