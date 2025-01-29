@@ -373,6 +373,7 @@ export default function PasswordTab() {
                   </div>
                 </button>
               </div>
+              
               <button type="button" onClick={handleCancel}>
                 <div className="w-full text-sm font-semibold text-qblack mb-5 sm:mb-0">
                   Cancel
