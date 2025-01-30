@@ -4,7 +4,7 @@ import { FaShoppingCart, FaTh, FaList } from "react-icons/fa"; // Importing the 
 import { auth, db } from "../../firebse.js";
 import { collection, getDocs } from "firebase/firestore";
 import { getFirestore, doc, setDoc } from "firebase/firestore";
-
+import { useParams, useNavigate } from 'react-router-dom';
 const ProductCardStyleOne = () => {
   const [products, setProducts] = useState([]);
   const [cartItems, setCartItems] = useState([]);
@@ -14,7 +14,7 @@ const ProductCardStyleOne = () => {
   const [errorMessage, setErrorMessage] = useState("");
   const [viewMode, setViewMode] = useState("grid"); // State for toggling view mode
   const [priceFilter, setPriceFilter] = useState(""); // Dropdown value for price filter
-
+  const navigate = useNavigate();
   useEffect(() => {
     fetchProducts(); // Fetch products on mount
   }, []);
@@ -80,7 +80,9 @@ const ProductCardStyleOne = () => {
       }
     }
   };
-
+  const handleProductClick = (productId) => {
+    navigate(`/product/${productId}`);
+  };
   const handleBuyNow = (product) => {
     alert(`Buy Now functionality for ${product.name}`);
   };
@@ -201,7 +203,7 @@ const ProductCardStyleOne = () => {
     style={{
       height: viewMode === "list" ? "120px" : "250px",
       width: viewMode === "list" ? "200px" : "300px"
-    }}
+    }} onClick={() => handleProductClick(product.id)}
   />
   
   

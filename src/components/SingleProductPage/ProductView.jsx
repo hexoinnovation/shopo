@@ -2,19 +2,24 @@ import { useState,useEffect  } from "react";
 import Star from "../Helpers/icons/Star";
 import Selectbox from "../Helpers/Selectbox";
 import { getFirestore, doc, updateDoc, arrayUnion,getDoc,setDoc,deleteDoc ,getDocs,collection } from "firebase/firestore";
-import { getAuth } from "firebase/auth";
+import { getAuth,onAuthStateChanged } from "firebase/auth";
 import { auth,db } from "../firebse";
-import { useNavigate,useParams } from "react-router-dom";
-
-
+import { getDatabase, ref, set } from "firebase/database";
+import { useNavigate,useParams, } from "react-router-dom";
+import TopBar from "../Partials/Headers/HeaderOne/TopBar";
+import Middlebar from "../Partials/Headers/HeaderOne/Middlebar";
+import Navbar from "../Partials/Headers/HeaderOne/Navbar";
+import Footer from "../Partials/Footers/Footer";
+import { FaStar, FaRegStar } from "react-icons/fa";
 
 export default function ProductView({ className }) {
   const[products,setProducts]=useState([]);
   const { id } = useParams();
-
+  const [loading, setLoading] = useState(true);
   // const [src, setSrc] = useState(products[0].src);
   const [selectedColor, setSelectedColor] = useState(""); // Initialize with an empty string or default color
-
+  const [rating, setRating] = useState(0);
+  const [totalReviews, setTotalReviews] = useState(0);
 const [selectedSize, setSelectedSize] = useState("");
 const [quantity, setQuantity] = useState(1);
 //const [isFavorite, setIsFavorite] = useState(false);
@@ -23,117 +28,103 @@ const selectSizeHandler = (size) => setSelectedSize(size);
 const increment = () => setQuantity((prev) => prev + 1);
 const decrement = () => setQuantity((prev) => Math.max(1, prev - 1));
 
-  // const handleAddToCart = async (product) => {
-  //   if (!product.id || !product.name || !product.src || !product.title || !product.category || !product.description || !product.price) {
-  //     console.error("Missing product fields", product);
-  //     alert("Failed to add item to cart. Some product details are missing.");
-  //     return;
-  //   }
-  
-  //   const auth = getAuth();
-  //   const db = getFirestore();
-  //   const user = auth.currentUser;
-  
-  //   if (user) {
-  //     try {
-  //       const sanitizedEmail = user.email ? user.email.replace(/\ /g, "_") : "unknown_user";
-  
-        // Fetch and convert the image to Base64
-        // const imageBase64 = await fetch(product.src)
-        //   .then((res) => {
-        //     if (!res.ok) {
-        //       throw new Error("Failed to fetch image");
-        //     }
-        //     const mimeType = res.headers.get("Content-Type"); // Get the MIME type of the image
-        //     return res.blob().then((blob) => ({ blob, mimeType }));
-        //   })
-        //   .then(({ blob, mimeType }) =>
-        //     new Promise((resolve, reject) => {
-        //       const reader = new FileReader();
-        //       reader.onloadend = () => resolve(reader.result); // Store the full Base64 string
-        //       reader.onerror = reject;
-        //       reader.readAsDataURL(blob);
-        //     })
-        //   );
-          
-  //       const cartRef = doc(db, "users", sanitizedEmail, "cart", String(product.id));
-  
-  //       const docSnap = await getDoc(cartRef);
-  //       if (!docSnap.exists()) {
-  //         await setDoc(cartRef, {
-  //           items: [
-  //             {
-  //               id: String(product.id),
-  //               name: product.name,
-  //               // image: imageBase64,
-  //               title: product.title,
-  //               category: product.category,
-  //               description: product.description,
-  //               price: product.price,
-  //               color: selectedColor,
-  //         size: selectedSize,
-  //         quantity: quantity,
-  //             },
-  //           ],
-  //         });
-  //         alert("Item added to cart (new document created)!");
-  //       } else {
-  //         await updateDoc(cartRef, {
-  //           items: arrayUnion({
-  //             id: String(product.id),
-  //             name: product.name,
-  //             // image: imageBase64,
-  //             title: product.title,
-  //             category: product.category,
-  //             description: product.description,
-  //             price: product.price,
-  //             color: selectedColor,
-  //         size: selectedSize,
-  //         quantity: quantity,
-  //           }),
-  //         });
-  //         alert("Item added to cart!");
-  //       }
-  //     } catch (error) {
-  //       console.error("Error adding to cart:", error);
-  //       alert("Failed to add item to cart.");
-  //     }
-  //   } else {
-  //     alert("Please log in to add items to your cart.");
-  //   }
-  // };
+const handleAddToCart = async () => {
+  const auth = getAuth();
+  const db = getFirestore();
 
-  const fetchProducts = async () => {
-    try {
-      const collectionRef = collection(
-        db,
-        "admin",
-        "nithya123@gmail.com",
-        "products"
-      );
-      const snapshot = await getDocs(collectionRef);
-  
-      const productsList = snapshot.docs.map((doc) => ({
-        id: doc.id,
-        ...doc.data(),
-      }));
-  
-      // Remove duplicates based on 'id'
-      const uniqueProducts = Array.from(
-        new Map(productsList.map((item) => [item.id, item])).values()
-      );
-  
-      setProducts(uniqueProducts); // Set products state with unique products
-    } catch (error) {
-      console.error("Error fetching products:", error);
-    }
+  // Ensure Firebase is fully initialized and auth state is checked
+  await new Promise((resolve) => {
+    onAuthStateChanged(auth, (user) => {
+      if (user) {
+        resolve();
+      } else {
+        alert("Please log in to add products to your cart.");
+        return;
+      }
+    });
+  });
+
+  const user = auth.currentUser;
+
+  if (!user) {
+    alert("Please log in to add products to your cart.");
+    return;
+  }
+
+  if (!products || !products.id) {
+    alert("Product ID is missing. Cannot add to cart.");
+    return;
+  }
+
+  const sanitizedEmail = user.email.replace(/\ /g, "_").replace(/ /g, "_at_");
+  console.log("Sanitized Email:", sanitizedEmail);
+
+  if (!sanitizedEmail) {
+    console.error("Invalid sanitized email.");
+    return;
+  }
+
+  const cartRef = doc(db, "admin", "nithya123@gmail.com", "users", sanitizedEmail, "add_to_cart", products.id);
+  console.log("Firestore Reference Path:", cartRef.path);
+
+  const cartData = {
+    name: products.name,
+    price: products.price,
+    category: products.category,
+    brand: products.brand,
+    image: products.image,
+    availability: products.availability,
+    rating: products.rating,
+    quantity: quantity,
   };
-  useEffect(() => {
-    if (id) {
-      setLoading(true); // Set loading to true when fetching starts
-      fetchProducts(id); // Call fetchProduct with the correct 'id'
+
+  // Check for any missing or undefined values in cartData
+  for (const key in cartData) {
+    if (cartData[key] === undefined || cartData[key] === null) {
+      console.error(`Missing value for ${key}`);
+      return;
     }
-  }, [id]); 
+  }
+
+  try {
+    await setDoc(cartRef, cartData);
+    alert("Product added to cart!");
+  } catch (error) {
+    console.error("Error adding product to cart: ", error);
+  }
+};
+
+
+const fetchProduct = async (id) => {
+  try {
+    const docRef = doc(db, "admin", "nithya123@gmail.com", "products", id);
+    const docSnap = await getDoc(docRef);
+
+    if (docSnap.exists()) {
+      const productData = docSnap.data();
+      setProducts({
+        ...productData,
+        id: docSnap.id,  // Make sure to add the product ID here
+      });
+      setRating(productData.rating || 0);
+      setTotalReviews(productData.totalReviews || 0);
+      setLoading(false);
+    } else {
+      console.error("No product found!");
+    }
+  } catch (error) {
+    console.error("Error fetching product:", error);
+  }
+};
+
+  
+  useEffect(() => {
+  if (id) {
+    setLoading(true);
+    fetchProduct(id);
+  }
+}, [id]);
+
 
   //  useEffect(() => {
   //   if (id) {
@@ -144,7 +135,7 @@ const decrement = () => setQuantity((prev) => Math.max(1, prev - 1));
 
   const navigate = useNavigate();
 
-  const [user, setUser] = useState(null);
+
   const [isFavorite, setIsFavorite] = useState(false);
 
   // Monitor authentication state
@@ -210,190 +201,74 @@ const decrement = () => setQuantity((prev) => Math.max(1, prev - 1));
   // };
  
   return (
-    <div className={`product-view w-full lg:flex justify-between ${className || ""}`}>
-      <div data-aos="fade-right" className="lg:w-1/2 xl:mr-[70px] lg:mr-[50px]">
-        <div className="w-full">
-          {/* <div className="w-full h-[600px] border border-qgray-border flex justify-center items-center overflow-hidden relative mb-3">
-            <img
-              src={`${import.meta.env.VITE_PUBLIC_URL}/assets/images/${src}`}
-              alt=""
-              className="object-contain"
-            />
-            <div className="w-[80px] h-[80px] rounded-full bg-qyellow text-qblack flex justify-center items-center text-xl font-medium absolute left-[30px] top-[30px]">
-              <span>-50%</span>
-            </div>
-          </div> */}
-          {/* <div className="flex gap-2 flex-wrap">
-            {products.map((img) => (
-              <div
-                onClick={() => changeImgHandler(img.src)}
-                key={img.id}
-                className="w-[110px] h-[110px] p-[15px] border border-qgray-border cursor-pointer"
-              >
-                <img
-                  src={`${import.meta.env.VITE_PUBLIC_URL}/assets/images/${img.src}`}
-                  alt=""
-                  className={`w-full h-full object-contain ${src !== img.src ? "opacity-50" : ""}`}
-                />
-              </div>
-            ))}
-          </div> */}
-        </div>
+    <div>
+      <TopBar/>
+              <Middlebar/>
+              <Navbar/>
+        
+              <div className={`product-view w-full lg:flex justify-between px-10 py-10 bg-white shadow-md rounded-lg`}> 
+      {/* Product Image Section */}
+      <div data-aos="fade-right" className="lg:w-1/2 xl:mr-[70px] lg:mr-[50px] flex justify-center">
+        <img
+          src={products.image || "https://via.placeholder.com/150"}
+          alt={products.name}
+          className="w-full max-w-md object-cover rounded-lg shadow-lg ml-40"
+        />
       </div>
 
-      <div className="flex-1">
-        <div className="product-details w-full mt-10 lg:mt-0">
-          <span data-aos="fade-up" className="text-qgray text-xs font-normal uppercase tracking-wider mb-2 inline-block">
-            {products.category}
-          </span>
-          <p data-aos="fade-up" className="text-xl font-medium text-qblack mb-4">
-            {products.name} 
+      {/* Product Details Section */}
+      <div className="flex-1 ">
+        <div className="product-details w-full mt-10 lg:mt-0 space-y-6">
+          <h2 className="text-3xl font-bold text-gray-800 mb-2">{products.name}</h2>
+          <span className="text-lg font-medium text-gray-600 uppercase tracking-wide">{products.category}</span>
+          
+          {/* Brand */}
+          <p className="text-gray-600 mt-2"><strong>Brand:</strong> {products.brand}</p>
+          
+          {/* Availability */}
+          <p className={`mt-2 ${products.availability === "In Stock" ? "text-green-500" : "text-red-500"}`}>
+            <strong>Availability:</strong> {products.availability}
           </p>
 
-          <div data-aos="fade-up" className="flex space-x-[10px] items-center mb-6">
-            <div className="flex">
-              <Star />
-              <Star />
-              <Star />
-              <Star />
-              <Star />
-            </div>
-            <span className="text-[13px] font-normal text-qblack">6 Reviews</span>
+          {/* Rating */}
+          <div className="flex items-center mt-4">
+            {[...Array(5)].map((_, index) => (
+              <span key={index}>
+                {index < products.rating ? <FaStar className="text-yellow-500" /> : <FaRegStar className="text-gray-400" />}
+              </span>
+            ))}
           </div>
-
-          <div data-aos="fade-up" className="flex space-x-2 items-center mb-7">
-            <span className="text-sm font-500 text-qgray line-through mt-2">₹ 9.99</span>
-            <span className="text-2xl font-500 text-qred">{products.price}</span>
+          
+          {/* Price */}
+          <div className="flex items-center mt-4 text-2xl font-bold text-red-500">
+            ₹ {products.price}
+            {products.discountPrice && (
+              <span className="text-xl font-medium text-gray-500 line-through ml-2">₹ {products.discountPrice}</span>
+            )}
           </div>
-
-          {/* <p data-aos="fade-up" className="text-qgray text-sm text-normal mb-[30px] leading-7">
-            {products[0].description}
-          </p> */}
-
-          <div data-aos="fade-up" className="colors mb-[30px]">
-  <span className="text-sm font-normal uppercase text-qgray mb-[14px] inline-block">COLOR</span>
-  <div className="flex space-x-4 items-center">
-    {products.map((img) => (
-      <button
-        key={img.id}
-        onClick={() => changeImgHandler(img.color)} // Update the color state
-        style={{ "--tw-ring-color": img.color }}
-        className="color-button"
-      >
-        <span style={{ background: img.color }} className="color-circle"></span>
-      </button>
-    ))}
-  </div>
-</div>
-<div className="product-details w-full mt-10 lg:mt-0">
-  <span data-aos="fade-up" className="text-qgray text-xs font-normal uppercase tracking-wider mb-2 inline-block">
-    {products.category}
-  </span>
-  <p data-aos="fade-up" className="text-xl font-medium text-qblack mb-4">
-    {products.name}
-  </p>
-
-  {/* Brand */}
-  <div data-aos="fade-up" className="flex space-x-2 items-center mb-3">
-    <span className="text-sm font-500 text-qgray">Brand:</span>
-    <span className="text-sm font-500 text-qblack">{products.brand}</span>
-  </div>
-
-  {/* Availability */}
-  <div data-aos="fade-up" className="flex space-x-2 items-center mb-3">
-    <span className="text-sm font-500 text-qgray">Availability:</span>
-    <span className={`text-sm font-500 ${products.availability === "In Stock" ? "text-green-600" : "text-qred"}`}>
-      {products.availability}
-    </span>
-  </div>
-
-  {/* Additional Notes */}
-  <p data-aos="fade-up" className="text-qgray text-sm text-normal mb-[30px] leading-7">
-    {products.additionalNotes}
-  </p>
-
-  {/* Other details */}
-  <div data-aos="fade-up" className="flex space-x-2 items-center mb-7">
-    <span className="text-sm font-500 text-qgray line-through mt-2">₹ 9.99</span>
-    <span className="text-2xl font-500 text-qred">{products.price}</span>
-  </div>
-</div>
-
-<div data-aos="fade-up" className="product-size mb-[30px]">
-  <span className="text-sm font-normal uppercase text-qgray mb-[14px] inline-block">SIZE</span>
-  <div className="w-full">
-    <div className="border border-qgray-border h-[50px] flex justify-between items-center px-6 cursor-pointer">
-      <Selectbox
-        onSelect={selectSizeHandler} // Update the size state
-        datas={["Small", "Medium", "Large", "Extra Large"]}
-      />
-    </div>
-  </div>
-</div>
-
-
-          <div data-aos="fade-up" className="quantity-card-wrapper w-full flex items-center h-[50px] space-x-[10px] mb-[30px]">
-            <div className="w-[120px] h-full px-[26px] flex items-center border border-qgray-border">
-              <div className="flex justify-between items-center w-full">
-                <button onClick={decrement} type="button" className="text-base text-qgray">-</button>
-                <span className="text-qblack">{quantity}</span>
-                <button onClick={increment} type="button" className="text-base text-qgray">+</button>
-              </div>
-            </div>
-            <div className="w-[60px] h-full flex justify-center items-center">
-  <button
-    type="button"
-    // onClick={handleWishlistClick}
-    className={`w-full h-full flex justify-center items-center ${isFavorite ? 'bg-pink-500' : 'bg-transparent'}`}
-  >
-    <span>
-      <svg
-        width="24"
-        height="24"
-        viewBox="0 0 24 24"
-        fill="none"
-        xmlns="http://www.w3.org/2000/svg"
-      >
-        <path
-          d="M17 1C14.9 1 13.1 2.1 12 3.7C10.9 2.1 9.1 1 7 1C3.7 1 1 3.7 1 7C1 13 12 22 12 22C12 22 23 13 23 7C23 3.7 20.3 1 17 1Z"
-          stroke={isFavorite ? "white" : "#D5D5D5"} // Set the stroke color to white when pink
-          strokeWidth="2"
-          strokeMiterlimit="10"
-          strokeLinecap="square"
-        />
-      </svg>
-    </span>
-  </button>
-</div>
-            <div className="w-[210px] h-[60px] flex justify-center items-center border border-qgray-border">
-  <button
-    type="button"
-    onClick={() => handleAddToCart(products[0])}
-    className="bg-black text-white w-full h-full rounded-md flex items-center justify-center gap-2 hover:bg-gray-800 transition duration-300"
-  >
-    ADD TO CART
-    <span>
-      <svg
-        width="30"
-        height="32"
-        viewBox="0 0 26 24"
-        fill="none"
-        xmlns="http://www.w3.org/2000/svg"
-        className="fill-current text-white"
-      >
-        <path
-          d="M17 1C14.9 1 13 2.9 13 5C13 5.9 13.5 6.7 14.3 7.2L12.1 9.3C10.5 9.9 9 11.7 9 13.4V18C9 18.6 9.4 19 10 19H12C12.6 19 13 18.6 13 18V14C13 13.4 13.4 13 14 13H17C17.6 13 18 13.4 18 14V17C18 17.6 17.6 18 17 18H14C13.4 18 13 18.4 13 19C13 19.6 13.4 20 14 20H17C18.1 20 19 19.1 19 18V14C19 12.9 18.1 12 17 12C16.5 12 16 11.5 16 11C16 10.4 16.4 10 17 10C17.6 10 18 9.6 18 9C18 8.4 17.6 8 17 8H14C13.4 8 13 7.6 13 7C13 6.4 13.4 6 14 6C15.1 6 16 5.1 16 4C16 2.9 15.1 2 14 2C13.4 2 13 2.4 13 3C13 3.6 13.4 4 14 4C14.6 4 15 4.4 15 5C15 5.6 14.6 6 14 6H13C12.4 6 12 5.6 12 5C12 4.4 12.4 4 13 4H15C16.1 4 17 4.9 17 5.9C17.4 6.5 17 7.5 17 7C17.6 8.8 17 9.4 17 10"
-          fill="currentColor"
-        />
-      </svg>
-    </span>
-  </button>
-</div>
-
+          
+          {/* Quantity Selector */}
+          <div className="flex items-center mt-6">
+            <button onClick={decrement} className="px-4 py-2 text-xl font-bold text-gray-700 border border-gray-300 rounded-l-md">-</button>
+            <span className="px-6 py-2 text-xl font-semibold text-gray-800 border-t border-b border-gray-300">{quantity}</span>
+            <button onClick={increment} className="px-4 py-2 text-xl font-bold text-gray-700 border border-gray-300 rounded-r-md">+</button>
           </div>
-
+          
+          {/* Wishlist & Add to Cart Buttons */}
+          <div className="flex items-center mt-6 space-x-4">
+            <button className={`p-3 rounded-md ${isFavorite ? "bg-pink-500" : "bg-gray-200"}`}>
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M17 1C14.9 1 13.1 2.1 12 3.7C10.9 2.1 9.1 1 7 1C3.7 1 1 3.7 1 7C1 13 12 22 12 22C12 22 23 13 23 7C23 3.7 20.3 1 17 1Z" stroke="white" strokeWidth="2" strokeMiterlimit="10" strokeLinecap="square" />
+              </svg>
+            </button>
+            <button onClick={handleAddToCart} className="px-6 py-3 text-lg font-semibold text-white bg-black rounded-md shadow-md hover:bg-gray-800 transition duration-300">
+              ADD TO CART
+            </button>
+          </div>
         </div>
       </div>
+    </div>
+    <Footer/>
     </div>
   );
 }

@@ -28,6 +28,7 @@ import HomeFour from "./components/HomeFour";
 import HomeFive from "./components/HomeFive";
 import ProductDetailPage from "./components/Helpers/Cards/ProductDetailPage.jsx";
 import CategoryPage from "./components/Partials/Headers/HeaderOne/CategoryPage.jsx"
+import ProductView from "./components/SingleProductPage/ProductView.jsx";
 const router = createBrowserRouter([
   { path: "/", element: <Home /> },
   { path: "/home-two", element: <HomeTwo /> },
@@ -57,8 +58,10 @@ const router = createBrowserRouter([
   { path: "/privacy-policy", element: <PrivacyPolicy /> },
   { path: "/terms-condition", element: <TermsCondition /> },
   { path: "*", element: <FourZeroFour /> },
-  { path: "/category/:categoryName", element: <CategoryPage /> }
+  { path: "/category/:categoryName", element: <CategoryPage /> },
+  { path: "/product/:id", element: <ProductView /> },
 ]);
+
 <Router>
       <Routes>
         <Route path="/product/:productId" element={<ProductDetailPage />} />
