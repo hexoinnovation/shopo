@@ -121,7 +121,7 @@ export default function Login() {
               </span>
             </div>
             <Link
-              to="/forgot-password"
+              to="/profile#password"
               className="text-sm text-purple-600 hover:underline"
             >
               Forgot Password?
