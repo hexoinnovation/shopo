@@ -97,6 +97,7 @@ export default function Navbar({ className, type }) {
                     />
                   </div>
                 </button>
+                
                 {categoryToggle && (
                   <div
                     className="fixed top-0 left-0 w-full h-full -z-10"
