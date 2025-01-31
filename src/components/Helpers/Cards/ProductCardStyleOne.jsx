@@ -4,9 +4,11 @@ import { FaShoppingCart, FaTh, FaList } from "react-icons/fa"; // Importing the 
 import { auth, db } from "../../firebse.js";
 import { collection, getDocs } from "firebase/firestore";
 import { getFirestore, doc, setDoc } from "firebase/firestore";
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate,Link } from 'react-router-dom';
+import { getAuth,onAuthStateChanged } from "firebase/auth";
 const ProductCardStyleOne = () => {
   const [products, setProducts] = useState([]);
+  const [productss, selectedProduct] = useState([]);
   const [cartItems, setCartItems] = useState([]);
   const [cartCount, setCartCount] = useState(0);
   const [quantity, setQuantity] = useState(1);
@@ -47,45 +49,71 @@ const ProductCardStyleOne = () => {
   };
 
   const handleAddToCart = async (product) => {
-    if (!auth.currentUser) {
-      setErrorMessage("Please log in to add products to the cart.");
+    const auth = getAuth();
+    const db = getFirestore();
+  
+    // Ensure Firebase is fully initialized and auth state is checked
+    await new Promise((resolve) => {
+      onAuthStateChanged(auth, (user) => {
+        if (user) {
+          resolve();
+        } else {
+          alert("Please log in to add products to your cart.");
+          return;
+        }
+      });
+    });
+  
+    const user = auth.currentUser;
+  
+    if (!user) {
+      alert("Please log in to add products to your cart.");
       return;
     }
-
-    const user = auth.currentUser;
-    if (user) {
-      const productInCart = cartItems.find((item) => item.id === product.id);
-      if (productInCart) {
-        setCartItems((prevItems) =>
-          prevItems.map((item) =>
-            item.id === product.id
-              ? { ...item, quantity: item.quantity + quantity }
-              : item
-          )
-        );
-      } else {
-        setCartItems((prevItems) => [...prevItems, { ...product, quantity }]);
-      }
-
-      try {
-        const userCartRef = collection(db, "users", user.email, "AddToCart");
-        await setDoc(doc(userCartRef, product.id.toString()), {
-          ...product,
-          quantity,
-        });
-        setSuccessMessage("Product added to cart successfully!");
-        setCartCount(cartCount + 1); // Update cart count
-      } catch (error) {
-        setErrorMessage("Failed to add product to cart.");
-      }
+  
+    // Ensure product has an ID
+    if (!product || !product.id) {
+      alert("Product ID is missing. Cannot add to cart.");
+      return;
+    }
+  
+    const sanitizedEmail = user.email.replace(/\ /g, "_");
+    console.log("Sanitized Email:", sanitizedEmail);
+  
+    if (!sanitizedEmail) {
+      console.error("Invalid sanitized email.");
+      return;
+    }
+  
+    const cartRef = doc(db, "admin", "nithya123@gmail.com", "users", sanitizedEmail, "add_to_cart", product.id);
+    console.log("Firestore Reference Path:", cartRef.path);
+  
+    const cartData = {
+      name: product.name,
+      price: product.price,
+      category: product.category,
+      brand: product.brand,
+      image: product.image,
+      availability: product.availability,
+      rating: product.rating,
+      quantity: 1, // Default quantity
+    };
+  
+    try {
+      await setDoc(cartRef, cartData);
+      alert("Product added to cart!");
+    } catch (error) {
+      console.error("Error adding product to cart: ", error);
     }
   };
+  
+
   const handleProductClick = (productId) => {
     navigate(`/product/${productId}`);
   };
-  const handleBuyNow = (product) => {
-    alert(`Buy Now functionality for ${product.name}`);
-  };
+  // const handleBuyNow = (product) => {
+  //   alert(`Buy Now functionality for ${product.name}`);
+  // };
 
   // Filter products based on the selected price range
   const getPriceRangeFilter = (range) => {
@@ -265,18 +293,18 @@ const ProductCardStyleOne = () => {
 
               {/* Buttons Section */}
               <div className="flex space-x-8 mt-4 w-full justify-start">
-                <button
-                  onClick={() => handleAddToCart(product)}
-                  className="py-1 px-3 bg-yellow-500 text-white rounded-lg hover:bg-yellow-600"
+                <button  onClick={() => handleAddToCart(product)}    className="py-1 px-3 bg-yellow-500 text-white rounded-lg hover:bg-yellow-600"
                 >
                   Add to Cart
                 </button>
-                <button
-                  onClick={() => handleBuyNow(product)}
-                  className="py-1 px-3 text-sm bg-green-500 text-white rounded-lg hover:bg-green-600"
-                >
-                  Buy Now
-                </button>
+               
+             
+  <button  onClick={() => handleProductClick(product.id)} className="py-1 px-3 text-sm bg-green-500 text-white rounded-lg hover:bg-green-600">
+    Buy Now
+  </button>
+
+
+
               </div>
             </div>
           ))

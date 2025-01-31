@@ -10,6 +10,7 @@ import Blogs from "./components/Blogs";
 import Blog from "./components/Blogs/Blog.jsx";
 import CardPage from "./components/CartPage";
 import CheakoutPage from "./components/CheakoutPage";
+import BuycheakoutPage from "./components/CheakoutPage/Buynowcheckout";
 import Contact from "./components/Contact";
 import Faq from "./components/Faq";
 import FlashSale from "./components/FlashSale";
@@ -41,6 +42,8 @@ const router = createBrowserRouter([
   { path: "/single-product", element: <SingleProductPage /> },
   { path: "/cart", element: <CardPage /> },
   { path: "/checkout", element: <CheakoutPage /> },
+  { path: "/buynow-checkout", element: <BuycheakoutPage /> },
+
   { path: "/wishlist", element: <Wishlist /> },
   { path: "/flash-sale", element: <FlashSale /> },
   { path: "/saller-page", element: <SallerPage /> },

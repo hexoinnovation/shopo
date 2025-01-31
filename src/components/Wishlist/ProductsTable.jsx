@@ -69,7 +69,7 @@ export default function ProductsTable() {
         <table className="w-full text-sm text-left text-gray-500 dark:text-gray-400">
           <tbody>
             {/* Table Heading */}
-            <tr className="text-[13px] font-medium text-black bg-[#F6F6F6] whitespace-nowrap px-2 border-b default-border-bottom uppercase">
+            <tr className="text-md font-semibold text-white bg-purple-800 uppercase">
               <td className="py-4 pl-10 block whitespace-nowrap w-[380px]">Product</td>
               <td className="py-4 whitespace-nowrap text-center">Category</td>
               <td className="py-4 whitespace-nowrap text-center">Brand</td>
@@ -118,7 +118,7 @@ export default function ProductsTable() {
                   <td className="text-right py-4">
                     <button
                       onClick={() => handleDelete(item.id)}
-                      className="text-gray-400 hover:text-red-500 mr-12 "
+                      className="text-red-600 hover:text-red-500 mr-12 "
                     >
                       <FaTrash />
                     </button>

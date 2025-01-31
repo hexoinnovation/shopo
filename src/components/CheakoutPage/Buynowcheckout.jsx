@@ -5,9 +5,11 @@ import { getAuth, onAuthStateChanged  } from "firebase/auth";
 import { doc, setDoc ,getDoc, getFirestore, collection, getDocs, deleteDoc,addDoc } from "firebase/firestore";
 import { db } from "../firebse";
 import React, { useState,useEffect } from "react";
-
-export default function CheakoutPage() {
-  const [products, setProducts] = useState([]);
+import { useLocation } from "react-router-dom";
+export default function BuycheakoutPage() {
+    const location = useLocation();
+    const products = location.state?.products || [];
+  const [productsss, setProducts] = useState([]);
   const [cartempty, setCartEmpty] = useState([]);
   const [formData, setFormData] = useState({
     firstName: "",
@@ -29,6 +31,7 @@ export default function CheakoutPage() {
       [name]: type === "checkbox" ? checked : value,
     }));
   };
+ 
   const handleSubmit = async (e) => {
     e.preventDefault();
   
@@ -133,51 +136,11 @@ export default function CheakoutPage() {
   }, []);
   
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState("");
-  const [subtotal, setSubtotal] = useState(0);
-  const tax = 50;
-  const shippingCharge = 80;
-  const discount = 20;
-  const [grandTotal, setGrandTotal] = useState(0);
+  const subtotal = products.reduce((total, item) => total + (item.price || 0) * (item.quantity || 1), 0);
+  const shippingCharge = 80;  // Update if you have dynamic shipping charges
+  const discount = 20;  // Set discount value dynamically if needed
+  const grandTotal = subtotal + shippingCharge - discount;
 
-  
-
-  useEffect(() => {
-    const fetchCartDetails = async () => {
-      const auth = getAuth();
-      const db = getFirestore();
-      const user = auth.currentUser;
-
-      if (user) {
-        try {
-          const adminEmail = "nithya123@gmail.com";
-          const sanitizedEmail = user.email.replace(/\ /g, "_at_");
-          const cartDocRef = doc(db, "admin", adminEmail, "users", sanitizedEmail, "cart_total", "amount");
-
-          // Fetch subtotal from Firestore
-          const cartDoc = await getDoc(cartDocRef);
-          if (cartDoc.exists()) {
-            const fetchedSubtotal = cartDoc.data().subtotal || 0;
-            setSubtotal(fetchedSubtotal);
-
-            // Calculate Grand Total
-            const calculatedGrandTotal = fetchedSubtotal + tax + shippingCharge - discount;
-            setGrandTotal(calculatedGrandTotal);
-
-            // Save Grand Total back to Firestore
-            await setDoc(cartDocRef, { subtotal: fetchedSubtotal, tax, shippingCharge, discount, grandTotal: calculatedGrandTotal }, { merge: true });
-          } else {
-            console.log("No cart document found.");
-          }
-        } catch (error) {
-          console.error("Error fetching cart details:", error);
-        }
-      }
-    };
-
-    fetchCartDetails();
-  }, [tax, shippingCharge, discount]);
-
-  // Handle radio button selection
   const handleRadioChange = (e) => {
     setSelectedPaymentMethod(e.target.id);
   };
@@ -194,10 +157,10 @@ export default function CheakoutPage() {
         address: `${formData.address}, ${formData.city}, ${formData.state}, ${formData.postcode}, ${formData.country}`,
         cartItems: products.map((item) => ({
           name: item.name,
-          image:item.image,
           category: item.category,
           quantity: item.quantity,
           price: item.price,
+          image:item.image,
         })),
         subtotal,
         shippingCharge,
@@ -255,8 +218,7 @@ export default function CheakoutPage() {
     }
   };
   
-  
-
+ 
 
 
 const [user, setUser] = useState(null);
@@ -274,29 +236,6 @@ useEffect(() => {
 
   return () => unsubscribe();
 }, [auth]);
-
-const fetchCartItems = async () => {
-  if (!user || ! user.email) {
-    alert("Please log in to view your Cart.");
-    return;
-  } 
-  const sanitizedEmail = user.email.replace(/\ /g, "_at_");
-  const cartRef = collection(db, "admin", "nithya123@gmail.com", "users", sanitizedEmail, "add_to_cart");
-
-  try {
-    const cartSnapshot = await getDocs(cartRef);
-    const cartData = cartSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-    setProducts(cartData);
-    setCartEmpty(cartData.length === 0);
-  } catch (error) {
-    console.error("Error fetching cart items: ", error);
-  }
-};
-useEffect(() => {
-  if (user) {
-    fetchCartItems();
-  }
-}, [user]);
 
 
   return (
@@ -521,36 +460,37 @@ useEffect(() => {
       </div>
 
 
-      <h2>Cart Items : {products.length}</h2>
+      <div>
+      <h2>Cart Items: {products.length}</h2>
 
-{products.length > 0 ? (
-  <div className="product-list w-full mb-[40px]">
-    <ul className="flex flex-col space-y-5 mt-6">
-      {products.map((item, index) => (
-        <li key={index} className="flex items-center justify-between">
-          <div className="flex items-center space-x-4">
-            <img 
-              src={item.image || "fallback_image_url"} 
-              alt={item.name} 
-              className="w-12 h-12 rounded-md"
-            />
-            <h4 className="text-[15px] text-qblack mb-2.5 truncate max-w-[150px]">
-              {item.name || "Unknown Product"}  ({item.quantity || "1"})
-            </h4>
-          </div>
-      
-          <div>
-            <span className="text-[15px] text-qblack font-medium">
-            ₹{item.price || "0.00"}
-            </span>
-          </div>
-        </li>
-      ))}
-    </ul>
-  </div>
-) : (
-  <p>No cart items found.</p>
-)}
+      {products.length > 0 ? (
+        <div className="product-list w-full mb-[40px]">
+          <ul className="flex flex-col space-y-5 mt-6">
+            {products.map((item, index) => (
+              <li key={index} className="flex items-center justify-between">
+                <div className="flex items-center space-x-4">
+                  <img 
+                    src={item.image || "fallback_image_url"} 
+                    alt={item.name} 
+                    className="w-12 h-12 rounded-md"
+                  />
+                  <h4 className="text-[15px] text-qblack mb-2.5 truncate max-w-[150px]">
+                    {item.name || "Unknown Product"} ({item.quantity || "1"})
+                  </h4>
+                </div>
+                <div>
+                  <span className="text-[15px] text-qblack font-medium">
+                    ₹{item.price || "0.00"}
+                  </span>
+                </div>
+              </li>
+            ))}
+          </ul>
+        </div>
+      ) : (
+        <p>No cart items found.</p>
+      )}
+    </div>
 
 <div className="cart-summary">
       <div className="w-full h-[1px] bg-[#EDEDED]"></div>
@@ -558,7 +498,7 @@ useEffect(() => {
       <div className="mt-[30px]">
         <div className="flex justify-between mb-5">
           <p className="text-[13px] font-medium text-qblack uppercase">SUBTOTAL</p>
-          <p className="text-[15px] font-medium text-qblack uppercase">₹{subtotal}</p>
+          <p className="text-[15px] font-medium text-qblack uppercase">₹{subtotal.toFixed(2)}</p>
         </div>
       </div>
 
@@ -569,17 +509,17 @@ useEffect(() => {
               <span className="text-xs text-qgraytwo mb-3 block">SHIPPING</span>
               <p className="text-base font-medium text-qblack">Free Shipping</p>
             </div>
-            <p className="text-[15px] font-medium text-qblack">+{shippingCharge}</p>
-            
+            <p className="text-[15px] font-medium text-qblack">₹{shippingCharge.toFixed(2)}</p>
           </div>
+
           <div className="flex justify-between mb-5">
             <div>
               <span className="text-xs text-qgraytwo mb-3 block">Overall Discount</span>
               <p className="text-base font-medium text-qblack">Discount</p>
             </div>
-            <p className="text-[15px] font-medium text-qblack">+{discount}</p>
-            
+            <p className="text-[15px] font-medium text-qblack">-₹{discount.toFixed(2)}</p>
           </div>
+
           <div className="w-full h-[1px] bg-[#EDEDED]"></div>
         </div>
       </div>
@@ -587,7 +527,7 @@ useEffect(() => {
       <div className="mt-[30px]">
         <div className="flex justify-between mb-5">
           <p className="text-2xl font-medium text-qblack">Total</p>
-          <p className="text-2xl font-medium text-qred">₹{grandTotal}</p>
+          <p className="text-2xl font-medium text-qred">₹{grandTotal.toFixed(2)}</p>
         </div>
       </div>
     </div>

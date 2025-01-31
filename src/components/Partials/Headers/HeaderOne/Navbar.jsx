@@ -62,7 +62,7 @@ export default function Navbar({ className, type }) {
   const fetchPersonalInfo = async (email) => {
     try {
       const sanitizedEmail = email.replace(/\ /g, "_");
-      const userDoc = await getDoc(doc(db, "users", sanitizedEmail));
+      const userDoc = await getDoc(doc(db, "admin", "nithya123@gmail.com", "users", sanitizedEmail));
 
       if (userDoc.exists()) {
         const userData = userDoc.data();
@@ -168,14 +168,15 @@ export default function Navbar({ className, type }) {
               </div>
             </div>
             <div className="become-seller-btn">
-              {userDetails ? (
-                <div className="black-btn ml-12 w-[161px] h-[40px] flex justify-center items-center cursor-pointer">
-                  <div className="flex space-x-2 items-center">
-                    <span className="text-sm font-600">
-                      Welcome, {userDetails.firstName}
-                    </span>
-                  </div>
-                </div>
+            {userDetails ? (
+  <div className="yellow-btn ml-12 w-[168px] min-h-[40px] flex justify-center items-center cursor-pointer">
+    <div className="flex space-x-2 items-center">
+      <span className="text-sm font-600">
+        Welcome, {userDetails.firstName}
+      </span>
+    </div>
+  </div>
+
               ) : (
                 <Link to="/login">
                   <div className="yellow-btn ml-8 w-[200px] h-[90px] flex justify-center items-center cursor-pointer">

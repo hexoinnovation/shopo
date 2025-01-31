@@ -5,15 +5,16 @@ import { getFirestore, doc, updateDoc, arrayUnion,getDoc,setDoc,deleteDoc ,getDo
 import { getAuth,onAuthStateChanged } from "firebase/auth";
 import { auth,db } from "../firebse";
 import { getDatabase, ref, set } from "firebase/database";
-import { useNavigate,useParams, } from "react-router-dom";
+import { useNavigate,useParams,Link } from "react-router-dom";
 import TopBar from "../Partials/Headers/HeaderOne/TopBar";
 import Middlebar from "../Partials/Headers/HeaderOne/Middlebar";
 import Navbar from "../Partials/Headers/HeaderOne/Navbar";
 import Footer from "../Partials/Footers/Footer";
 import { FaStar, FaRegStar } from "react-icons/fa";
-
+import { UserCircleIcon } from '@heroicons/react/outline';  // or @heroicons/react/solid
 export default function ProductView({ className }) {
   const[products,setProducts]=useState([]);
+  const[productss,selectedProduct]=useState([]);
   const { id } = useParams();
   const [loading, setLoading] = useState(true);
   // const [src, setSrc] = useState(products[0].src);
@@ -30,6 +31,8 @@ const decrement = () => setQuantity((prev) => Math.max(1, prev - 1));
 const [isInWishlist, setIsInWishlist] = useState(false); // Track if product is in the wishlist
 const [message, setMessage] = useState(""); // Message to show user
 const [isLoading, setIsLoading] = useState(false);
+const [loginPrompt, setLoginPrompt] = useState(false); 
+const { isLoggedIn } = getAuth(); 
 const handleAddToCart = async () => {
   const auth = getAuth();
   const db = getFirestore();
@@ -136,7 +139,22 @@ const fetchProduct = async (id) => {
   // }, [id]); 
 
   const navigate = useNavigate();
+  const handleBuyNow = () => {
+    const user = auth.currentUser;
 
+    if (!user) {
+      alert("Please log in to add products to your cart.");
+    } else {
+      const productToAdd = { 
+        ...products, 
+        quantity: quantity || 1 // Ensure quantity is not undefined
+      };
+      
+      (productToAdd); 
+  
+      navigate("/buynow-checkout", { state: { products: [productToAdd] } });
+    }
+  };
 
   const [isFavorite, setIsFavorite] = useState(false);
 
@@ -262,24 +280,50 @@ const fetchProduct = async (id) => {
             <button onClick={increment} className="px-4 py-2 text-xl font-bold text-gray-700 border border-gray-300 rounded-r-md">+</button>
           </div>
           
-          {/* Wishlist & Add to Cart Buttons */}
-          <div className="flex items-center mt-6 space-x-4">
-          <button
-          onClick={handleAddToWishlist}
-          disabled={isLoading}
-          className={`text-lg ${isInWishlist ? "text-red-500" : "text-gray-500"}`}
-        >
-          {isInWishlist ? "❤️" : "🤍"} {/* Filled heart if in wishlist, otherwise empty heart */}
-        </button>
-       
-            <button onClick={handleAddToCart} className="px-6 py-3 text-lg font-semibold text-white bg-black rounded-md shadow-md hover:bg-gray-800 transition duration-300">
-              ADD TO CART
-            </button>
-          
-          </div>
+         {/* Wishlist & Add to Cart Buttons */}
+<div className="flex items-center mt-6 space-x-4 flex-wrap-none">
+  <button
+    onClick={handleAddToWishlist}
+    disabled={isLoading}
+    className={`text-2xl ${isInWishlist ? "text-red-500" : "text-gray-500"}`}
+  >
+    {isInWishlist ? "❤️" : "🤍"} {/* Filled heart if in wishlist, otherwise empty heart */}
+  </button>
+
+  <button
+    onClick={handleAddToCart}
+    className="px-6 py-3 text-lg font-semibold text-black bg-yellow-500 rounded-md shadow-md hover:bg-gray-800 transition duration-300"
+  >
+    ADD TO CART
+  </button>
+
+  <button 
+    onClick={handleBuyNow} 
+    className="px-6 py-3 text-lg font-semibold text-white bg-green-700 rounded-md shadow-md hover:bg-gray-800 transition duration-300"
+  >
+    BUY NOW
+  </button>
+</div>
+
           {message && <p className="wishlist-message">{message}</p>}
         </div>
       </div>
+                
+{loginPrompt && (
+  <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 p-4">
+    <div className="bg-white dark:bg-gray-900 text-gray-900 dark:text-white p-8 rounded-md shadow-lg">
+      <h2 className="text-xl font-semibold">Please log in to access your products.</h2>
+      <button>
+     
+        <UserCircleIcon className="w-5 h-5 mr-2" />
+        Go to Login
+      </button>
+      
+     </div>
+    </div>
+
+)}
+
     </div>
     <Footer/>
     </div>
