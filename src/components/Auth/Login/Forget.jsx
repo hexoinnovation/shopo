@@ -8,7 +8,7 @@ import Middlebar from "../../Partials/Headers/HeaderOne/Middlebar";
 import TopBar from "../../Partials/Headers/HeaderOne/TopBar";
 import Footer from "../../Partials/Footers/Footer";
 import Swal from "sweetalert2";
-
+import { LockClosedIcon } from '@heroicons/react/solid';
 // Correct imports for Firebase v9+
 
 
@@ -107,7 +107,9 @@ export default function ResetPassword({ email }) {
 
       <div className="flex justify-center items-center min-h-screen bg-purple-200">
         <div className="w-full max-w-md bg-white p-8 rounded-lg shadow-lg">
-          <h1 className="text-3xl font-semibold text-center mb-6 text-gray-800">Reset Password</h1>
+        <h1 className="text-3xl font-semibold text-center mb-6 text-gray-800 flex items-center justify-center">
+        <LockClosedIcon className="h-6 w-6 text-gray-600 mr-2" /> Reset Password
+      </h1>
 
           <div className="mb-5">
             <input
@@ -141,7 +143,7 @@ export default function ResetPassword({ email }) {
 
           <div className="text-center mb-8">
             <button
-              onClick={handlePasswordReset}
+              // onClick={handlePasswordReset}
               className="w-full bg-purple-600 text-white py-3 rounded-lg font-semibold text-lg hover:bg-purple-700 transition-all"
               disabled={loading}
             >
