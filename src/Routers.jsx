@@ -2,6 +2,7 @@ import { createBrowserRouter, RouterProvider,Router, Route, Routes } from "react
 import About from "./components/About";
 import AllProductPage from "./components/AllProductPage";
 import Login from "./components/Auth/Login/index";
+import ResetPassword from "./components/Auth/Login/Forget"
 import Profile from "./components/Auth/Profile";
 import Signup from "./components/Auth/Signup";
 import BecomeSaller from "./components/BecomeSaller";
@@ -53,6 +54,7 @@ const router = createBrowserRouter([
   { path: "/faq", element: <Faq /> },
   { path: "/login", element: <Login /> },
   { path: "/signup", element: <Signup /> },
+  { path: "/ResetPassword", element: <ResetPassword /> },
   { path: "/profile", element: <Profile /> },
   { path: "/become-saller", element: <BecomeSaller /> },
   { path: "/privacy-policy", element: <PrivacyPolicy /> },

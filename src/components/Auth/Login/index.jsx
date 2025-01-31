@@ -120,8 +120,8 @@ export default function Login() {
                 Remember Me
               </span>
             </div>
-            <Link
-              to="/profile#password"
+            <Link to="/ResetPassword"
+             
               className="text-sm text-purple-600 hover:underline"
             >
               Forgot Password?

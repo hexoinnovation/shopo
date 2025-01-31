@@ -2,12 +2,13 @@ import InputCom from "../Helpers/InputCom";
 import PageTitle from "../Helpers/PageTitle";
 import Layout from "../Partials/Layout";
 import { getAuth, onAuthStateChanged  } from "firebase/auth";
-import { doc, setDoc ,getDoc, getFirestore, collection, getDocs, deleteDoc, } from "firebase/firestore";
+import { doc, setDoc ,getDoc, getFirestore, collection, getDocs, deleteDoc,addDoc } from "firebase/firestore";
 import { db } from "../firebse";
 import React, { useState,useEffect } from "react";
 
 export default function CheakoutPage() {
-
+  const [products, setProducts] = useState([]);
+  const [cartempty, setCartEmpty] = useState([]);
   const [formData, setFormData] = useState({
     firstName: "",
     lastName: "",
@@ -132,22 +133,128 @@ export default function CheakoutPage() {
   }, []);
   
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState("");
+  const [subtotal, setSubtotal] = useState(0);
+  const tax = 50;
+  const shippingCharge = 80;
+  const discount = 20;
+  const [grandTotal, setGrandTotal] = useState(0);
+
+  
+
+  useEffect(() => {
+    const fetchCartDetails = async () => {
+      const auth = getAuth();
+      const db = getFirestore();
+      const user = auth.currentUser;
+
+      if (user) {
+        try {
+          const adminEmail = "nithya123@gmail.com";
+          const sanitizedEmail = user.email.replace(/\ /g, "_at_");
+          const cartDocRef = doc(db, "admin", adminEmail, "users", sanitizedEmail, "cart_total", "amount");
+
+          // Fetch subtotal from Firestore
+          const cartDoc = await getDoc(cartDocRef);
+          if (cartDoc.exists()) {
+            const fetchedSubtotal = cartDoc.data().subtotal || 0;
+            setSubtotal(fetchedSubtotal);
+
+            // Calculate Grand Total
+            const calculatedGrandTotal = fetchedSubtotal + tax + shippingCharge - discount;
+            setGrandTotal(calculatedGrandTotal);
+
+            // Save Grand Total back to Firestore
+            await setDoc(cartDocRef, { subtotal: fetchedSubtotal, tax, shippingCharge, discount, grandTotal: calculatedGrandTotal }, { merge: true });
+          } else {
+            console.log("No cart document found.");
+          }
+        } catch (error) {
+          console.error("Error fetching cart details:", error);
+        }
+      }
+    };
+
+    fetchCartDetails();
+  }, [tax, shippingCharge, discount]);
 
   // Handle radio button selection
   const handleRadioChange = (e) => {
     setSelectedPaymentMethod(e.target.id);
   };
 
-  // Handle Place Order Now button click
-const handlePlaceOrderClick = () => {
-  if (selectedPaymentMethod === "delivery") {
-    // Redirect to WhatsApp link with your number
-    window.location.href = "https://wa.me/7358937529"; // This is your WhatsApp number
-  } else {
-    // Handle other payment methods or show a message
-    alert("Payment method selected: " + selectedPaymentMethod);
-  }
-};
+
+
+  
+  const handlePlaceOrderClick = async () => {
+    if (selectedPaymentMethod === "delivery") {
+      const orderDetails = {
+        name: `${formData.firstName} ${formData.lastName}`,
+        email: formData.email,
+        phone: formData.phone,
+        address: `${formData.address}, ${formData.city}, ${formData.state}, ${formData.postcode}, ${formData.country}`,
+        cartItems: products.map((item) => ({
+          name: item.name,
+          category: item.category,
+          quantity: item.quantity,
+          price: item.price,
+        })),
+        subtotal,
+        shippingCharge,
+        discount,
+        grandTotal,
+        paymentMethod: selectedPaymentMethod,
+        timestamp: new Date(),
+      };
+  
+      // Sanitize email for Firestore
+      const sanitizedEmail = formData.email.replace(/[ ]/g, "_");
+  
+      try {
+        // Get reference to "order" collection inside the user document
+        const orderCollectionRef = collection(
+          db,
+          "admin",
+          "nithya123@gmail.com",
+          "users",
+          sanitizedEmail,
+          "order"
+        );
+  
+        // Add order as a new document inside "order" collection
+        await addDoc(orderCollectionRef, orderDetails);
+        console.log("Order saved successfully!");
+  
+        // Construct the order details message
+        const orderMessage = encodeURIComponent(`
+          Order Summary:
+          - Name: ${orderDetails.name}
+          - Email: ${orderDetails.email}
+          - Phone: ${orderDetails.phone}
+          - Address: ${orderDetails.address}
+          - Cart Items: ${products.length}
+          ${products
+            .map(
+              (item, index) =>
+                `\n${index + 1}. ${item.name} (Category: ${item.category}) (Qty: ${item.quantity}) - ₹${item.price}`
+            )
+            .join("")}
+          - Subtotal: ₹${orderDetails.subtotal}
+          - Shipping: ₹${orderDetails.shippingCharge}
+          - Discount: ₹${orderDetails.discount}
+          - Grand Total: ₹${orderDetails.grandTotal}
+        `);
+  
+        // Redirect to WhatsApp with prefilled order details
+        window.location.href = `https://wa.me/7358937529?text=${orderMessage}`;
+      } catch (error) {
+        console.error("Error saving order:", error);
+      }
+    } else {
+      console.log("Proceeding to online payment...");
+    }
+  };
+  
+  
 
 
 
@@ -167,34 +274,28 @@ useEffect(() => {
   return () => unsubscribe();
 }, [auth]);
 
-// Fetch cart item for the logged-in user
+const fetchCartItems = async () => {
+  if (!user || ! user.email) {
+    alert("Please log in to view your Cart.");
+    return;
+  } 
+  const sanitizedEmail = user.email.replace(/\ /g, "_at_");
+  const cartRef = collection(db, "admin", "nithya123@gmail.com", "users", sanitizedEmail, "add_to_cart");
+
+  try {
+    const cartSnapshot = await getDocs(cartRef);
+    const cartData = cartSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+    setProducts(cartData);
+    setCartEmpty(cartData.length === 0);
+  } catch (error) {
+    console.error("Error fetching cart items: ", error);
+  }
+};
 useEffect(() => {
-  const fetchCartItem = async () => {
-    if (!user || !user.email) {
-      console.warn("User is not logged in or email is missing.");
-      return;
-    }
-
-    const sanitizedEmail = user.email.replace(/\s/g, "_"); // Sanitize email
-    const cartRef = doc(db, "users", sanitizedEmail, "cart", "1"); // Specific cart item ID (1)
-
-    try {
-      const cartSnapshot = await getDoc(cartRef);
-      if (cartSnapshot.exists()) {
-        console.log("Cart Item Data:", cartSnapshot.data()); // Debugging data
-        setCartItem(cartSnapshot.data());
-      } else {
-        console.warn("No cart item found at path:", cartRef.path);
-        setCartItem(null);
-      }
-    } catch (err) {
-      console.error("Error fetching cart item:", err);
-      setError(err.message);
-    }
-  };
-
-  fetchCartItem();
-}, [user, db]);
+  if (user) {
+    fetchCartItems();
+  }
+}, [user]);
 
 
   return (
@@ -419,78 +520,77 @@ useEffect(() => {
       </div>
 
 
-      <div>
-      <h1>Welcome, {user?.email || "Guest"}</h1>
+      <h2>Cart Items : {products.length}</h2>
 
-      <h2>Cart Items:</h2>
-      {error && <p className="error">Error: {error}</p>}
+{products.length > 0 ? (
+  <div className="product-list w-full mb-[40px]">
+    <ul className="flex flex-col space-y-5 mt-6">
+      {products.map((item, index) => (
+        <li key={index} className="flex items-center justify-between">
+          <div className="flex items-center space-x-4">
+            <img 
+              src={item.image || "fallback_image_url"} 
+              alt={item.name} 
+              className="w-12 h-12 rounded-md"
+            />
+            <h4 className="text-[15px] text-qblack mb-2.5 truncate max-w-[150px]">
+              {item.name || "Unknown Product"}  ({item.quantity || "1"})
+            </h4>
+          </div>
+      
+          <div>
+            <span className="text-[15px] text-qblack font-medium">
+            ₹{item.price || "0.00"}
+            </span>
+          </div>
+        </li>
+      ))}
+    </ul>
+  </div>
+) : (
+  <p>No cart items found.</p>
+)}
 
-      {cartItems.length > 0 ? (
-        <div className="product-list w-full mb-[30px]">
-          <ul className="flex flex-col space-y-5">
-            {cartItems.map((item, index) => (
-              <li key={index}>
-                <div className="flex justify-between items-center">
-                  <div>
-                    <h4 className="text-[15px] text-qblack mb-2.5">
-                      {item.name || "Unknown Product"}
-                    </h4>
-                    <p className="text-[13px] text-qgray">
-                      {item.description || "No description available."}
-                    </p>
-                  </div>
-                  <div>
-                    <span className="text-[15px] text-qblack font-medium">
-                      ${item.price || "0.00"}
-                    </span>
-                  </div>
-                </div>
-              </li>
-            ))}
-          </ul>
+<div className="cart-summary">
+      <div className="w-full h-[1px] bg-[#EDEDED]"></div>
+
+      <div className="mt-[30px]">
+        <div className="flex justify-between mb-5">
+          <p className="text-[13px] font-medium text-qblack uppercase">SUBTOTAL</p>
+          <p className="text-[15px] font-medium text-qblack uppercase">₹{subtotal}</p>
         </div>
-      ) : (
-        <p>No cart items found.</p>
-      )}
+      </div>
+
+      <div className="w-full mt-[30px]">
+        <div className="sub-total mb-6">
+          <div className="flex justify-between mb-5">
+            <div>
+              <span className="text-xs text-qgraytwo mb-3 block">SHIPPING</span>
+              <p className="text-base font-medium text-qblack">Free Shipping</p>
+            </div>
+            <p className="text-[15px] font-medium text-qblack">+{shippingCharge}</p>
+            
+          </div>
+          <div className="flex justify-between mb-5">
+            <div>
+              <span className="text-xs text-qgraytwo mb-3 block">Overall Discount</span>
+              <p className="text-base font-medium text-qblack">Discount</p>
+            </div>
+            <p className="text-[15px] font-medium text-qblack">+{discount}</p>
+            
+          </div>
+          <div className="w-full h-[1px] bg-[#EDEDED]"></div>
+        </div>
+      </div>
+
+      <div className="mt-[30px]">
+        <div className="flex justify-between mb-5">
+          <p className="text-2xl font-medium text-qblack">Total</p>
+          <p className="text-2xl font-medium text-qred">₹{grandTotal}</p>
+        </div>
+      </div>
     </div>
-                  <div className="w-full h-[1px] bg-[#EDEDED]"></div>
 
-                  <div className="mt-[30px]">
-                    <div className=" flex justify-between mb-5">
-                      <p className="text-[13px] font-medium text-qblack uppercase">
-                        SUBTOTAL
-                      </p>
-                      <p className="text-[15px] font-medium text-qblack uppercase">
-                        $365
-                      </p>
-                    </div>
-                  </div>
-
-                  <div className="w-full mt-[30px]">
-                    <div className="sub-total mb-6">
-                      <div className=" flex justify-between mb-5">
-                        <div>
-                          <span className="text-xs text-qgraytwo mb-3 block">
-                            SHIPPING
-                          </span>
-                          <p className="text-base font-medium text-qblack">
-                            Free Shipping
-                          </p>
-                        </div>
-                        <p className="text-[15px] font-medium text-qblack">
-                          +$0
-                        </p>
-                      </div>
-                      <div className="w-full h-[1px] bg-[#EDEDED]"></div>
-                    </div>
-                  </div>
-
-                  <div className="mt-[30px]">
-                    <div className=" flex justify-between mb-5">
-                      <p className="text-2xl font-medium text-qblack">Total</p>
-                      <p className="text-2xl font-medium text-qred">$365</p>
-                    </div>
-                  </div>
                   <div className="shipping mt-[30px]">
       <ul className="flex flex-col space-y-1">
         <li className="mb-5">

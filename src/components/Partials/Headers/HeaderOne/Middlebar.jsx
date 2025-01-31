@@ -22,32 +22,31 @@ const[product, setProduct] = useState(0);
     setUser(currentUser);
   }, []);
   
-  useEffect(() => {
-    let unsubscribe;
   
-    if (user) {
-      const sanitizedEmail = user.email ? user.email.replace(/\ /g, "_") : "unknown_user";
-      
-      const cartRef = doc(db, "users", sanitizedEmail, "cart", "1");
-  
-      unsubscribe = onSnapshot(cartRef, (docSnapshot) => {
-        if (docSnapshot.exists()) {
-          const cartData = docSnapshot.data();
-          const items = cartData?.items || [];  // Get the items array
-          setCartCount(items.length);  // Set cart count based on the number of items
-        } else {
-          setCartCount(0);  // If no cart data exists, reset count
-        }
-      });
-    } else {
-      setCartCount(0); // If no user, reset cart count
-    }
-  
-    // Cleanup
-    return () => {
-      if (unsubscribe) unsubscribe();
+    const fetchCartCount = async () => {
+      const auth = getAuth();
+      const db = getFirestore();
+      const user = auth.currentUser;
+    
+      if (!user) {
+        setCartCount(0); // Reset count when no user is logged in
+        return;
+      }
+    
+      const sanitizedEmail = user.email.replace(/\ /g, "_").replace(/ /g, "_at_");
+      const cartRef = collection(db, "admin", "nithya123@gmail.com", "users", sanitizedEmail, "add_to_cart");
+    
+      try {
+        const cartSnapshot = await getDocs(cartRef);
+        setCartCount(cartSnapshot.size); // Set count based on the number of cart items
+      } catch (error) {
+        console.error("Error fetching cart count: ", error);
+      }
     };
-  }, [user, db]);
+    useEffect(() => {
+      fetchCartCount();
+    }, []);
+    
   
   const [wishlistCount, setWishlistCount] = useState(0);
 
@@ -59,7 +58,7 @@ const[product, setProduct] = useState(0);
       if (currentUser) {
         try {
           const sanitizedEmail = currentUser.email.replace(/\s/g, "_");
-          const wishlistCollectionRef = collection(db, "users", sanitizedEmail, "wishlist");
+          const wishlistCollectionRef = collection(db, "admin", "nithya123@gmail.com", "users", sanitizedEmail, "wishlist");
           const snapshot = await getDocs(wishlistCollectionRef);
           setWishlistCount(snapshot.size); // Count of documents in the wishlist
         } catch (error) {
@@ -69,36 +68,16 @@ const[product, setProduct] = useState(0);
     };
 
     fetchWishlistCount();
-  }, []); // Empty dependency array to fetch on component mount
+  }, []); 
 
   const [showLoginPopup, setShowLoginPopup] = useState(false);
-
-  useEffect(() => {
-    const fetchWishlistCount = async () => {
-      const auth = getAuth();
-      const currentUser = auth.currentUser;
-
-      if (currentUser) {
-        try {
-          const sanitizedEmail = currentUser.email.replace(/\s/g, "_");
-          const wishlistCollectionRef = collection(db, "users", sanitizedEmail, "wishlist");
-          const snapshot = await getDocs(wishlistCollectionRef);
-          setWishlistCount(snapshot.size); // Count of documents in the wishlist
-        } catch (error) {
-          console.error("Error fetching wishlist count: ", error);
-        }
-      }
-    };
-
-    fetchWishlistCount();
-  }, []);
 
   const handleWishlistClick = () => {
     const auth = getAuth();
     const currentUser = auth.currentUser;
 
     if (!currentUser) {
-      setShowLoginPopup(true); // Show the login popup
+      setShowLoginPopup(true);
     }
   };
    

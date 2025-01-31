@@ -8,86 +8,64 @@ import ProductsTable from "./ProductsTable";
 import { getAuth } from "firebase/auth";
 import { getFirestore, doc, getDoc, setDoc } from "firebase/firestore";
 
-export default function CardPage({ cart = true, products = [] }) {
-  const [subtotal, setSubtotal] = useState(0); // Set initial subtotal as 0
+export default function CardPage({ cart = true }) {
+  const [subtotal, setSubtotal] = useState(0);
+  const [grandTotal, setGrandTotal] = useState(0);
 
-  const tax = 50; // Fixed tax amount
-  const shippingCharge = 80; // Fixed shipping charge
-  const discount = 20; // Fixed discount amount
-
-  // Calculate grand total
-  const calculateGrandTotal = () => {
-    return subtotal + tax + shippingCharge - discount;
-  };
-
-  const grandTotal = calculateGrandTotal();
+  const tax = 50;
+  const shippingCharge = 80;
+  const discount = 20;
 
   useEffect(() => {
-    const fetchAndStoreCartDetails = async () => {
+    const fetchCartDetails = async () => {
       const auth = getAuth();
       const db = getFirestore();
       const user = auth.currentUser;
 
       if (user) {
         try {
-          const sanitizedEmail = user.email.replace(/\ /g, "_"); // Replace spaces in email to prevent Firestore path issues
-          const cartDocRef = doc(db, "users", sanitizedEmail, "cart", "amount");
+          const adminEmail = "nithya123@gmail.com";
+         
+          const sanitizedEmail = user.email.replace(/\ /g, "_at_");
+          const cartDocRef = doc(db, "admin", adminEmail, "users", sanitizedEmail, "cart_total", "amount");
 
-          // Fetch the existing data
+          // Fetch subtotal from Firestore
           const cartDoc = await getDoc(cartDocRef);
-
           if (cartDoc.exists()) {
-            // If subtotal exists in Firestore, set it
-            const fetchedSubtotal = cartDoc.data().subtotal;
-            if (fetchedSubtotal) {
-              setSubtotal(fetchedSubtotal);
-            } else {
-              console.log("Subtotal not found in Firestore.");
-            }
+            const fetchedSubtotal = cartDoc.data().subtotal || 0;
+            setSubtotal(fetchedSubtotal);
+
+            // Calculate Grand Total
+            const calculatedGrandTotal = fetchedSubtotal + tax + shippingCharge - discount;
+            setGrandTotal(calculatedGrandTotal);
+
+            // Save Grand Total back to Firestore
+            await setDoc(cartDocRef, { subtotal: fetchedSubtotal, tax, shippingCharge, discount, grandTotal: calculatedGrandTotal }, { merge: true });
           } else {
-            console.log("No cart document found in Firestore.");
+            console.log("No cart document found.");
           }
-
-          // Store the updated cart details in Firestore
-          const cartDetails = {
-            subtotal: subtotal, // Ensure to save the existing or updated subtotal
-            tax,
-            shippingCharge,
-            discount,
-            grandTotal,
-          };
-
-          await setDoc(cartDocRef, cartDetails, { merge: true }); // Merge the new details with existing ones
-          console.log("Cart details updated successfully in Firestore.");
         } catch (error) {
-          console.error("Error fetching or storing cart details in Firestore:", error);
+          console.error("Error fetching cart details:", error);
         }
-      } else {
-        console.error("No user is logged in. Unable to fetch or store cart details.");
       }
     };
 
-    fetchAndStoreCartDetails();
-  }, [subtotal]); // Update Firestore whenever `subtotal` changes
+    fetchCartDetails();
+  }, []);
 
   return (
     <Layout childrenClasses={cart ? "pt-0 pb-0" : ""}>
       {cart === false ? (
         <div className="cart-page-wrapper w-full">
           <div className="container-x mx-auto">
-            <BreadcrumbCom
-              paths={[{ name: "home", path: "/" }, { name: "cart", path: "/cart" }]}
-            />
+            <BreadcrumbCom paths={[{ name: "home", path: "/" }, { name: "cart", path: "/cart" }]} />
             <EmptyCardError />
           </div>
         </div>
       ) : (
         <div className="cart-page-wrapper w-full bg-white pb-[60px]">
           <div className="w-full">
-            <PageTitle
-              title="Your Cart"
-              breadcrumb={[{ name: "home", path: "/" }, { name: "cart", path: "/cart" }]}
-            />
+            <PageTitle title="Your Cart" breadcrumb={[{ name: "home", path: "/" }, { name: "cart", path: "/cart" }]} />
           </div>
           <div className="w-full mt-[23px]">
             <div className="container-x mx-auto">
@@ -97,9 +75,7 @@ export default function CardPage({ cart = true, products = [] }) {
                   <div className="sub-total mb-6">
                     <div className="flex justify-between mb-6">
                       <p className="text-[15px] font-medium text-qblack">Subtotal</p>
-                      <p className="text-[15px] font-medium text-qred">
-                        ₹{Math.round(subtotal)} {/* Display rounded subtotal */}
-                      </p>
+                      <p className="text-[15px] font-medium text-qred">₹{Math.round(subtotal)}</p>
                     </div>
                     <div className="w-full h-[1px] bg-[#EDEDED]"></div>
                   </div>
@@ -137,4 +113,3 @@ export default function CardPage({ cart = true, products = [] }) {
     </Layout>
   );
 }
-
