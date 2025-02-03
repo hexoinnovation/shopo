@@ -25,17 +25,21 @@ export default function OrderTab() {
             "order"
           )
         );
-        const ordersList = querySnapshot.docs.map((doc) => doc.data());
+        const ordersList = querySnapshot.docs.map((doc) => ({
+          id: doc.id, 
+          ...doc.data(),
+        }));
         setOrders(ordersList);
       } catch (error) {
         console.error("Error fetching orders: ", error);
       }
     };
-
+  
     if (currentUser) {
       fetchOrders();
     }
   }, [currentUser]);
+  
 
   const handleViewDetails = (order) => {
     setSelectedOrder(order);
@@ -55,7 +59,7 @@ export default function OrderTab() {
           <tbody>
             {/* Table Heading */}
             <tr className="text-base text-white whitespace-nowrap px-2 border-b default-border-bottom bg-purple-800">
-              {/* <td className="py-4 block whitespace-nowrap text-center">Order</td> */}
+              <td className="py-4 block whitespace-nowrap text-center">Order Id</td>
               <td className="py-4 whitespace-nowrap text-center">Date</td>
               <td className="py-4 whitespace-nowrap text-center">Status</td>
               <td className="py-4 whitespace-nowrap text-center">Amount</td>
@@ -64,9 +68,9 @@ export default function OrderTab() {
             {/* Table Rows */}
             {orders.map((order, index) => (
               <tr key={index} className="border-b border-gray-300 hover:bg-gray-100 transition">
-                {/* <td className="text-center py-4">
+                <td className="text-center py-4">
                   <span className="text-lg text-qgray font-medium">#{order.id}</span>
-                </td> */}
+                </td>
                 <td className="text-center py-4 px-2">
                   <span className="text-base text-qgray whitespace-nowrap">
                     {new Date(order.timestamp.seconds * 1000).toLocaleDateString()}
