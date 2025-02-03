@@ -31,6 +31,7 @@ import HomeFive from "./components/HomeFive";
 import ProductDetailPage from "./components/Helpers/Cards/ProductDetailPage.jsx";
 import CategoryPage from "./components/Partials/Headers/HeaderOne/CategoryPage.jsx"
 import ProductView from "./components/SingleProductPage/ProductView.jsx";
+import PasswordTab from "./components/Auth/Profile/tabs/PasswordTab.jsx";
 const router = createBrowserRouter([
   { path: "/", element: <Home /> },
   { path: "/home-two", element: <HomeTwo /> },
@@ -70,7 +71,7 @@ const router = createBrowserRouter([
 <Router>
       <Routes>
         <Route path="/product/:productId" element={<ProductDetailPage />} />
-      
+        <Route path="/tabs/PasswordTab" element={<PasswordTab />} />
         <Route path="/category/:categoryName" element={<CategoryPage />} />
       </Routes>
     </Router>
