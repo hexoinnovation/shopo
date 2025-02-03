@@ -135,25 +135,8 @@ const ProductCardStyleOne = () => {
   const filteredProducts = products.filter(getPriceRangeFilter(priceFilter));
 
   return (
-    <div className="p-2">
-      {/* Success or Error Message */}
-      {successMessage && (
-        <div className="flex items-center bg-green-500 text-white p-3 rounded-lg shadow-lg mb-2">
-          <FaShoppingCart className="mr-3 text-7xl animate-bounce" />
-          <div className="flex flex-col">
-            <p className="text-lg font-bold">{successMessage}</p>
-          </div>
-        </div>
-      )}
-
-      {errorMessage && (
-        <div className="flex items-center bg-red-500 text-white p-3 rounded-lg shadow-lg mb-4">
-          <FaShoppingCart className="mr-3 text-7xl animate-bounce" />
-          <div className="flex flex-col">
-            <p className="text-lg font-bold">{errorMessage}</p>
-          </div>
-        </div>
-      )}
+    <div className="p-2 w-[300]">
+      
 
       <h1 className="text-2xl font-bold mb-2">Product List</h1>
 
@@ -203,7 +186,7 @@ const ProductCardStyleOne = () => {
       <div
         className={`${
           viewMode === "grid"
-            ? "grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4"
+            ? "grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4"
             : "space-y-6"
         }`}
       >

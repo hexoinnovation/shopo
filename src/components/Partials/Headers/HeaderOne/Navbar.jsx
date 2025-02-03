@@ -125,7 +125,7 @@ export default function Navbar({ className, type }) {
               <li key={index} className="category-item">
                 <Link
                   to={`/category/${encodeURIComponent(category.name)}`}
-                  className="block w-full text-left px-5 py-2 hover:bg-yellow-300"
+                  className="block w-full text-left px-5 py-2 hover:bg-purple-800"
                 >
                   <div className="flex justify-between items-center px-5 h-10 bg-yellow-200 transition-all duration-300 ease-in-out cursor-pointer text-qblack">
                     <span className="text-xs font-400">{category.name}</span>
