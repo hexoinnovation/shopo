@@ -86,7 +86,7 @@ const handleLogout = async () => {
                 <h1 className="text-[22px] font-bold text-qblack">
                   Your Dashboard
                 </h1>
-                <div className="switch-dashboard flex space-x-3 items-center">
+                {/* <div className="switch-dashboard flex space-x-3 items-center">
                   <p className="text-qgray text-base">Switch Dashboard</p>
                   <button
                     onClick={() => setSwitchDashboard(!switchDashboard)}
@@ -99,7 +99,7 @@ const handleLogout = async () => {
                       }`}
                     ></div>
                   </button>
-                </div>
+                </div> */}
               </div>
               <div className="profile-wrapper w-full mt-8 flex space-x-10">
                 <div className="w-[236px] min-h-[600px] border-r border-[rgba(0, 0, 0, 0.1)]">

@@ -3,14 +3,14 @@ export default function Checkbox(props) {
 
   return (
     <div>
-      <input
+      {/* <input
         className={className}
         id={id}
-        type="checkbox"
+        type=""
         name={name}
         onChange={handleChange}
         checked={checked}
-      />
+      /> */}
     </div>
   );
 }

@@ -70,7 +70,7 @@ export default function AllProductPage() {
             </div>
 
             <div className="flex-1">
-              <div className="products-sorting w-full bg-white md:h-[70px] flex md:flex-row flex-col md:space-y-0 space-y-5 md:justify-between md:items-center p-[30px] mb-[40px]">
+              {/* <div className="products-sorting w-full bg-white md:h-[70px] flex md:flex-row flex-col md:space-y-0 space-y-5 md:justify-between md:items-center p-[30px] mb-[40px]">
                 <div>
                   <p className="font-400 text-[13px]">
                     <span className="text-qgray"> Showing</span> 1–16 of 66
@@ -117,8 +117,8 @@ export default function AllProductPage() {
                   </svg>
                 </button>
                 {/* View Toggle Buttons */}
-                <div className="flex space-x-3 items-center"></div>
-              </div>
+                {/* <div className="flex space-x-3 items-center"></div> */}
+              {/* </div> */} 
 
               {/* First Set of Products */}
               <div

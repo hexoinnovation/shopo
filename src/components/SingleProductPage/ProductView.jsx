@@ -12,6 +12,7 @@ import Navbar from "../Partials/Headers/HeaderOne/Navbar";
 import Footer from "../Partials/Footers/Footer";
 import { FaStar, FaRegStar } from "react-icons/fa";
 import { UserCircleIcon } from '@heroicons/react/outline';  // or @heroicons/react/solid
+
 export default function ProductView({ className }) {
   const[products,setProducts]=useState([]);
   const[productss,selectedProduct]=useState([]);
@@ -19,8 +20,8 @@ export default function ProductView({ className }) {
   const [loading, setLoading] = useState(true);
   // const [src, setSrc] = useState(products[0].src);
   const [selectedColor, setSelectedColor] = useState(""); // Initialize with an empty string or default color
-  const [rating, setRating] = useState(0);
-  const [totalReviews, setTotalReviews] = useState(0);
+const [rating, setRating] = useState(0);
+const [totalReviews, setTotalReviews] = useState(0);
 const [selectedSize, setSelectedSize] = useState("");
 const [quantity, setQuantity] = useState(1);
 //const [isFavorite, setIsFavorite] = useState(false);
@@ -304,11 +305,9 @@ const fetchProduct = async (id) => {
     BUY NOW
   </button>
 </div>
-
           {message && <p className="wishlist-message">{message}</p>}
         </div>
-      </div>
-                
+      </div>    
 {loginPrompt && (
   <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 p-4">
     <div className="bg-white dark:bg-gray-900 text-gray-900 dark:text-white p-8 rounded-md shadow-lg">
@@ -321,9 +320,7 @@ const fetchProduct = async (id) => {
       
      </div>
     </div>
-
 )}
-
     </div>
     <Footer/>
     </div>
