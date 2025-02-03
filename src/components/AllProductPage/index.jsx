@@ -43,22 +43,14 @@ export default function AllProductPage() {
     <Layout>
       <div className="products-page-wrapper w-full">
         <div className="container-x mx-auto">
-          <BreadcrumbCom />
+          {/* <BreadcrumbCom /> */}
           <div className="w-full lg:flex lg:space-x-[30px]">
-            <div className="lg:w-[270px]">
-              <ProductsFilter
-                filterToggle={filterToggle}
-                filterToggleHandler={() => setToggle(!filterToggle)}
-                filters={filters}
-                checkboxHandler={checkboxHandler}
-                volume={volume}
-                volumeHandler={(value) => setVolume(value)}
-                storage={storage}
-                filterstorage={filterStorage}
-                className="mb-[30px]"
-              />
+            {/* <div className="lg:w-[270px]"> */}
+              {/* <ProductsFilter
+                
+              /> */}
               {/* Ads */}
-              <div className="w-full hidden lg:block h-[295px]">
+              {/* <div className="w-full hidden lg:block h-[295px]">
                 <img
                   src={`${
                     import.meta.env.VITE_PUBLIC_URL
@@ -66,8 +58,8 @@ export default function AllProductPage() {
                   alt=""
                   className="w-full h-full object-contain"
                 />
-              </div>
-            </div>
+              </div> */}
+            {/* </div> */}
 
             <div className="flex-1">
               {/* <div className="products-sorting w-full bg-white md:h-[70px] flex md:flex-row flex-col md:space-y-0 space-y-5 md:justify-between md:items-center p-[30px] mb-[40px]">

@@ -135,7 +135,7 @@ const ProductCardStyleOne = () => {
   const filteredProducts = products.filter(getPriceRangeFilter(priceFilter));
 
   return (
-    <div className="p-2">
+    <div className="p-2 w-[300]">
       
 
       <h1 className="text-2xl font-bold mb-2">Product List</h1>
@@ -186,7 +186,7 @@ const ProductCardStyleOne = () => {
       <div
         className={`${
           viewMode === "grid"
-            ? "grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4"
+            ? "grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4"
             : "space-y-6"
         }`}
       >
