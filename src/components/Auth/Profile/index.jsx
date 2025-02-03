@@ -175,7 +175,7 @@ const handleLogout = async () => {
                         </div>
                       </Link>
                     </div>
-                    <div className="item group">
+                    {/* <div className="item group">
                       <Link to="/profile#review">
                         <div className="flex space-x-3 items-center text-qgray hover:text-qblack">
                           <span>
@@ -186,7 +186,7 @@ const handleLogout = async () => {
                           </span>
                         </div>
                       </Link>
-                    </div>
+                    </div> */}
                     <div className="item group">
                       <Link to="/profile#password">
                         <div className="flex space-x-3 items-center text-qgray hover:text-qblack">
