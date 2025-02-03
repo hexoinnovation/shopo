@@ -126,7 +126,7 @@ const[product, setProduct] = useState(0);
               <SearchBox type={type} className="search-com" />
             </div>
             <div className="flex space-x-6 items-center">
-              <div className="compaire relative">
+              {/* <div className="compaire relative">
                 <Link to="/products-compaire">
                   <span>
                     <Compair />
@@ -139,7 +139,7 @@ const[product, setProduct] = useState(0);
                 >
                   2
                 </span>
-              </div>
+              </div> */}
               <div className="favorite relative group relative py-4">
               <div className="favorite relative cursor-pointer">
       <Link to="/wishlist">
