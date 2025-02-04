@@ -158,14 +158,14 @@ const CategoryPage = () => {
           </select>
         </div>
 
-          <div className="flex space-x-3">
+          {/* <div className="flex space-x-3">
             <button className={`p-2 rounded-lg ${viewMode === "grid" ? "bg-blue-500 text-white" : "bg-gray-200"}`} onClick={() => setViewMode("grid")}>
               <FaTh size={20} />
             </button>
             <button className={`p-2 rounded-lg ${viewMode === "list" ? "bg-blue-500 text-white" : "bg-gray-200"}`} onClick={() => setViewMode("list")}>
               <FaList size={20} />
             </button>
-          </div>
+          </div> */}
         </div>
 
         {/* Product Display */}
@@ -189,7 +189,7 @@ const CategoryPage = () => {
                   <p className="text-xl font-semibold text-black">₹{product.price}</p>
                 </div>
                 <div className="flex space-x-10 mb-0 w-full justify-start ">
-                  <button onClick={() => handleAddToCart(product)} className="py-1 px-3 bg-yellow-500 text-white rounded-lg hover:bg-yellow-600 ml-10 ">Add to Cart</button>
+                  <button onClick={() => handleAddToCart(product)} className="py-1 px-3 bg-yellow-500 text-white rounded-lg hover:bg-yellow-600  ">Add to Cart</button>
                   <button onClick={() => handleProductClick(product.id)} className="py-1 px-3 bg-green-500 text-white rounded-lg hover:bg-green-600">Buy Now</button>
                 </div>
               </div>
