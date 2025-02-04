@@ -40,7 +40,10 @@ export default function TopBar({ className }) {
             <div className="topbar-dropdowns sm:block hidden">
               <div className="flex space-x-6">
                 <div className="country-select flex space-x-1 items-center">
-                  <div>
+                <span className="text-xs leading-6 text-yellow-400 font-500">
+                 Telephone Number   +91 4562358531 
+                    </span>
+                  {/* <div>
                     <img
                       src={`${
                         import.meta.env.VITE_PUBLIC_URL
@@ -50,23 +53,23 @@ export default function TopBar({ className }) {
                       alt="country logo"
                       className="overflow-hidden rounded-full"
                     />
-                  </div>
-                  <Selectbox
+                  </div> */}
+                  {/* <Selectbox
                     className="w-fit"
                     datas={["United State", "Bangladesh", "India"]}
-                  />
-                  <div>
+                  /> */}
+                  {/* <div>
                     <Arrow className="fill-current text-yellow-400" />
-                  </div>
+                  </div> */}
                 </div>
-                <div className="currency-select flex space-x-1 items-center">
+                {/* <div className="currency-select flex space-x-1 items-center">
                   <Selectbox className="w-fit" datas={["USD", "BDT"]} />
                   <Arrow className="fill-current text-yellow-400" />
-                </div>
-                <div className="language-select flex space-x-1 items-center">
+                </div> */}
+                {/* <div className="language-select flex space-x-1 items-center">
                   <Selectbox className="w-fit" datas={["Bangla", "english"]} />
                   <Arrow className="fill-current text-yellow-400" />
-                </div>
+                </div> */}
               </div>
             </div>
           </div>
