@@ -146,10 +146,11 @@ export default function BuycheakoutPage() {
   };
 
 
-
-  
   const handlePlaceOrderClick = async () => {
+    const currentUser = auth.currentUser;
     if (selectedPaymentMethod === "delivery") {
+      const orderNumber = Math.floor(1000 + Math.random() * 9000); // Random 4-digit order ID
+  
       const orderDetails = {
         name: `${formData.firstName} ${formData.lastName}`,
         email: formData.email,
@@ -157,10 +158,10 @@ export default function BuycheakoutPage() {
         address: `${formData.address}, ${formData.city}, ${formData.state}, ${formData.postcode}, ${formData.country}`,
         cartItems: products.map((item) => ({
           name: item.name,
+          image: item.image,
           category: item.category,
           quantity: item.quantity,
           price: item.price,
-          image:item.image,
         })),
         subtotal,
         shippingCharge,
@@ -168,29 +169,32 @@ export default function BuycheakoutPage() {
         grandTotal,
         paymentMethod: selectedPaymentMethod,
         timestamp: new Date(),
+        orderId: orderNumber, // Store order number inside Firestore
       };
   
       // Sanitize email for Firestore
-      const sanitizedEmail = formData.email.replace(/[ ]/g, "_");
+      const sanitizedEmail = currentUser.email.replace(/[ ]/g, "_");
   
       try {
-        // Get reference to "order" collection inside the user document
-        const orderCollectionRef = collection(
+        // Create a document reference with the random order number as the document ID
+        const orderDocRef = doc(
           db,
           "admin",
           "nithya123@gmail.com",
           "users",
           sanitizedEmail,
-          "order"
+          "order",
+          orderNumber.toString() // Use random number as document ID
         );
   
-        // Add order as a new document inside "order" collection
-        await addDoc(orderCollectionRef, orderDetails);
-        console.log("Order saved successfully!");
+        // Add order details to Firestore
+        await setDoc(orderDocRef, orderDetails);
+        console.log("Order saved successfully with Order ID:", orderNumber);
   
-        // Construct the order details message
+        // Construct the order details message for WhatsApp
         const orderMessage = encodeURIComponent(`
           Order Summary:
+          - Order ID: ${orderNumber}
           - Name: ${orderDetails.name}
           - Email: ${orderDetails.email}
           - Phone: ${orderDetails.phone}
@@ -217,6 +221,7 @@ export default function BuycheakoutPage() {
       console.log("Proceeding to online payment...");
     }
   };
+  
   
  
 
