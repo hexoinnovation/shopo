@@ -20,7 +20,7 @@ export default function ProductsFilter({
         }  ${filterToggle ? "block" : "hidden lg:block"}`}
       >
         
-        <button
+        {/* <button
           onClick={filterToggleHandler}
           type="button"
           className="w-10 h-10 fixed top-5 right-5 z-50 rounded  lg:hidden flex justify-center items-center border border-qred text-qred"
@@ -37,7 +37,7 @@ export default function ProductsFilter({
               clipRule="evenodd"
             />
           </svg>
-        </button>
+        </button> */}
       </div>
     </>
   );
