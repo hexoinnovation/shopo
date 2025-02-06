@@ -86,7 +86,7 @@ export default function Forget() {
       <Navbar />
       <div className="min-h-screen flex flex-col justify-center items-center bg-gray-100 mb-20">
         <form ref={formRef} className="w-full max-w-md bg-white shadow-lg rounded-lg p-6">
-          <h2 className="text-2xl font-semibold text-center text-gray-700 mb-6">Reset Password</h2>
+          {/* <h2 className="text-2xl font-semibold text-center text-gray-700 mb-6">Reset Password</h2> */}
 
           <div className="mb-4">
             <label className="block text-gray-600 text-sm font-medium mb-2" htmlFor="email">
@@ -131,13 +131,13 @@ export default function Forget() {
           </div>
 
           <div className="flex justify-between">
-            <button
+            {/* <button
               type="button"
               className="bg-blue-500 hover:bg-blue-600 text-white font-medium py-2 px-4 rounded-md"
               onClick={updatePasswordForUser}
             >
               Reset Password
-            </button>
+            </button> */}
             <button
               type="button"
               className="bg-gray-500 hover:bg-gray-600 text-white font-medium py-2 px-4 rounded-md"
