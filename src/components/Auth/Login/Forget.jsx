@@ -131,13 +131,7 @@ export default function Forget() {
           </div>
 
           <div className="flex justify-between">
-            {/* <button
-              type="button"
-              className="bg-blue-500 hover:bg-blue-600 text-white font-medium py-2 px-4 rounded-md"
-              onClick={updatePasswordForUser}
-            >
-              Reset Password
-            </button> */}
+            
             <button
               type="button"
               className="bg-gray-500 hover:bg-gray-600 text-white font-medium py-2 px-4 rounded-md"
