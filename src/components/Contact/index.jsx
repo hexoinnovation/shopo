@@ -208,7 +208,7 @@ export default function Contact() {
             id="firstName"
             value={firstName}
             onChange={(e) => setFirstName(e.target.value)}
-            placeholder="Demo Name"
+            placeholder="Enter your Name"
             required
             className="h-[50px] border p-2 rounded focus:outline-none focus:ring-2 focus:ring-indigo-500"
           />
@@ -222,7 +222,7 @@ export default function Contact() {
             id="email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            placeholder="info@example.com"
+            placeholder="info@hexoinnovation.com"
             required
             className="h-[50px] border p-2 rounded focus:outline-none focus:ring-2 focus:ring-indigo-500"
           />

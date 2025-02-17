@@ -41,9 +41,11 @@ export default function Footer({ type }) {
             <h1 className="text-[16px] font-500 text-yellow-400 mb-4">
               About Us
             </h1>
-            <p className="text-yellow-200 text-[14px] w-[247px] leading-[24px]">
-              We specialize in producing premium crackers, from savory to sweet.
-              We aim to bring the best flavor to your table.
+            <p className="text-yellow-200 text-[14px] w-[290px] leading-[24px]">
+            We envision a world where businesses of all sizes can leverage 
+            the power of technology to achieve their full potential. 
+            Our goal is to be the IT partner that drives your business forward, 
+            providing the expertise and support you need to succeed.
             </p>
           </div>
           <div className="flex-1 lg:flex">
@@ -148,27 +150,27 @@ export default function Footer({ type }) {
         <div className="bottom-bar border-t border-yellow-400 lg:h-[60px] lg:flex justify-between items-center">
           <div className="flex lg:space-x-5 justify-between items-center mb-3">
             <div className="flex space-x-5 items-center">
-              <a href="#">
+              <a href=" https://www.instagram.com/hexoinnovation/#">
                 <Instagram className="fill-current text-yellow-200 hover:text-yellow-400" />
               </a>
-              <a href="#">
+              <a href="https://www.facebook.com/people/Hexo-Innovation/61556658466330/?mibextid=qi2Omg&rdid=drGh7rn336b0PPTf&share_url=https%3A%2F%2Fwww.facebook.com%2Fshare%2FReFmZkbJu2NCFPeR%2F%3Fmibextid%3Dqi2Omg">
                 <Facebook className="fill-current text-yellow-200 hover:text-yellow-400" />
               </a>
-              <a href="#">
+              <a href="https://www.linkedin.com/company/hexo-innovation/posts/?feedView=all">
                 <Youtube className="fill-current text-yellow-200 hover:text-yellow-400" />
               </a>
             </div>
             <span className="sm:text-base text-[10px] text-yellow-200 font-300">
-              ©2022
+              ©2025
               <a
                 href="https://quomodosoft.com/"
                 target="_blank"
                 rel="noreferrer"
                 className="font-500 text-yellow-400 mx-1"
               >
-                Quomodosoft
+               Hexo Innovation
               </a>
-              All rights reserved
+              All rights reserved.
             </span>
           </div>
           <div>
