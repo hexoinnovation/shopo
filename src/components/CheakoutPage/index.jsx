@@ -160,7 +160,7 @@ export default function CheakoutPage() {
             setSubtotal(fetchedSubtotal);
 
             // Calculate Grand Total
-            const calculatedGrandTotal = fetchedSubtotal + tax + shippingCharge - discount;
+            const calculatedGrandTotal = fetchedSubtotal ;
             setGrandTotal(calculatedGrandTotal);
 
             // Save Grand Total back to Firestore
@@ -571,22 +571,22 @@ useEffect(() => {
 
       <div className="w-full mt-[30px]">
         <div className="sub-total mb-6">
-          <div className="flex justify-between mb-5">
+          {/* <div className="flex justify-between mb-5">
             <div>
               <span className="text-xs text-qgraytwo mb-3 block">SHIPPING</span>
               <p className="text-base font-medium text-qblack">Free Shipping</p>
             </div>
             <p className="text-[15px] font-medium text-qblack">+{shippingCharge}</p>
             
-          </div>
-          <div className="flex justify-between mb-5">
+          </div> */}
+          {/* <div className="flex justify-between mb-5">
             <div>
               <span className="text-xs text-qgraytwo mb-3 block">Overall Discount</span>
               <p className="text-base font-medium text-qblack">Discount</p>
             </div>
             <p className="text-[15px] font-medium text-qblack">+{discount}</p>
             
-          </div>
+          </div> */}
           <div className="w-full h-[1px] bg-[#EDEDED]"></div>
         </div>
       </div>
