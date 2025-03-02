@@ -318,7 +318,7 @@ export default function Signup() {
             </div>
 
             {/* Forgot Password Link */}
-            <div className="forgot-password-area mb-5 flex justify-end">
+            {/* <div className="forgot-password-area mb-5 flex justify-end">
               <Link
                 to="#"
                 onClick={() => handleForgotPassword()}
@@ -326,7 +326,7 @@ export default function Signup() {
               >
                 Forgot Password?
               </Link>
-            </div>
+            </div> */}
 
             <div className="forgot-password-area mb-7">
               <div className="remember-checkbox flex items-center space-x-2.5">

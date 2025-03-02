@@ -120,12 +120,7 @@ export default function Login() {
                 Remember Me
               </span>
             </div>
-            <Link to="/ResetPassword"
-             
-              className="text-sm text-purple-600 hover:underline"
-            >
-              Forgot Password?
-            </Link>
+            
           </div>
           <div className="mb-5">
             <button
