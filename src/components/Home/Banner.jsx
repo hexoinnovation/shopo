@@ -293,5 +293,6 @@ export default function Banner({ className }) {
         </div>
       </div>
     </div>
+    
   );
 }
