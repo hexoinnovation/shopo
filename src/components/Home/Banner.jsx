@@ -23,7 +23,7 @@ export default function Banner({ className }) {
               data-aos="fade-right"
               className="xl:w-[70%] w-full h-full transition-transform duration-500 transform hover:scale-105"
             >
-              <Link to="/single-product">
+              <Link to="">
                 <picture>
                   <source
                     media="(min-width:1025px)"
@@ -51,7 +51,7 @@ export default function Banner({ className }) {
                 className="w-full h-[50%] cursor-pointer"
                 onClick={() => handleImageChange(2)}
               >
-                <Link to="/single-product">
+                <Link to="">
                   <img
                     src={`${
                       import.meta.env.VITE_PUBLIC_URL
@@ -67,7 +67,7 @@ export default function Banner({ className }) {
                 className="w-full h-[50%] cursor-pointer"
                 onClick={() => handleImageChange(3)}
               >
-                <Link to="/single-product">
+                <Link to="">
                   <img
                     src={`${
                       import.meta.env.VITE_PUBLIC_URL
