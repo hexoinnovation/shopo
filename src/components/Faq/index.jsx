@@ -3,6 +3,7 @@ import InputCom from "../Helpers/InputCom";
 import PageTitle from "../Helpers/PageTitle";
 import Layout from "../Partials/Layout";
 
+
 export default function Faq() {
   return (
     <Layout childrenClasses="pt-0 pb-0">
