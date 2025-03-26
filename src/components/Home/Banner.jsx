@@ -262,6 +262,7 @@ export default function Banner({ className }) {
                         strokeWidth="2"
                         strokeMiterlimit="10"
                       />
+                      
                       <path
                         d="M16 22C11.05 22 7 17.95 7 13V1H25V13C25 17.95 20.95 22 16 22Z"
                         stroke="#6A0DAD"
