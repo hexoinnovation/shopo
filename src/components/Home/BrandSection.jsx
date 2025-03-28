@@ -1,6 +1,99 @@
+import { useState, useEffect } from "react";
+import AOS from "aos";
+import "aos/dist/aos.css";
+import { collection, doc, getDoc } from "firebase/firestore";
+import { db } from "../firebse";
+
 export default function CrackerBrandSection({ className, sectionTitle }) {
+  const [brands, setBrands] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    AOS.init({ duration: 1000 });
+  }, []);
+
+  useEffect(() => {
+    const fetchBrands = async () => {
+      try {
+        setLoading(true);
+        
+        // Array of image document IDs to fetch
+        const imageDocs = ['images4', 'images5', 'images6', 'images12'];
+        let fetchedBrands = [];
+        
+        // Fetch each image document
+        for (const docId of imageDocs) {
+          const imagesRef = collection(
+            db, 
+            "admin", 
+            "nithya123@gmail.com", 
+            "webimages"
+          );
+          
+          const docRef = doc(imagesRef, docId);
+          const docSnap = await getDoc(docRef);
+          
+          if (docSnap.exists()) {
+            const data = docSnap.data();
+            fetchedBrands.push({
+              id: docId,
+              name: data.name || `Brand ${fetchedBrands.length + 1}`,
+              imageUrl: data.image,
+              isBase64: data.image?.startsWith("data:image")
+            });
+          }
+        }
+
+        // Shuffle the images randomly
+        const shuffleArray = (array) => {
+          return array.sort(() => Math.random() - 0.5);
+        };
+
+        let shuffledBrands = shuffleArray([...fetchedBrands]);
+
+        // Duplicate images randomly until we reach 12 items
+        while (shuffledBrands.length < 12) {
+          shuffledBrands = [...shuffledBrands, ...shuffleArray(fetchedBrands)];
+          shuffledBrands = shuffleArray(shuffledBrands).slice(0, 12);
+        }
+
+        setBrands(shuffledBrands);
+      } catch (err) {
+        console.error("Error fetching brand images:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchBrands();
+  }, []);
+
+  // Predefined gradients matching your original design
+  const gradients = [
+    "from-purple-400 via-pink-500 to-purple-600",
+    "from-yellow-400 via-orange-500 to-red-600",
+    "from-indigo-500 via-purple-600 to-pink-700",
+    "from-green-400 via-blue-500 to-purple-600",
+    "from-pink-500 via-purple-500 to-blue-500",
+    "from-yellow-500 via-red-500 to-orange-600",
+    "from-teal-400 via-cyan-500 to-indigo-600",
+    "from-red-400 via-orange-400 to-yellow-500",
+    "from-blue-400 via-purple-500 to-indigo-600",
+    "from-green-500 via-teal-500 to-blue-600",
+    "from-indigo-500 via-blue-600 to-purple-700",
+    "from-teal-400 via-cyan-500 to-indigo-600"
+  ];
+
+  if (loading) {
+    return (
+      <div className="w-full h-[500px] flex items-center justify-center">
+        Loading brands...
+      </div>
+    );
+  }
+
   return (
-    <div data-aos="fade-up" className={`w-full ${className || ""}`}>
+    <div  className={`w-full ${className || ""}`}>
       <div className="container-x mx-auto">
         <div className="section-title flex justify-center items-center mb-10">
           <div className="text-center">
@@ -14,137 +107,23 @@ export default function CrackerBrandSection({ className, sectionTitle }) {
         </div>
 
         <div className="grid lg:grid-cols-6 md:grid-cols-4 sm:grid-cols-2 grid-cols-2 gap-6">
-          {/* Cracker Brand 1 */}
-          <div className="item">
-            <div className="w-full h-[150px] bg-gradient-to-r from-purple-400 via-pink-500 to-purple-600 border-4 border-white flex justify-center items-center transition-all duration-300 hover:scale-105 hover:shadow-xl">
-              <img
-                src={`${import.meta.env.VITE_PUBLIC_URL}/assets/images/7.jpg`}
-                alt="Cracker Brand 1"
-                className="w-3/4 object-contain"
-              />
+          {brands.map((brand, index) => (
+            <div key={brand.id} className="item">
+              <div 
+                className={`w-full h-[150px] bg-gradient-to-r ${gradients[index % gradients.length]} border-4 border-white flex justify-center items-center transition-all duration-300 hover:scale-105 hover:shadow-xl`}
+              >
+                {brand.imageUrl ? (
+                  <img
+                    src={brand.imageUrl}
+                    alt={brand.name}
+                    className="w-3/4 object-contain"
+                  />
+                ) : (
+                  <span className="text-white font-bold text-center p-2">{brand.name}</span>
+                )}
+              </div>
             </div>
-          </div>
-
-          {/* Cracker Brand 2 */}
-          <div className="item">
-            <div className="w-full h-[150px] bg-gradient-to-r from-yellow-400 via-orange-500 to-red-600 border-4 border-white flex justify-center items-center transition-all duration-300 hover:scale-105 hover:shadow-xl">
-              <img
-                src={`${import.meta.env.VITE_PUBLIC_URL}/assets/images/5.webp`}
-                alt="Cracker Brand 2"
-                className="w-3/4 object-contain"
-              />
-            </div>
-          </div>
-
-          {/* Cracker Brand 3 */}
-          <div className="item">
-            <div className="w-full h-[150px] bg-gradient-to-r from-indigo-500 via-purple-600 to-pink-700 border-4 border-white flex justify-center items-center transition-all duration-300 hover:scale-105 hover:shadow-xl">
-              <img
-                src={`${import.meta.env.VITE_PUBLIC_URL}/assets/images/6.jpg`}
-                alt="Cracker Brand 3"
-                className="w-3/4 object-contain"
-              />
-            </div>
-          </div>
-
-          {/* Cracker Brand 4 */}
-          <div className="item">
-            <div className="w-full h-[150px] bg-gradient-to-r from-green-400 via-blue-500 to-purple-600 border-4 border-white flex justify-center items-center transition-all duration-300 hover:scale-105 hover:shadow-xl">
-              <img
-                src={`${import.meta.env.VITE_PUBLIC_URL}/assets/images/4.webp`}
-                alt="Cracker Brand 4"
-                className="w-3/4 object-contain"
-              />
-            </div>
-          </div>
-
-          {/* Cracker Brand 5 */}
-          <div className="item">
-            <div className="w-full h-[150px] bg-gradient-to-r from-pink-500 via-purple-500 to-blue-500 border-4 border-white flex justify-center items-center transition-all duration-300 hover:scale-105 hover:shadow-xl">
-              <img
-                src={`${import.meta.env.VITE_PUBLIC_URL}/assets/images/4.webp`}
-                alt="Cracker Brand 5"
-                className="w-3/4 object-contain"
-              />
-            </div>
-          </div>
-
-          {/* Cracker Brand 6 */}
-          <div className="item">
-            <div className="w-full h-[150px] bg-gradient-to-r from-yellow-500 via-red-500 to-orange-600 border-4 border-white flex justify-center items-center transition-all duration-300 hover:scale-105 hover:shadow-xl">
-              <img
-                src={`${import.meta.env.VITE_PUBLIC_URL}/assets/images/5.webp`}
-                alt="Cracker Brand 6"
-                className="w-3/4 object-contain"
-              />
-            </div>
-          </div>
-
-          {/* Cracker Brand 7 */}
-          <div className="item">
-            <div className="w-full h-[150px] bg-gradient-to-r from-teal-400 via-cyan-500 to-indigo-600 border-4 border-white flex justify-center items-center transition-all duration-300 hover:scale-105 hover:shadow-xl">
-              <img
-                src={`${import.meta.env.VITE_PUBLIC_URL}/assets/images/7.jpg`}
-                alt="Cracker Brand 7"
-                className="w-3/4 object-contain"
-              />
-            </div>
-          </div>
-
-          {/* Cracker Brand 8 */}
-          <div className="item">
-            <div className="w-full h-[150px] bg-gradient-to-r from-red-400 via-orange-400 to-yellow-500 border-4 border-white flex justify-center items-center transition-all duration-300 hover:scale-105 hover:shadow-xl">
-              <img
-                src={`${import.meta.env.VITE_PUBLIC_URL}/assets/images/6.jpg`}
-                alt="Cracker Brand 8"
-                className="w-3/4 object-contain"
-              />
-            </div>
-          </div>
-
-          {/* Cracker Brand 9 */}
-          <div className="item">
-            <div className="w-full h-[150px] bg-gradient-to-r from-blue-400 via-purple-500 to-indigo-600 border-4 border-white flex justify-center items-center transition-all duration-300 hover:scale-105 hover:shadow-xl">
-              <img
-                src={`${import.meta.env.VITE_PUBLIC_URL}/assets/images/4.webp`}
-                alt="Cracker Brand 9"
-                className="w-3/4 object-contain"
-              />
-            </div>
-          </div>
-
-          {/* Cracker Brand 10 */}
-          <div className="item">
-            <div className="w-full h-[150px] bg-gradient-to-r from-green-500 via-teal-500 to-blue-600 border-4 border-white flex justify-center items-center transition-all duration-300 hover:scale-105 hover:shadow-xl">
-              <img
-                src={`${import.meta.env.VITE_PUBLIC_URL}/assets/images/7.jpg`}
-                alt="Cracker Brand 10"
-                className="w-3/4 object-contain"
-              />
-            </div>
-          </div>
-
-          {/* Cracker Brand 11 */}
-          <div className="item">
-            <div className="w-full h-[150px] bg-gradient-to-r from-indigo-500 via-blue-600 to-purple-700 border-4 border-white flex justify-center items-center transition-all duration-300 hover:scale-105 hover:shadow-xl">
-              <img
-                src={`${import.meta.env.VITE_PUBLIC_URL}/assets/images/5.webp`}
-                alt="Cracker Brand 11"
-                className="w-3/4 object-contain"
-              />
-            </div>
-          </div>
-
-          {/* Cracker Brand 12 */}
-          <div className="item">
-            <div className="w-full h-[150px] bg-gradient-to-r from-teal-400 via-cyan-500 to-indigo-600 border-4 border-white flex justify-center items-center transition-all duration-300 hover:scale-105 hover:shadow-xl">
-              <img
-                src={`${import.meta.env.VITE_PUBLIC_URL}/assets/images/6.jpg`}
-                alt="Cracker Brand 12"
-                className="w-3/4 object-contain"
-              />
-            </div>
-          </div>
+          ))}
         </div>
       </div>
     </div>
