@@ -5,9 +5,11 @@ import ThinLove from "../../../Helpers/icons/ThinLove";
 import ThinPeople from "../../../Helpers/icons/ThinPeople";
 import SearchBox from "../../../Helpers/SearchBox";
 import { Link } from "react-router-dom";
-import { getFirestore, doc, onSnapshot,collection, getDocs } from "firebase/firestore";
+import { getFirestore, doc, onSnapshot,collection, getDocs,getDoc } from "firebase/firestore";
 import { useState, useEffect } from "react";
 import { getAuth } from "firebase/auth";
+// import { db } from "../../../firebse";  // Firebase import
+
 
 export default function Middlebar({ className, type }) {
   const [cartCount, setCartCount] = useState(0);
@@ -81,47 +83,60 @@ const[product, setProduct] = useState(0);
     }
   };
    
+  const [logoUrl, setLogoUrl] = useState("");
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    if (!db) return; // Ensure db is available
+
+    const fetchLogo = async () => {
+      try {
+        setLoading(true);
+        console.log("Fetching image from Firestore...");
+    
+        const docRef = doc(db, "admin", "nithya123@gmail.com", "webimages", "images13");
+        const docSnap = await getDoc(docRef);
+    
+        if (docSnap.exists()) {
+          const data = docSnap.data();
+          console.log("Firestore Document Data:", data);
+    
+          if (data.image) {
+            setLogoUrl(data.image);
+            console.log("Image URL Set:", data.image);
+          } else {
+            console.warn("Document exists but no 'image' field found!");
+          }
+        } else {
+          console.error("No image found in Firestore!");
+        }
+      } catch (err) {
+        console.error("Error fetching logo image:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchLogo();
+  }, [db]);
+
+
   return (
     <div className={`w-full h-[86px] bg-white ${className}`}>
       <div className="container-x mx-auto h-full">
         <div className="relative h-full">
           <div className="flex justify-between items-center h-full">
-            <div>
-              {type === 3 ? (
-                <Link to="/">
-                  <img
-                    width="152"
-                    height="36"
-                    src={`${
-                      import.meta.env.VITE_PUBLIC_URL
-                    }/assets/images/logo-3.svg`}
-                    alt="logo"
-                  />
-                </Link>
-              ) : type === 4 ? (
-                <Link to="/">
-                  <img
-                    width="152"
-                    height="36"
-                    src={`${
-                      import.meta.env.VITE_PUBLIC_URL
-                    }/assets/images/logo-4.svg`}
-                    alt="logo"
-                  />
-                </Link>
-              ) : (
-                <Link to="/">
-                  <img
-                    width="152"
-                    height="36"
-                    src={`${
-                      import.meta.env.VITE_PUBLIC_URL
-                    }/assets/images/logo.svg`}
-                    alt="logo"
-                  />
-                </Link>
-              )}
-            </div>
+          <div>
+          {type === 3 ? (
+  <Link to="/">
+    {!loading && logoUrl ? (
+      <img width="152" height="36" src={logoUrl} alt="logo" />
+    ) : (
+      <p>Loading logo...</p>
+    )}
+  </Link>
+) : null}
+    </div>
             <div className="w-[517px] h-[44px]">
               <SearchBox type={type} className="search-com" />
             </div>
