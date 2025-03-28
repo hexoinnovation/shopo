@@ -18,7 +18,7 @@ export default function CrackerBrandSection({ className, sectionTitle }) {
         setLoading(true);
         
         // Array of image document IDs to fetch
-        const imageDocs = ['images4', 'images5', 'images6', 'images12'];
+        const imageDocs = ['images4', 'images5', 'images6', 'images12', 'images15', 'images16', 'images17', 'images18', 'images19'];
         let fetchedBrands = [];
         
         // Fetch each image document
@@ -44,20 +44,20 @@ export default function CrackerBrandSection({ className, sectionTitle }) {
           }
         }
 
-        // Shuffle the images randomly
-        const shuffleArray = (array) => {
-          return array.sort(() => Math.random() - 0.5);
-        };
-
-        let shuffledBrands = shuffleArray([...fetchedBrands]);
-
-        // Duplicate images randomly until we reach 12 items
-        while (shuffledBrands.length < 12) {
-          shuffledBrands = [...shuffledBrands, ...shuffleArray(fetchedBrands)];
-          shuffledBrands = shuffleArray(shuffledBrands).slice(0, 12);
+        // If we have no images, return empty
+        if (fetchedBrands.length === 0) {
+          setBrands([]);
+          return;
         }
 
-        setBrands(shuffledBrands);
+        // Fill remaining slots with random duplicates from fetched images
+        const displayBrands = [...fetchedBrands];
+        while (displayBrands.length < 12) {
+          const randomIndex = Math.floor(Math.random() * fetchedBrands.length);
+          displayBrands.push({...fetchedBrands[randomIndex], id: `${fetchedBrands[randomIndex].id}-dup-${displayBrands.length}`});
+        }
+
+        setBrands(displayBrands);
       } catch (err) {
         console.error("Error fetching brand images:", err);
       } finally {
@@ -92,6 +92,14 @@ export default function CrackerBrandSection({ className, sectionTitle }) {
     );
   }
 
+  if (brands.length === 0) {
+    return (
+      <div className="w-full h-[500px] flex items-center justify-center">
+        No brands available
+      </div>
+    );
+  }
+
   return (
     <div  className={`w-full ${className || ""}`}>
       <div className="container-x mx-auto">
@@ -110,7 +118,7 @@ export default function CrackerBrandSection({ className, sectionTitle }) {
           {brands.map((brand, index) => (
             <div key={brand.id} className="item">
               <div 
-                className={`w-full h-[150px] bg-gradient-to-r ${gradients[index % gradients.length]} border-4 border-white flex justify-center items-center transition-all duration-300 hover:scale-105 hover:shadow-xl`}
+                className={`w-full h-[150px] bg-gradient-to-r ${gradients[index]} border-4 border-white flex justify-center items-center transition-all duration-300 hover:scale-105 hover:shadow-xl`}
               >
                 {brand.imageUrl ? (
                   <img
