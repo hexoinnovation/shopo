@@ -1,5 +1,7 @@
+import { useEffect, useState } from "react";
+import { db } from "../firebse";
+import { collection, doc, getDoc } from "firebase/firestore";
 import datas from "../../data/products.json";
-import SectionStyleOne from "../Helpers/SectionStyleOne";
 import SectionStyleTwo from "../Helpers/SectionStyleTwo";
 import Layout from "../Partials/Layout";
 import Banner from "./Banner";
@@ -9,15 +11,49 @@ import ViewMoreTitle from "../Helpers/ViewMoreTitle";
 
 export default function Home() {
   const { products } = datas;
-  const brands = [];
-  products.forEach((product) => {
-    brands.push(product.brand);
-  });
+  const brands = products.map((product) => product.brand);
+
+  const [imageUrls, setImageUrls] = useState({ images8: "", images2: "" ,images9: "",images11: "",images10: ""});
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchImages = async () => {
+      try {
+        setLoading(true);
+        const imagesRef = collection(
+          db,
+          "admin",
+          "nithya123@gmail.com",
+          "webimages"
+        );
+
+        const docIds = ["images8", "images2","images9","images11","images10"];
+        let fetchedImages = {};
+
+        for (const docId of docIds) {
+          const docRef = doc(imagesRef, docId);
+          const docSnap = await getDoc(docRef);
+
+          if (docSnap.exists()) {
+            fetchedImages[docId] = docSnap.data().image; // Assuming `image` field contains the URL
+          }
+        }
+
+        setImageUrls(fetchedImages);
+      } catch (err) {
+        console.error("Error fetching images:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchImages();
+  }, []);
 
   return (
     <Layout>
-      <div className="btn w-5 h-5 "></div>
       <Banner className="banner-wrapper mb-[60px]" />
+      
       <ViewMoreTitle
         className="popular-products mb-[60px]"
         seeMoreUrl="/all-products"
@@ -25,25 +61,32 @@ export default function Home() {
       >
         <SectionStyleTwo products={products} />
       </ViewMoreTitle>
-      <ProductsAds
-        ads={[
-          `${import.meta.env.VITE_PUBLIC_URL}/assets/images/9.jpg`,
-          `${import.meta.env.VITE_PUBLIC_URL}/assets/images/banner-2.jpg`,
-        ]}
-        sectionHeight="sm:h-[350px] h-full"
-        className="products-ads-section mb-[60px]"
-      />
+
+      {!loading ? (
+        <ProductsAds
+          ads={[imageUrls.images8, imageUrls.images2]}
+          sectionHeight="sm:h-[350px] h-full"
+          className="products-ads-section mb-[60px]"
+        />
+      ) : (
+        <p className="text-center">Loading images...</p>
+      )}
 
       <BrandSection
         sectionTitle="Shop by Collection"
         className="brand-section-wrapper mb-[60px]"
       />
 
-      <ProductsAds
-        ads={[`${import.meta.env.VITE_PUBLIC_URL}/assets/images/17.jpg`]}
-        sectionHeight="sm:h-[350px] h-full"
-        className="products-ads-section mb-[60px]"
-      />
+{!loading ? (
+        <ProductsAds
+          ads={[imageUrls.images9]}
+          sectionHeight="sm:h-[350px] h-full"
+          className="products-ads-section mb-[60px]"
+        />
+      ) : (
+        <p className="text-center">Loading images...</p>
+      )}
+
 
       <ViewMoreTitle
         className="popular-products mb-[60px]"
@@ -52,14 +95,17 @@ export default function Home() {
       >
         <SectionStyleTwo products={products} />
       </ViewMoreTitle>
-      <ProductsAds
-        ads={[
-          `${import.meta.env.VITE_PUBLIC_URL}/assets/images/17.webp`,
-          `${import.meta.env.VITE_PUBLIC_URL}/assets/images/16.jpg`,
-        ]}
-        sectionHeight="sm:h-[350px] h-full"
-        className="products-ads-section mb-[60px]"
-      />
+
+      {!loading ? (
+        <ProductsAds
+          ads={[imageUrls.images11, imageUrls.images10]}
+          sectionHeight="sm:h-[350px] h-full"
+          className="products-ads-section mb-[60px]"
+        />
+      ) : (
+        <p className="text-center">Loading images...</p>
+      )}
+
     </Layout>
   );
 }

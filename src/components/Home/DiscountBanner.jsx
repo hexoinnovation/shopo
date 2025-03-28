@@ -1,16 +1,74 @@
+import { useState, useEffect } from "react";
+import { db } from "../firebse";
+import { collection, getDoc ,doc,setDoc} from "firebase/firestore";
+
 export default function DiscountBanner({ className, type }) {
+  const [banners, setBanners] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [activeImage, setActiveImage] = useState(0);
+
+  useEffect(() => {
+    const fetchBanners = async () => {
+      try {
+        setLoading(true);
+        const imageDocs = ["images7"]; // Add more IDs if needed
+        let fetchedBanners = [];
+
+        for (const docId of imageDocs) {
+          const imagesRef = collection(
+            db,
+            "admin",
+            "nithya123@gmail.com",
+            "webimages"
+          );
+          const docRef = doc(imagesRef, docId);
+          const docSnap = await getDoc(docRef);
+
+          if (docSnap.exists()) {
+            const data = docSnap.data();
+            fetchedBanners.push({
+              id: docId,
+              name: data.name || `Banner ${fetchedBanners.length + 1}`,
+              url: data.image,
+              isBase64: data.image?.startsWith("data:image"),
+              uploadedAt: data.uploadedAt || new Date().toISOString(),
+            });
+          }
+        }
+
+        // Sort by upload date (newest first)
+        fetchedBanners.sort((a, b) => new Date(b.uploadedAt) - new Date(a.uploadedAt));
+
+        setBanners(fetchedBanners);
+        setActiveImage(0);
+      } catch (err) {
+        console.error("Error fetching banner images:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchBanners();
+  }, []);
+  if (loading) {
+    return <div className="text-center">Loading...</div>;
+  }
+
+  const activeBanner = banners[activeImage];
+  
   return (
     <div
-      className={`discount-banner w-full h-[300px] bg-cover flex justify-center items-center ${
-        className || ""
-      }`}
-      style={{
-        background: `url(${
-          import.meta.env.VITE_PUBLIC_URL
-        }/assets/images/15.jpg) no-repeat center center`,
-        backgroundSize: "cover",
-      }}
-    >
+    className={`discount-banner w-full h-[300px] bg-cover flex justify-center items-center ${
+      className || ""
+    }`}
+    style={{
+      backgroundImage: activeBanner
+        ? `url(${activeBanner.url})`
+        : "none",
+      backgroundSize: "cover",
+      backgroundPosition: "center",
+    }}
+  >
       {type === 3 ? (
         <div className="container-x mx-auto">
           <div className="best-services w-full flex flex-col space-y-10 lg:space-y-0 lg:flex-row lg:justify-between lg:items-center lg:h-[110px] px-10 lg:py-0 py-10">
