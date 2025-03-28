@@ -1,295 +1,139 @@
 import { Link } from "react-router-dom";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import AOS from "aos";
 import "aos/dist/aos.css";
+import { collection, getDoc ,doc,setDoc} from "firebase/firestore";
+import { db } from "../firebse";
 
 export default function Banner({ className }) {
-  const [activeImage, setActiveImage] = useState(1);
+  const [banners, setBanners] = useState([]);
+  const [activeImage, setActiveImage] = useState(0);
+  const [loading, setLoading] = useState(true);
 
-  // Initialize AOS library for scroll animations
-  AOS.init();
+  useEffect(() => {
+    AOS.init({ duration: 1000 });
+  }, []);
 
-  const handleImageChange = (imageNumber) => {
-    setActiveImage(imageNumber);
+  useEffect(() => {
+    const fetchBanners = async () => {
+      try {
+        setLoading(true);
+        
+        // Array of image document IDs to fetch
+        const imageDocs = ['images3', 'images2' , 'images1']; // Add more as needed
+        let fetchedBanners = [];
+        
+        // Fetch each image document
+        for (const docId of imageDocs) {
+          const imagesRef = collection(
+            db, 
+            "admin", 
+            "nithya123@gmail.com", 
+            "webimages"
+          );
+          
+          const docRef = doc(imagesRef, docId);
+          const docSnap = await getDoc(docRef);
+          
+          if (docSnap.exists()) {
+            const data = docSnap.data();
+            fetchedBanners.push({
+              id: docId,
+              name: data.name || `Banner ${fetchedBanners.length + 1}`,
+              url: data.image,
+              isBase64: data.image?.startsWith("data:image"),
+              uploadedAt: data.uploadedAt || new Date().toISOString()
+            });
+          }
+        }
+        
+        // Sort by upload date (newest first)
+        fetchedBanners.sort((a, b) => new Date(b.uploadedAt) - new Date(a.uploadedAt));
+        
+        setBanners(fetchedBanners);
+        setActiveImage(0);
+      } catch (err) {
+        console.error("Error fetching banner images:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchBanners();
+  }, []);
+
+  const handleImageChange = (index) => {
+    setActiveImage(index);
   };
+
+  if (loading) {
+    return <div className="w-full h-[500px] flex items-center justify-center">Loading...</div>;
+  }
+
+  if (banners.length === 0) {
+    return <div className="w-full h-[500px] flex items-center justify-center">No banners found</div>;
+  }
+
+  // Get up to 3 banners
+  const displayBanners = banners.slice(0, 3);
 
   return (
     <div className={`w-full ${className || ""}`}>
       <div className="container-x mx-auto">
         <div className="main-wrapper w-full">
-          <div className="banner-card xl:flex xl:space-x-[30px] xl:h-[500px] mb-[40px]">
-            {/* Banner Image Section */}
-            <div
-              data-aos="fade-right"
-              className="xl:w-[70%] w-full h-full transition-transform duration-500 transform hover:scale-105"
-            >
-              <Link to="">
-                <picture>
-                  <source
-                    media="(min-width:1025px)"
-                    srcSet={`${
-                      import.meta.env.VITE_PUBLIC_URL
-                    }/assets/images/banner-1.jpg`}
-                  />
-                  <img
-                    src={`${
-                      import.meta.env.VITE_PUBLIC_URL
-                    }/assets/images/banner-2.jpg`}
-                    alt=""
-                    className="w-full h-full object-cover rounded-lg shadow-lg"
-                  />
-                </picture>
-              </Link>
-            </div>
+        <div className="banner-card xl:flex xl:space-x-[30px] xl:h-[500px] mb-[40px]">
+  {/* Main Banner - Always shows first image (image1) */}
+  <div
+    data-aos="fade-right"
+    className="xl:w-[70%] w-full h-full transition-transform duration-500 hover:scale-105"
+  >
+    <Link to="">
+      {displayBanners[0] && (
+        <img
+          src={displayBanners[0].url}
+          alt={displayBanners[0].name}
+          className="w-full h-full object-cover rounded-lg shadow-lg"
+        />
+      )}
+    </Link>
+  </div>
 
-            {/* Additional Banner Images with Hover Effect */}
-            <div
-              data-aos="fade-left"
-              className="flex-1 flex xl:flex-col flex-row xl:space-y-[20px] h-full"
-            >
-              <div
-                className="w-full h-[50%] cursor-pointer"
-                onClick={() => handleImageChange(2)}
-              >
-                <Link to="">
-                  <img
-                    src={`${
-                      import.meta.env.VITE_PUBLIC_URL
-                    }/assets/images/banner-2.jpg`}
-                    alt=""
-                    className={`w-full h-full object-cover rounded-lg shadow-md transition-all duration-300 ${
-                      activeImage === 2 ? "opacity-80 scale-95" : ""
-                    } hover:opacity-90 hover:scale-105`}
-                  />
-                </Link>
-              </div>
-              <div
-                className="w-full h-[50%] cursor-pointer"
-                onClick={() => handleImageChange(3)}
-              >
-                <Link to="">
-                  <img
-                    src={`${
-                      import.meta.env.VITE_PUBLIC_URL
-                    }/assets/images/banner-3.jpg`}
-                    alt=""
-                    className={`w-full h-full object-cover rounded-lg shadow-md transition-all duration-300 ${
-                      activeImage === 3 ? "opacity-80 scale-95" : ""
-                    } hover:opacity-90 hover:scale-105`}
-                  />
-                </Link>
-              </div>
-            </div>
-          </div>
+  {/* Thumbnails - Shows image2 and image3 */}
+  <div className="flex-1 flex xl:flex-col xl:space-y-[20px] h-full">
+    {displayBanners[1] && (
+      <div
+        className="w-full h-[50%] cursor-pointer"
+        onClick={() => handleImageChange(1)} // Still allows changing active image
+      >
+        <Link to="">
+          <img
+            src={displayBanners[1].url}
+            alt={displayBanners[1].name}
+            className="w-full h-full object-cover rounded-lg shadow-md transition-all hover:opacity-90 hover:scale-105"
+          />
+        </Link>
+      </div>
+    )}
+    {displayBanners[2] && (
+      <div
+        className="w-full h-[50%] cursor-pointer"
+        onClick={() => handleImageChange(2)} // Still allows changing active image
+      >
+        <Link to="">
+          <img
+            src={displayBanners[2].url}
+            alt={displayBanners[2].name}
+            className="w-full h-full object-cover rounded-lg shadow-md transition-all hover:opacity-90 hover:scale-105"
+          />
+        </Link>
+      </div>
+    )}
+  </div>
+</div>
+          
 
-          {/* Services Section with Equal Sized Elements */}
-          <div
-            data-aos="fade-up"
-            className="best-services w-full bg-gray-100 flex flex-col space-y-8 lg:space-y-0 lg:flex-row lg:justify-between lg:items-center lg:h-[130px] px-10 py-8 rounded-lg shadow-md"
-          >
-            {/* Service 1 */}
-            <div className="item">
-              <div className="flex space-x-5 items-center">
-                <div>
-                  <span>
-                    <svg
-                      width="36"
-                      height="36"
-                      viewBox="0 0 36 36"
-                      fill="none"
-                      xmlns="http://www.w3.org/2000/svg"
-                    >
-                      <path
-                        d="M1 1H5.63636V24.1818H35"
-                        stroke="#6A0DAD"
-                        strokeWidth="2"
-                        strokeMiterlimit="10"
-                        strokeLinecap="square"
-                      />
-                      <path
-                        d="M8.72763 35.0002C10.4347 35.0002 11.8185 33.6163 11.8185 31.9093C11.8185 30.2022 10.4347 28.8184 8.72763 28.8184C7.02057 28.8184 5.63672 30.2022 5.63672 31.9093C5.63672 33.6163 7.02057 35.0002 8.72763 35.0002Z"
-                        stroke="#6A0DAD"
-                        strokeWidth="2"
-                        strokeMiterlimit="10"
-                        strokeLinecap="square"
-                      />
-                      <path
-                        d="M31.9073 35.0002C33.6144 35.0002 34.9982 33.6163 34.9982 31.9093C34.9982 30.2022 33.6144 28.8184 31.9073 28.8184C30.2003 28.8184 28.8164 30.2022 28.8164 31.9093C28.8164 33.6163 30.2003 35.0002 31.9073 35.0002Z"
-                        stroke="#6A0DAD"
-                        strokeWidth="2"
-                        strokeMiterlimit="10"
-                        strokeLinecap="square"
-                      />
-                      <path
-                        d="M34.9982 1H11.8164V18H34.9982V1Z"
-                        stroke="#6A0DAD"
-                        strokeWidth="2"
-                        strokeMiterlimit="10"
-                        strokeLinecap="square"
-                      />
-                      <path
-                        d="M11.8164 7.18164H34.9982"
-                        stroke="#6A0DAD"
-                        strokeWidth="2"
-                        strokeMiterlimit="10"
-                        strokeLinecap="square"
-                      />
-                    </svg>
-                  </span>
-                </div>
-                <div>
-                  <p className="text-black text-[16px] font-semibold tracking-wide mb-1">
-                    Free Shipping
-                  </p>
-                  <p className="text-sm text-qgray">When ordering over $100</p>
-                </div>
-              </div>
-            </div>
-
-            {/* Service 2 */}
-            <div className="item">
-              <div className="flex space-x-5 items-center">
-                <div>
-                  <span>
-                    <svg
-                      width="32"
-                      height="34"
-                      viewBox="0 0 32 34"
-                      fill="none"
-                      xmlns="http://www.w3.org/2000/svg"
-                    >
-                      <path
-                        d="M31 17.4502C31 25.7002 24.25 32.4502 16 32.4502C7.75 32.4502 1 25.7002 1 17.4502C1 9.2002 7.75 2.4502 16 2.4502C21.85 2.4502 26.95 5.7502 29.35 10.7002"
-                        stroke="#6A0DAD"
-                        strokeWidth="2"
-                        strokeMiterlimit="10"
-                      />
-                      <path
-                        d="M30.7 2L29.5 10.85L20.5 9.65"
-                        stroke="#6A0DAD"
-                        strokeWidth="2"
-                        strokeMiterlimit="10"
-                        strokeLinecap="square"
-                      />
-                    </svg>
-                  </span>
-                </div>
-                <div>
-                  <p className="text-black text-[16px] font-semibold tracking-wide mb-1">
-                    Free Return
-                  </p>
-                  <p className="text-sm text-qgray">
-                    Get Return within 30 days
-                  </p>
-                </div>
-              </div>
-            </div>
-
-            {/* Service 3 */}
-            <div className="item">
-              <div className="flex space-x-5 items-center">
-                <div>
-                  <span>
-                    <svg
-                      width="32"
-                      height="38"
-                      viewBox="0 0 32 38"
-                      fill="none"
-                      xmlns="http://www.w3.org/2000/svg"
-                    >
-                      <path
-                        d="M22.6654 18.667H9.33203V27.0003H22.6654V18.667Z"
-                        stroke="#6A0DAD"
-                        strokeWidth="2"
-                        strokeMiterlimit="10"
-                        strokeLinecap="square"
-                      />
-                      <path
-                        d="M12.668 18.6663V13.6663C12.668 11.833 14.168 10.333 16.0013 10.333C17.8346 10.333 19.3346 11.833 19.3346 13.6663V18.6663"
-                        stroke="#6A0DAD"
-                        strokeWidth="2"
-                        strokeMiterlimit="10"
-                        strokeLinecap="square"
-                      />
-                      <path
-                        d="M31 22C31 30.3333 24.3333 37 16 37C7.66667 37 1 30.3333 1 22V5.33333L16 2L31 5.33333V22Z"
-                        stroke="#6A0DAD"
-                        strokeWidth="2"
-                        strokeMiterlimit="10"
-                        strokeLinecap="square"
-                      />
-                    </svg>
-                  </span>
-                </div>
-                <div>
-                  <p className="text-black text-[16px] font-semibold tracking-wide mb-1">
-                    Secure Payment
-                  </p>
-                  <p className="text-sm text-qgray">
-                    100% Secure Online Payment
-                  </p>
-                </div>
-              </div>
-            </div>
-
-            {/* Service 4 */}
-            <div className="item">
-              <div className="flex space-x-5 items-center">
-                <div>
-                  <span>
-                    <svg
-                      width="32"
-                      height="35"
-                      viewBox="0 0 32 35"
-                      fill="none"
-                      xmlns="http://www.w3.org/2000/svg"
-                    >
-                      <path
-                        d="M7 13H5.5C2.95 13 1 11.05 1 8.5V1H7"
-                        stroke="#6A0DAD"
-                        strokeWidth="2"
-                        strokeMiterlimit="10"
-                      />
-                      <path
-                        d="M25 13H26.5C29.05 13 31 11.05 31 8.5V1H25"
-                        stroke="#6A0DAD"
-                        strokeWidth="2"
-                        strokeMiterlimit="10"
-                      />
-                      <path
-                        d="M16 28V22"
-                        stroke="#6A0DAD"
-                        strokeWidth="2"
-                        strokeMiterlimit="10"
-                      />
-                      <path
-                        d="M16 22C11.05 22 7 17.95 7 13V1H25V13C25 17.95 20.95 22 16 22Z"
-                        stroke="#6A0DAD"
-                        strokeWidth="2"
-                        strokeMiterlimit="10"
-                        strokeLinecap="square"
-                      />
-                      <path
-                        d="M25 34H7C7 30.7 9.7 28 13 28H19C22.3 28 25 30.7 25 34Z"
-                        stroke="#6A0DAD"
-                        strokeWidth="2"
-                        strokeMiterlimit="10"
-                        strokeLinecap="square"
-                      />
-                    </svg>
-                  </span>
-                </div>
-                <div>
-                  <p className="text-black text-[16px] font-semibold tracking-wide mb-1">
-                    Best Quality
-                  </p>
-                  <p className="text-sm text-qgray">
-                    Original Product Guarenteed
-                  </p>
-                </div>
-              </div>
-            </div>
-          </div>
+          {/* Services Section */}
+          {/* ... (keep your existing services section) ... */}
         </div>
       </div>
     </div>
